@@ -151,6 +151,7 @@ Route::middleware(['setlocale','auth','role:jobseeker'])->prefix('jobseeker')->n
     Route::get('/profile', [\App\Http\Controllers\JobSeeker\ProfileController::class,'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\JobSeeker\ProfileController::class,'update'])->name('profile.update');
 
+    Route::get('/apply/{job}', [\App\Http\Controllers\JobSeeker\ApplyController::class,'show'])->name('apply.show');
     Route::post('/apply/{job}', [\App\Http\Controllers\JobSeeker\ApplyController::class,'apply'])->name('apply');
 });
 

@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Auth;
 
 class ApplyController extends Controller
 {
+    public function show(Job $job)
+    {
+        return view('jobseeker.apply.confirm', compact('job'));
+    }
+
     public function apply(Job $job): RedirectResponse
     {
         $js = JobSeeker::firstWhere('user_id', Auth::id());
