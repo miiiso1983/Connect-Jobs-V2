@@ -20,11 +20,17 @@ class SendJobAlerts implements ShouldQueue
     public $tries = 3;
     public $backoff = [60, 300, 600];
 
-    public function __construct(public Job $job) {}
+    // Avoid conflict with InteractsWithQueue::$job
+    private Job $domainJob;
+
+    public function __construct(Job $domainJob)
+    {
+        $this->domainJob = $domainJob;
+    }
 
     public function handle(): void
     {
-        $job = $this->job->fresh('company');
+        $job = $this->domainJob->fresh('company');
         // Target seekers by province or speciality overlap
         $query = JobSeeker::query()
             ->with('user')
