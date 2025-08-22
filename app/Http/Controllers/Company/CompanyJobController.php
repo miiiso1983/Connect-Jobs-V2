@@ -22,6 +22,9 @@ class CompanyJobController extends Controller
     public function create(): View
     {
         $titles = MasterSetting::where('setting_type','job_title')->pluck('value');
+        if ($titles->isEmpty()) {
+            $titles = collect(['صيدلاني','صيدلاني مساعد','مندوب مبيعات طبية','فني مختبر','محاسب','سكرتير/ة']);
+        }
         $provinces = MasterSetting::where('setting_type','province')->pluck('value');
         if ($provinces->isEmpty()) {
             $provinces = collect([
@@ -29,6 +32,7 @@ class CompanyJobController extends Controller
             ]);
         }
         $specialities = MasterSetting::where('setting_type','speciality')->pluck('value');
+        if ($specialities->isEmpty()) { $specialities = collect(['صيدلة','طب','تمريض','مبيعات','محاسبة','إدارة']); }
         return view('company.jobs.create', compact('titles','provinces','specialities'));
     }
 
@@ -112,6 +116,9 @@ class CompanyJobController extends Controller
     {
         $this->authorize('manage', $job);
         $titles = MasterSetting::where('setting_type','job_title')->pluck('value');
+        if ($titles->isEmpty()) {
+            $titles = collect(['صيدلاني','صيدلاني مساعد','مندوب مبيعات طبية','فني مختبر','محاسب','سكرتير/ة']);
+        }
         $provinces = MasterSetting::where('setting_type','province')->pluck('value');
         if ($provinces->isEmpty()) {
             $provinces = collect([
@@ -119,6 +126,7 @@ class CompanyJobController extends Controller
             ]);
         }
         $specialities = MasterSetting::where('setting_type','speciality')->pluck('value');
+        if ($specialities->isEmpty()) { $specialities = collect(['صيدلة','طب','تمريض','مبيعات','محاسبة','إدارة']); }
         return view('company.jobs.edit', compact('job','titles','provinces','specialities'));
     }
 

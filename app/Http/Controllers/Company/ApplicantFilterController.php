@@ -25,8 +25,11 @@ class ApplicantFilterController extends Controller
 
         // Load master settings for dropdowns
         $titles = \App\Models\MasterSetting::where('setting_type','job_title')->pluck('value');
+        if ($titles->isEmpty()) { $titles = collect(['صيدلاني','صيدلاني مساعد','مندوب مبيعات طبية','فني مختبر','محاسب','سكرتير/ة']); }
         $provinces = \App\Models\MasterSetting::where('setting_type','province')->pluck('value');
+        if ($provinces->isEmpty()) { $provinces = collect(['بغداد','أربيل','البصرة','نينوى','النجف','كربلاء','الأنبار','ديالى','دهوك','السليمانية','صلاح الدين','كركوك','بابل','واسط','الديوانية','ميسان','المثنى','ذي قار']); }
         $specialities = \App\Models\MasterSetting::where('setting_type','speciality')->pluck('value');
+        if ($specialities->isEmpty()) { $specialities = collect(['صيدلة','طب','تمريض','مبيعات','محاسبة','إدارة']); }
 
         // Restrict to applicants who applied to this company's jobs only
         $companyId = auth()->user()->company?->id;
