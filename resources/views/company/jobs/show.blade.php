@@ -1,154 +1,313 @@
-<x-app-layout>
-<div x-data='{ prov: @js($stats["by_province"]), spec: @js($stats["by_speciality"]) }'></div>
-
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">تفاصيل الوظيفة</h2>
-            <div class="flex items-center gap-2">
-                <a href="{{ route('company.jobs.edit',$job) }}" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm">تعديل</a>
-                <form method="POST" action="{{ route('company.jobs.destroy',$job) }}" x-data="{open:false}">
-                    @csrf
-                    @method('DELETE')
-                    <button type="button" @click="open=true" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm">حذف</button>
-                    <x-confirm-modal title="تأكيد الحذف" message="هل أنت متأكد من حذف هذه الوظيفة؟ لا يمكن التراجع." />
-                </form>
+# إنشاء صفحة ترحيب جديدة وجذابة
+cat > resources/views/welcome.blade.php << 'EOF'
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connect Jobs - منصة الوظائف الرائدة</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- DaisyUI + Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="navbar bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto">
+            <div class="flex-1">
+                <a href="/" class="btn btn-ghost text-xl font-bold text-primary">
+                    <i class="fas fa-briefcase ml-2"></i>
+                    Connect Jobs
+                </a>
             </div>
-        </div>
-    </x-slot>
-
-    <div class="py-8 max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow md:col-span-2">
-                <div class="text-sm text-gray-500">العنوان</div>
-                <div class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ $job->title }}</div>
-                <div class="mt-4 text-sm text-gray-500">الوصف</div>
-                <div class="prose prose-sm dark:prose-invert max-w-none">{!! nl2br(e($job->description)) !!}</div>
-                @if($job->requirements)
-                    <div class="mt-4 text-sm text-gray-500">المتطلبات</div>
-                    <div class="prose prose-sm dark:prose-invert max-w-none">{!! nl2br(e($job->requirements)) !!}</div>
-                @endif
-                @if($job->jd_file)
-                    <div class="mt-4 text-sm text-gray-500">الوصف الوظيفي (ملف)</div>
-                    <a class="text-indigo-600" href="{{ Storage::url($job->jd_file) }}" target="_blank">عرض الملف</a>
-                @endif
-            </div>
-            <div class="space-y-4">
-                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow">
-                    <div class="text-sm text-gray-500">المحافظة</div>
-                    <div class="text-lg font-semibold">{{ $job->province }}</div>
-                    <div class="mt-3 text-sm text-gray-500">حالة النشر</div>
-                    <div><span class="px-2 py-1 rounded-full text-xs {{ $job->status==='open'?'bg-emerald-100 text-emerald-800':'bg-gray-100 text-gray-700' }}">{{ $job->status }}</span></div>
-                    <div class="mt-3 text-sm text-gray-500">موافقة الأدمن</div>
-                    <div><span class="px-2 py-1 rounded-full text-xs {{ $job->approved_by_admin ? 'bg-emerald-100 text-emerald-800':'bg-yellow-100 text-yellow-800' }}">{{ $job->approved_by_admin ? 'معتمدة' : 'بانتظار' }}</span></div>
-                </div>
-                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow">
-                    <div class="text-sm text-gray-500">عدد المتقدمين</div>
-                    <div class="text-2xl font-bold">{{ $job->applications_count }}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow">
-                <div class="p-4 font-semibold">آخر المتقدمين</div>
-                <div class="divide-y divide-gray-100 dark:divide-gray-700">
-                    @forelse($latestApplicants as $app)
-                        <div class="p-4 flex items-center justify-between">
-                            <div>
-                                <div class="font-semibold">{{ $app->jobSeeker->full_name ?? ('#'.$app->job_seeker_id) }}</div>
-                                <div class="text-xs text-gray-500">{{ $app->applied_at }}</div>
-                            </div>
-                            <div class="text-sm text-gray-600">مطابقة: {{ $app->matching_percentage }}%</div>
-                        </div>
-                    @empty
-                        <div class="p-4 text-gray-500">لا يوجد متقدمون حتى الآن</div>
-                    @endforelse
-                </div>
-            </div>
-
-            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow">
-                <div class="text-sm text-gray-500">متوسط نسبة المطابقة</div>
-                <div class="text-3xl font-bold">{{ number_format($stats['avg_match'],1) }}%</div>
-            </div>
-
-            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow">
-                <div class="text-sm text-gray-500">أعلى المحافظات</div>
-                <ul class="mt-2 space-y-1 text-sm">
-                    @foreach($stats['by_province'] as $row)
-                        <li class="flex items-center justify-between"><span>{{ $row->province ?: 'غير محدد' }}</span><span class="text-gray-500">{{ $row->c }}</span></li>
-                    @endforeach
-            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow md:col-span-3">
-                <div class="text-sm text-gray-500 mb-2">توزيع المحافظات (Top 5)</div>
-                <div class="space-y-2" x-data>
-                    <template x-for="row in prov" :key="row.province">
-                        <div class="flex items-center gap-3">
-                            <div class="w-28 text-xs text-gray-600" x-text="row.province || 'غير محدد'"></div>
-                            <div class="flex-1 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                                <div class="h-2 rounded-full bg-gradient-to-r from-sky-500 to-indigo-600" :style="`width: ${Math.min(100, (row.c / (prov[0]?.c||1)) * 100)}%`"></div>
-                            </div>
-                            <div class="w-10 text-xs text-gray-500" x-text="row.c"></div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow md:col-span-3">
-            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow md:col-span-3">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <div class="text-sm text-gray-500 mb-2">Pie المحافظات</div>
-                        <canvas id="pieProvince" height="160"></canvas>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500 mb-2">Pie التخصصات</div>
-                        <canvas id="pieSpec" height="160"></canvas>
-                    </div>
-                </div>
-                <script>
-                    document.addEventListener('alpine:init', () => {
-                        const prov = @json($stats['by_province']);
-                        const spec = @json($stats['by_speciality']);
-                        const ctx1 = document.getElementById('pieProvince');
-                        const ctx2 = document.getElementById('pieSpec');
-                        const labels1 = prov.map(r => r.province || 'غير محدد');
-                        const data1 = prov.map(r => r.c);
-                        const labels2 = spec.map(r => r.speciality || 'غير محدد');
-                        const data2 = spec.map(r => r.c);
-                        const colors1 = ['#0ea5e9','#6366f1','#06b6d4','#22d3ee','#38bdf8'];
-                        const colors2 = ['#10b981','#34d399','#059669','#16a34a','#4ade80'];
-                        if (ctx1) new Chart(ctx1, { type: 'pie', data: { labels: labels1, datasets: [{ data: data1, backgroundColor: colors1 }] }, options: { plugins: { legend: { position: 'bottom' }}}});
-                        if (ctx2) new Chart(ctx2, { type: 'pie', data: { labels: labels2, datasets: [{ data: data2, backgroundColor: colors2 }] }, options: { plugins: { legend: { position: 'bottom' }}}});
-                    });
-                </script>
-            </div>
-                <div class="text-sm text-gray-500 mb-2">توزيع التخصصات (Top 5)</div>
-                <div class="space-y-2" x-data>
-                    <template x-for="row in spec" :key="row.speciality">
-                        <div class="flex items-center gap-3">
-                            <div class="w-28 text-xs text-gray-600" x-text="row.speciality || 'غير محدد'"></div>
-                            <div class="flex-1 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                                <div class="h-2 rounded-full bg-gradient-to-r from-emerald-500 to-green-600" :style="`width: ${Math.min(100, (row.c / (spec[0]?.c||1)) * 100)}%`"></div>
-                            </div>
-                            <div class="w-10 text-xs text-gray-500" x-text="row.c"></div>
-                        </div>
-                    </template>
-                </div>
-            </div>
+            <div class="flex-none">
+                <ul class="menu menu-horizontal px-1">
+                    <li><a href="/jobs" class="font-medium">الوظائف</a></li>
+                    <li><a href="/companies" class="font-medium">الشركات</a></li>
+                    <li><a href="/login" class="btn btn-outline btn-primary btn-sm">تسجيل الدخول</a></li>
+                    <li><a href="/register" class="btn btn-primary btn-sm mr-2">إنشاء حساب</a></li>
                 </ul>
             </div>
+        </div>
+    </nav>
 
-            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow md:col-span-3">
-                <div class="text-sm text-gray-500">أعلى التخصصات</div>
-                <div class="mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
-                    @foreach($stats['by_speciality'] as $row)
-                        <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-700/40 rounded px-3 py-2">
-                            <span>{{ $row->speciality ?: 'غير محدد' }}</span>
-                            <span class="text-gray-500">{{ $row->c }}</span>
-                        </div>
-                    @endforeach
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                اعثر على وظيفة أحلامك
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90">
+                منصة الوظائف الرائدة التي تربط المواهب بأفضل الفرص
+            </p>
+            
+            <!-- Search Box -->
+            <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-2xl p-6">
+                <form class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <input type="text" placeholder="ابحث عن وظيفة..." 
+                               class="input input-bordered w-full text-gray-800 text-lg">
+                    </div>
+                    <div class="flex-1">
+                        <select class="select select-bordered w-full text-gray-800 text-lg">
+                            <option>اختر المدينة</option>
+                            <option>الرياض</option>
+                            <option>جدة</option>
+                            <option>الدمام</option>
+                            <option>مكة</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg px-8">
+                        <i class="fas fa-search ml-2"></i>
+                        بحث
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
+                <div class="text-center">
+                    <div class="text-4xl font-bold">1000+</div>
+                    <div class="text-lg opacity-80">وظيفة متاحة</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold">500+</div>
+                    <div class="text-lg opacity-80">شركة</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold">5000+</div>
+                    <div class="text-lg opacity-80">باحث عن عمل</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold">95%</div>
+                    <div class="text-lg opacity-80">معدل النجاح</div>
                 </div>
             </div>
         </div>
-    </div>
-</x-app-layout>
+    </section>
 
+    <!-- Features Section -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">لماذا Connect Jobs؟</h2>
+                <p class="text-xl text-gray-600">نحن نقدم أفضل تجربة للباحثين عن عمل والشركات</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="card bg-base-100 shadow-xl card-hover">
+                    <div class="card-body text-center">
+                        <div class="text-5xl text-primary mb-4">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="card-title justify-center text-2xl mb-4">بحث ذكي</h3>
+                        <p class="text-gray-600">
+                            نظام بحث متطور يساعدك في العثور على الوظائف المناسبة لمهاراتك وخبراتك
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="card bg-base-100 shadow-xl card-hover">
+                    <div class="card-body text-center">
+                        <div class="text-5xl text-primary mb-4">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3 class="card-title justify-center text-2xl mb-4">مطابقة دقيقة</h3>
+                        <p class="text-gray-600">
+                            نربط بين المواهب والشركات بناءً على التوافق في المهارات والمتطلبات
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="card bg-base-100 shadow-xl card-hover">
+                    <div class="card-body text-center">
+                        <div class="text-5xl text-primary mb-4">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h3 class="card-title justify-center text-2xl mb-4">نمو مهني</h3>
+                        <p class="text-gray-600">
+                            نساعدك في تطوير مسارك المهني من خلال فرص عمل متنوعة ونصائح مهنية
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Jobs Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">أحدث الوظائف</h2>
+                <p class="text-xl text-gray-600">اكتشف أحدث الفرص الوظيفية المتاحة</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Job Card 1 -->
+                <div class="card bg-white shadow-lg card-hover">
+                    <div class="card-body">
+                        <div class="flex items-center mb-4">
+                            <div class="avatar placeholder ml-4">
+                                <div class="bg-primary text-white rounded-full w-12">
+                                    <span class="text-xl">T</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">مطور ويب</h3>
+                                <p class="text-gray-600">شركة التقنية</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="badge badge-primary">دوام كامل</span>
+                            <span class="badge badge-outline">الرياض</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">نبحث عن مطور ويب محترف للانضمام لفريقنا...</p>
+                        <div class="card-actions justify-between items-center">
+                            <span class="text-primary font-bold">5000 - 8000 ريال</span>
+                            <button class="btn btn-primary btn-sm">تقدم الآن</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Job Card 2 -->
+                <div class="card bg-white shadow-lg card-hover">
+                    <div class="card-body">
+                        <div class="flex items-center mb-4">
+                            <div class="avatar placeholder ml-4">
+                                <div class="bg-secondary text-white rounded-full w-12">
+                                    <span class="text-xl">M</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">مصمم جرافيك</h3>
+                                <p class="text-gray-600">وكالة الإبداع</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="badge badge-secondary">دوام جزئي</span>
+                            <span class="badge badge-outline">جدة</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">مطلوب مصمم جرافيك مبدع للعمل على مشاريع متنوعة...</p>
+                        <div class="card-actions justify-between items-center">
+                            <span class="text-primary font-bold">3000 - 5000 ريال</span>
+                            <button class="btn btn-primary btn-sm">تقدم الآن</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Job Card 3 -->
+                <div class="card bg-white shadow-lg card-hover">
+                    <div class="card-body">
+                        <div class="flex items-center mb-4">
+                            <div class="avatar placeholder ml-4">
+                                <div class="bg-accent text-white rounded-full w-12">
+                                    <span class="text-xl">S</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">مختص تسويق</h3>
+                                <p class="text-gray-600">شركة النمو</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="badge badge-accent">دوام كامل</span>
+                            <span class="badge badge-outline">الدمام</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">نبحث عن مختص تسويق رقمي لتطوير استراتيجياتنا...</p>
+                        <div class="card-actions justify-between items-center">
+                            <span class="text-primary font-bold">6000 - 9000 ريال</span>
+                            <button class="btn btn-primary btn-sm">تقدم الآن</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="/jobs" class="btn btn-primary btn-lg">
+                    عرض جميع الوظائف
+                    <i class="fas fa-arrow-left mr-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold mb-6">ابدأ رحلتك المهنية اليوم</h2>
+            <p class="text-xl mb-8 opacity-90">
+                انضم إلى آلاف الباحثين عن عمل الذين وجدوا وظائف أحلامهم معنا
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/register?type=jobseeker" class="btn btn-white btn-lg">
+                    <i class="fas fa-user ml-2"></i>
+                    سجل كباحث عن عمل
+                </a>
+                <a href="/register?type=company" class="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-primary">
+                    <i class="fas fa-building ml-2"></i>
+                    سجل كشركة
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Connect Jobs</h3>
+                    <p class="text-gray-400">
+                        منصة الوظائف الرائدة التي تربط المواهب بأفضل الفرص في السوق
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">روابط سريعة</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/jobs" class="hover:text-white">الوظائف</a></li>
+                        <li><a href="/companies" class="hover:text-white">الشركات</a></li>
+                        <li><a href="/about" class="hover:text-white">من نحن</a></li>
+                        <li><a href="/contact" class="hover:text-white">اتصل بنا</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">للباحثين عن عمل</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/register" class="hover:text-white">إنشاء حساب</a></li>
+                        <li><a href="/jobs" class="hover:text-white">تصفح الوظائف</a></li>
+                        <li><a href="/profile" class="hover:text-white">الملف الشخصي</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">للشركات</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/register?type=company" class="hover:text-white">سجل شركتك</a></li>
+                        <li><a href="/post-job" class="hover:text-white">انشر وظيفة</a></li>
+                        <li><a href="/pricing" class="hover:text-white">الأسعار</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Connect Jobs. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+EOF
