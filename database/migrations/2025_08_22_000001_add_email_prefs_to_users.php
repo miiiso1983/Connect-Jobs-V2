@@ -18,7 +18,9 @@ return new class extends Migration {
                 $table->boolean('application_notifications_opt_in')->default(true)->after('job_alerts_opt_in');
             }
             if (!Schema::hasColumn('users','email_unsubscribe_token')) {
-                $table->string('email_unsubscribe_token',64)->nullable()->unique()->after('remember_token');
+                // place after remember_token if it exists, otherwise after password
+                $after = Schema::hasColumn('users','remember_token') ? 'remember_token' : 'password';
+                $table->string('email_unsubscribe_token',64)->nullable()->unique()->after($after);
             }
         });
     }
