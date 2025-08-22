@@ -13,7 +13,14 @@ class ApplyController extends Controller
 {
     public function show(Job $job)
     {
-        return view('jobseeker.apply.confirm', compact('job'));
+        $js = JobSeeker::firstWhere('user_id', Auth::id());
+        $alreadyApplied = false;
+        if ($js) {
+            $alreadyApplied = Application::where('job_id', $job->id)
+                ->where('job_seeker_id', $js->id)
+                ->exists();
+        }
+        return view('jobseeker.apply.confirm', compact('job','alreadyApplied'));
     }
 
     public function apply(Job $job): RedirectResponse

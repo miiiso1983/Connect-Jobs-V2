@@ -5,6 +5,11 @@
 
     <div class="py-8 max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+            @if(!empty($alreadyApplied))
+                <div class="mb-4 p-3 rounded-lg bg-amber-100 text-amber-900 border border-amber-200 text-sm">
+                    لقد تقدمت لهذه الوظيفة سابقاً. يمكنك إعادة التقديم لتحديث ملفك.
+                </div>
+            @endif
             <h3 class="text-lg font-semibold mb-2">{{ $job->title }}</h3>
             <div class="text-sm text-slate-600 dark:text-slate-300 space-y-1">
                 <div><strong>الوصف:</strong> {{ $job->description }}</div>
