@@ -18,7 +18,7 @@
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-base-200">
+        <div class="min-h-screen bg-gradient-to-br from-sky-50 via-indigo-50 to-fuchsia-50">
             @include('layouts.navigation')
 
             @if (session('status'))
@@ -29,7 +29,7 @@
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-base-100 border-b">
+                <header class="bg-white/70 backdrop-blur border-b">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
