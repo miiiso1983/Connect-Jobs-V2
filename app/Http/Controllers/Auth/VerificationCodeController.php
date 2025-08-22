@@ -38,10 +38,12 @@ class VerificationCodeController extends Controller
         ]);
 
         if ($request->channel==='email') {
-            // Send via email
-            Mail::raw("رمز التفعيل الخاص بك: {$code}", function($m) use ($user){
-                $m->to($user->email)->subject('رمز التفعيل');
-            });
+            // Send via email using HTML template
+            Mail::to([$user->email => $user->name])
+                ->queue(new \App\Mail\VerifyCodeMail([
+                    'name' => $user->name,
+                    'code' => $code,
+                ]));
         } else {
             $token = config('services.whatsapp.token');
             $phoneId = config('services.whatsapp.phone_id');
