@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
+    ->withEvents() // register core event provider & discovery so Registered listener runs
     ->withRouting(
 
         web: __DIR__.'/../routes/web.php',

@@ -70,7 +70,14 @@ class RegisteredUserController extends Controller
             ]);
         }
 
+        // Ensure email verification link is sent even if events aren't registered
+        $dispatcher = app('events');
+        if (is_object($dispatcher) && method_exists($dispatcher, 'hasListeners')
+            && ! $dispatcher->hasListeners(Registered::class)) {
+            $user->sendEmailVerificationNotification();
+        }
 
+        // Fire the Registered event (framework listener will send verification when events are enabled)
         event(new Registered($user));
 
         Auth::login($user);
