@@ -44,7 +44,7 @@ class CompanyJobController extends Controller
         if ($request->hasFile('jd_file')) {
             $path = $request->file('jd_file')->store('jd','public');
         }
-        Job::create([
+        $job = Job::create([
             'company_id' => $companyId,
             'title' => $request->title,
             'description' => $request->description,
@@ -56,7 +56,10 @@ class CompanyJobController extends Controller
             'jd_file' => $path,
         ]);
 
-        return redirect()->route('company.jobs.index')->with('status','تم إنشاء الوظيفة وستظهر بعد موافقة الإدارة.');
+        // Dispatch job alerts asynchronously
+        \App\Jobs\SendJobAlerts::dispatch($job);
+
+        return redirect()->route('company.jobs.index')->with('status','تم إنشاء الوظيفة وستظهر بعد موافقة الإدارة، وتم إرسال إخطار للباحثين المناسبين.');
     }
 
     public function togglePublish(Job $job): RedirectResponse

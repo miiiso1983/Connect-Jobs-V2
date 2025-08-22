@@ -40,7 +40,7 @@ class ApplyController extends Controller
         }
         $percentage = $total ? round(($score/$total)*100,2) : 0;
 
-        $app = Application::updateOrCreate(
+        $application = Application::updateOrCreate(
             ['job_id'=>$job->id,'job_seeker_id'=>$js->id],
             ['cv_file'=>$js->cv_file,'matching_percentage'=>$percentage]
         );
@@ -50,6 +50,20 @@ class ApplyController extends Controller
             title: __('notifications.application_submitted_title'),
             message: __('notifications.application_submitted_body', ['pct'=>$percentage])
         ));
+
+        // Email the company asynchronously
+        if ($job->company?->user?->email && optional($job->company->user)->application_notifications_opt_in !== false) {
+            \Mail::to([$job->company->user->email => $job->company->company_name ?? 'Company'])
+                ->queue(new \App\Mail\NewApplicationMail($application));
+            \DB::table('email_logs')->insert([
+                'mailable' => \App\Mail\NewApplicationMail::class,
+                'to_email' => $job->company->user->email,
+                'to_name' => $job->company->company_name ?? 'Company',
+                'payload' => json_encode(['application_id' => $application->id]),
+                'status' => 'queued',
+                'queued_at' => now(),
+            ]);
+        }
 
         return back()->with('status','تم التقديم. نسبة المطابقة: '.$percentage.'%');
     }
