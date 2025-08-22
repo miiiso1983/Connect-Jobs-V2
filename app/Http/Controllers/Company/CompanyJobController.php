@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Mail;
 
 class CompanyJobController extends Controller
 {
@@ -65,8 +66,20 @@ class CompanyJobController extends Controller
             'jd_file' => $path,
         ]);
 
-        // Dispatch job alerts asynchronously
+        // Dispatch job alerts asynchronously and notify admin for review
         \App\Jobs\SendJobAlerts::dispatch($job);
+        try {
+            $adminEmail = env('MASTER_ADMIN_EMAIL', 'mustafa@teamiapps.com');
+            Mail::to($adminEmail)->queue(new \App\Mail\JobPendingReviewMail($job));
+            \DB::table('email_logs')->insert([
+                'mailable' => \App\Mail\JobPendingReviewMail::class,
+                'to_email' => $adminEmail,
+                'to_name' => 'Master Admin',
+                'payload' => json_encode(['job_id' => $job->id]),
+                'status' => 'queued',
+                'queued_at' => now(),
+            ]);
+        } catch (\Throwable $e) { \Log::error('JobPendingReview mail failed: '.$e->getMessage()); }
 
         return redirect()->route('company.jobs.index')->with('status','تم إنشاء الوظيفة وستظهر بعد موافقة الإدارة، وتم إرسال إخطار للباحثين المناسبين.');
     }

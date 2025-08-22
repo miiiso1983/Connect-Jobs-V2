@@ -88,6 +88,7 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
     // Jobs approvals
     Route::get('/jobs/pending', [\App\Http\Controllers\Admin\JobAdminController::class, 'pending'])->name('jobs.pending');
     Route::post('/jobs/{job}/approve', [\App\Http\Controllers\Admin\JobAdminController::class, 'approve'])->name('jobs.approve');
+    Route::post('/jobs/{job}/reject', [\App\Http\Controllers\Admin\JobAdminController::class, 'reject'])->name('jobs.reject');
 
     // Master settings CRUD
     Route::get('/settings', [\App\Http\Controllers\Admin\MasterSettingController::class, 'index'])->name('settings.index');

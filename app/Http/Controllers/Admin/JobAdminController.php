@@ -20,5 +20,11 @@ class JobAdminController extends Controller
         $job->update(['approved_by_admin' => true, 'status' => 'open']);
         return back()->with('status','تمت الموافقة على الوظيفة.');
     }
+    public function reject(Job $job): RedirectResponse
+    {
+        $job->update(['approved_by_admin' => false, 'status' => 'closed']);
+        return back()->with('status','تم رفض الوظيفة وإغلاقها.');
+    }
+
 }
 
