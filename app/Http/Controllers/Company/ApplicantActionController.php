@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ApplicantActionController extends Controller
 {
@@ -13,8 +14,7 @@ class ApplicantActionController extends Controller
     {
         $request->validate(['action' => 'required|in:accept,reject,archive']);
 
-        // Ensure the application belongs to current company
-        $companyId = auth()->user()->company?->id;
+        $companyId = Auth::user()->company?->id;
         if (!$application->job || ($application->job->company_id ?? null) !== $companyId) {
             abort(403, 'Unauthorized');
         }
