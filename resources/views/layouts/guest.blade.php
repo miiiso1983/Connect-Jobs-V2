@@ -18,6 +18,19 @@
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
     <body class="font-sans antialiased">
+        <!-- Top Guest Header with Login/Register -->
+        <header class="w-full bg-white/80 backdrop-blur border-b">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+                <a href="/" class="flex items-center gap-2">
+                    <x-application-logo class="w-8 h-8 fill-current text-gray-700" />
+                    <span class="font-semibold text-gray-800">Connect Jobs</span>
+                </a>
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('login') }}" class="btn btn-ghost btn-sm">تسجيل الدخول</a>
+                    <a href="{{ route('register') }}" class="btn btn-primary btn-sm">إنشاء حساب</a>
+                </div>
+            </div>
+        </header>
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-base-200">
             <div>
                 <a href="/">
