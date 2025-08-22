@@ -1,0 +1,83 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
+use Illuminate\View\View;
+
+class RegisteredUserController extends Controller
+{
+    /**
+     * Display the registration view.
+     */
+    public function create(): View
+    {
+        return view('auth.register');
+    }
+
+    /**
+     * Handle an incoming registration request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => ['required', 'in:company,jobseeker'],
+            'scientific_office_name' => ['nullable','string','max:150'],
+            'company_job_title' => ['nullable','string','max:150'],
+            'mobile_number' => ['nullable','string','max:30'],
+        ]);
+
+        $role = $request->input('role');
+        // Companies need admin approval, jobseekers need code verification
+        $status = $role === 'company' ? 'inactive' : 'inactive';
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $role,
+            'status' => $status,
+        ]);
+        // Post-create: create related profile record
+        if ($role === 'company') {
+            \App\Models\Company::firstOrCreate(['user_id' => $user->id], [
+                'company_name' => $request->name,
+                'scientific_office_name' => $request->scientific_office_name,
+                'company_job_title' => $request->company_job_title,
+                'mobile_number' => $request->mobile_number,
+                'province' => 'N/A',
+                'industry' => 'N/A',
+                'subscription_plan' => 'free',
+                'status' => 'inactive',
+            ]);
+        } else {
+            \App\Models\JobSeeker::firstOrCreate(['user_id' => $user->id], [
+                'full_name' => $request->name,
+                'province' => 'N/A',
+                'profile_completed' => false,
+            ]);
+        }
+
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        if ($role === 'jobseeker') {
+            return redirect()->route('verify.code.show')->with('status','أرسلنا لك صفحة التفعيل، اختر القناة وأرسل الرمز.');
+        }
+        return redirect(route('dashboard', absolute: false));
+    }
+}
