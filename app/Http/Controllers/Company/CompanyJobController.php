@@ -23,6 +23,11 @@ class CompanyJobController extends Controller
     {
         $titles = MasterSetting::where('setting_type','job_title')->pluck('value');
         $provinces = MasterSetting::where('setting_type','province')->pluck('value');
+        if ($provinces->isEmpty()) {
+            $provinces = collect([
+                'بغداد','أربيل','البصرة','نينوى','النجف','كربلاء','الأنبار','ديالى','دهوك','السليمانية','صلاح الدين','كركوك','بابل','واسط','الديوانية','ميسان','المثنى','ذي قار'
+            ]);
+        }
         $specialities = MasterSetting::where('setting_type','speciality')->pluck('value');
         return view('company.jobs.create', compact('titles','provinces','specialities'));
     }
@@ -108,6 +113,11 @@ class CompanyJobController extends Controller
         $this->authorize('manage', $job);
         $titles = MasterSetting::where('setting_type','job_title')->pluck('value');
         $provinces = MasterSetting::where('setting_type','province')->pluck('value');
+        if ($provinces->isEmpty()) {
+            $provinces = collect([
+                'بغداد','أربيل','البصرة','نينوى','النجف','كربلاء','الأنبار','ديالى','دهوك','السليمانية','صلاح الدين','كركوك','بابل','واسط','الديوانية','ميسان','المثنى','ذي قار'
+            ]);
+        }
         $specialities = MasterSetting::where('setting_type','speciality')->pluck('value');
         return view('company.jobs.edit', compact('job','titles','provinces','specialities'));
     }
