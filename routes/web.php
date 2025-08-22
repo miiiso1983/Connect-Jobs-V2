@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 // Locale switcher
 Route::get('/locale/{locale}', function(string $locale){
@@ -26,6 +29,15 @@ Route::middleware(['setlocale'])->get('/', function () {
 
 // Public jobs
 Route::middleware('setlocale')->group(function(){
+// Optional: GET logout that redirects to POST logout for convenience in old links
+Route::middleware(['auth'])->get('/logout', function(){
+    // Prefer POST for Laravel's CSRF protection, but support legacy GET by logging out and redirecting
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/');
+})->name('logout.get');
+
     Route::get('/jobs', [\App\Http\Controllers\Public\JobPublicController::class,'index'])->name('jobs.index');
     Route::get('/jobs/{job}', [\App\Http\Controllers\Public\JobPublicController::class,'show'])->name('jobs.show');
 });
