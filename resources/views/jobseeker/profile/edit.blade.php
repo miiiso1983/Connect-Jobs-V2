@@ -42,6 +42,16 @@
                     </div>
                 </div>
             </div>
+            <div>
+                <x-input-label for="job_title" value="المسمى الوظيفي" />
+                <select id="job_title" name="job_title" class="block mt-1 w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700">
+                    <option value="">—</option>
+                    @foreach(($titles->sort() ?? collect()) as $t)
+                        <option value="{{ $t }}" @selected(old('job_title', $js->job_title ?? '')===$t)>{{ $t }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div x-data="{selected: @js(old('specialities', $js->specialities ?? [])), options: @js($specialities->sort()->values())}">
                 <x-input-label value="التخصصات" />
                 <div class="mt-2 max-h-48 overflow-y-auto rounded border border-gray-200 dark:border-gray-700 p-3 space-y-2">
