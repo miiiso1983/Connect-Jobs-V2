@@ -81,10 +81,10 @@
                     <a href="{{ route('locale.switch','ku') }}" class="text-sm {{ app()->getLocale()==='ku'?'font-bold':'' }}">KU</a>
                 </div>
                 <!-- Theme Switcher -->
-                <div x-data="{ t: localStorage.getItem('theme') || 'winter', init(){ document.documentElement.setAttribute('data-theme', this.t); }, toggle(){ this.t = this.t==='winter' ? 'business' : 'winter'; localStorage.setItem('theme', this.t); document.documentElement.setAttribute('data-theme', this.t); } }" class="ms-4 hidden sm:flex items-center">
+                <div x-data="{ t: localStorage.getItem('theme') || 'brand', init(){ document.documentElement.setAttribute('data-theme', this.t); }, toggle(){ this.t = this.t==='brand' ? 'brand-dark' : 'brand'; localStorage.setItem('theme', this.t); document.documentElement.setAttribute('data-theme', this.t); } }" class="ms-4 hidden sm:flex items-center">
                     <button @click="toggle()" class="btn btn-ghost btn-circle" aria-label="Toggle theme">
-                        <svg x-show="t==='winter'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.64 13A9 9 0 1111 2.36 7 7 0 0021.64 13z"/></svg>
-                        <svg x-show="t==='business'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.79 1.8-1.79zM1 13h3v-2H1v2zm10 9h2v-3h-2v3zM4.84 19.16l1.8-1.79-1.8-1.8-1.79 1.8 1.79 1.79zM20 13h3v-2h-3v2zm-8-9h2V1h-2v3zm7.24 1.84l1.79-1.79-1.79-1.8-1.8 1.8 1.8 1.79zM12 6a6 6 0 100 12 6 6 0 000-12z"/></svg>
+                        <svg x-show="t==='brand'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.64 13A9 9 0 1111 2.36 7 7 0 0021.64 13z"/></svg>
+                        <svg x-show="t==='brand-dark'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.79 1.8-1.79zM1 13h3v-2H1v2zm10 9h2v-3h-2v3zM4.84 19.16l1.8-1.79-1.8-1.8-1.79 1.8 1.79 1.79zM20 13h3v-2h-3v2zm-8-9h2V1h-2v3zm7.24 1.84l1.79-1.79-1.79-1.8-1.8 1.8 1.8 1.79zM12 6a6 6 0 100 12 6 6 0 000-12z"/></svg>
                     </button>
                 </div>
                 </div>
