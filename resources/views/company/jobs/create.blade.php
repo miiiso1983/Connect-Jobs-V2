@@ -36,14 +36,56 @@
                 </datalist>
                 <x-input-error :messages="$errors->get('title')" class="mt-1" />
             </div>
-                <div>
-                    <x-input-label for="specialities" value="التخصصات (اختر أكثر من واحد)" />
-                    <select id="specialities" name="specialities[]" multiple size="5" class="select select-bordered w-full">
-                        @foreach ($specialities as $s)
-                            <option value="{{ $s }}" @selected(collect(old('specialities', []))->contains($s))>{{ $s }}</option>
-                        @endforeach
-                    </select>
-                    <div class="text-xs text-gray-500 mt-1">يمكنك اختيار أكثر من تخصص بالضغط على Ctrl/⌘ أثناء التحديد.</div>
+                <div x-data="specialityPicker()" x-init="init(@js($specialities), @js(old('specialities', [])))">
+                    <x-input-label value="التخصصات" />
+                    <input type="text" x-model="q" placeholder="ابحث عن تخصص..." class="input input-bordered w-full mt-1 mb-2" />
+
+                    <div class="mt-2 border border-base-300 rounded-lg bg-base-50 max-h-48 overflow-y-auto relative">
+                        <!-- Empty State -->
+                        <div x-show="!filtered().length" class="p-4 text-center text-gray-500 text-sm">
+                            لا توجد تخصصات مطابقة
+                        </div>
+
+                        <!-- Specialities List -->
+                        <div x-show="filtered().length" class="p-3 space-y-1">
+                            <template x-for="sp in filtered()" :key="sp">
+                                <label class="flex items-center gap-3 p-2 hover:bg-base-100 rounded-md cursor-pointer transition-all duration-200 group">
+                                    <input type="checkbox" :value="sp" name="specialities[]" x-model="selected" class="checkbox checkbox-sm checkbox-primary">
+                                    <span x-text="sp" class="text-sm flex-1 group-hover:text-primary transition-colors"></span>
+                                    <svg x-show="selected.includes(sp)" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </label>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Selected Tags -->
+                    <div x-show="selected.length" class="mt-3">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-xs font-medium text-gray-600">التخصصات المختارة:</span>
+                            <span class="badge badge-ghost badge-xs" x-text="selected.length"></span>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="s in selected" :key="s">
+                                <span class="badge badge-primary badge-sm gap-1 hover:badge-error transition-colors group">
+                                    <span x-text="s"></span>
+                                    <button type="button" @click="remove(s)" class="hover:scale-110 transition-transform" title="إزالة">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </span>
+                            </template>
+                            <button type="button" @click="selected = []" x-show="selected.length > 1" class="badge badge-ghost badge-sm hover:badge-error transition-colors" title="مسح الكل">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                مسح الكل
+                            </button>
+                        </div>
+                    </div>
+
                     <x-input-error :messages="$errors->get('specialities')" class="mt-1" />
                 </div>
 
@@ -186,6 +228,35 @@ function districtPicker(){
 }
 </script>
 @endpush
+@push('scripts')
+<script>
+function specialityPicker(){
+  return {
+    items: [],
+    selected: [],
+    q: '',
+    loading: false,
+
+    init(all, initialSelected){
+      this.items = Array.isArray(all) ? [...all] : [];
+      this.selected = Array.isArray(initialSelected) ? [...initialSelected] : [];
+    },
+
+    filtered(){
+      const q = this.q.toLowerCase().trim();
+      if(!q) return this.items;
+      return this.items.filter(s => (s||'').toLowerCase().includes(q));
+    },
+
+    remove(sp){ this.selected = this.selected.filter(s => s !== sp); },
+    toggle(sp){
+      if(this.selected.includes(sp)) this.remove(sp); else this.selected.push(sp);
+    }
+  }
+}
+</script>
+@endpush
+
                 <x-input-label for="jd_file" value="ملف وصف الوظيفة (PDF/Word)" />
                 <input id="jd_file" name="jd_file" type="file" class="file-input file-input-bordered w-full mt-1" accept=".pdf,.doc,.docx" />
                 <div class="text-xs text-gray-500 mt-1">
@@ -210,6 +281,7 @@ function districtPicker(){
                     إلغاء
                 </a>
                     </div>
+
                 </form>
             </div>
         </div>
