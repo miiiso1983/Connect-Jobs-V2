@@ -1,11 +1,11 @@
 <x-guest-layout>
     <!-- Hero -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-sky-500 via-indigo-500 to-fuchsia-500 text-white py-20 w-full">
+    <section class="relative overflow-hidden bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white py-20 w-full">
         <div class="absolute -top-20 -left-20 h-72 w-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
         <div class="absolute -bottom-16 -right-24 h-80 w-80 bg-black/10 dark:bg-white/10 rounded-full blur-3xl animate-pulse"></div>
         <div class="relative max-w-6xl mx-auto px-4 text-center">
             <div class="flex items-center justify-center gap-3 mb-6">
-                <img src="/images/logo.svg" alt="Connect Jobs" class="h-12 w-auto">
+                <x-application-logo class="h-10 sm:h-12" />
                 <span class="font-bold tracking-wide text-2xl">Connect Jobs</span>
             </div>
             <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
@@ -19,14 +19,14 @@
             <form method="GET" action="/jobs" class="max-w-2xl mx-auto flex items-stretch gap-2 bg-white/10 backdrop-blur rounded-2xl p-2">
                 <label for="q" class="sr-only">ابحث عن وظيفة</label>
                 <input id="q" name="q" type="text" placeholder="ابحث عن مسمى وظيفي..." class="flex-1 rounded-xl bg-white/90 text-gray-800 placeholder-gray-500 px-4 py-2 focus:outline-none">
-                <button class="px-5 py-2 rounded-xl bg-white text-indigo-700 font-semibold hover:bg-gray-100 transition">
+                <button class="px-5 py-2 rounded-xl bg-gradient-to-r from-[#D2A85A] to-[#B7792A] text-[#0D2660] font-semibold hover:from-[#E7C66A] hover:to-[#C98936] transition">
                     ابحث
                 </button>
             </form>
 
             <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="/jobs" class="px-6 py-3 rounded-xl bg-white text-indigo-700 font-semibold hover:bg-gray-100 transition">تصفح الوظائف</a>
-                <a href="/register" class="px-6 py-3 rounded-xl border border-white/80 hover:bg-white hover:text-indigo-600 transition">إنشاء حساب</a>
+                <a href="/jobs" class="px-6 py-3 rounded-xl bg-gradient-to-r from-[#D2A85A] to-[#B7792A] text-[#0D2660] font-semibold hover:from-[#E7C66A] hover:to-[#C98936] transition">تصفح الوظائف</a>
+                <a href="/register" class="px-6 py-3 rounded-xl border border-[#D2A85A] text-[#E7C66A] hover:bg-[#E7C66A] hover:text-[#0D2660] transition">إنشاء حساب</a>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-14">
