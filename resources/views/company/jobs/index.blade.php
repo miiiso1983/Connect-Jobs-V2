@@ -32,12 +32,12 @@
                         <tr>
                             <td class="px-4 py-2">{{ $j->id }}</td>
                             <td class="px-4 py-2">
-                                <a href="{{ route('company.jobs.edit',$j) }}" class="text-indigo-600 hover:underline">{{ $j->title }}</a>
+                                <a href="{{ route('company.jobs.edit',$j) }}" class="text-primary hover:underline">{{ $j->title }}</a>
                             </td>
                             <td class="px-4 py-2">{{ $j->province }}</td>
                             <td class="px-4 py-2">
                                 @if($j->jd_file)
-                                    <a href="{{ Storage::url($j->jd_file) }}" class="text-indigo-600" target="_blank">عرض</a>
+                                    <a href="{{ Storage::url($j->jd_file) }}" class="text-primary" target="_blank">عرض</a>
                                 @else - @endif
                             </td>
                             <td class="px-4 py-2">

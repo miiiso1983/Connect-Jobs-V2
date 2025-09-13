@@ -1,4 +1,19 @@
 <x-guest-layout>
+    <div class="grid md:grid-cols-2 gap-6 items-stretch">
+        <div class="hidden md:flex rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] p-8 text-white">
+            <div class="my-auto space-y-4">
+                <x-application-logo class="h-12 w-auto" />
+                <h2 class="text-2xl font-bold">مرحباً بعودتك</h2>
+                <p class="text-white/80 text-sm">سجّل دخولك وتابع التقديم على الوظائف المناسبة لك.</p>
+                <ul class="text-white/80 text-sm space-y-2 list-disc pr-5">
+                    <li>تتبع طلباتك بسهولة</li>
+                    <li>احفظ الوظائف للرجوع لاحقاً</li>
+                    <li>احصل على تنبيهات الفرص الجديدة</li>
+                </ul>
+            </div>
+        </div>
+        <div>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -36,4 +51,7 @@
             </x-primary-button>
         </div>
     </form>
+        </div>
+    </div>
+
 </x-guest-layout>

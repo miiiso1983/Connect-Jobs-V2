@@ -37,7 +37,7 @@
                     </div>
                     <div class="mt-2 flex flex-wrap gap-2" x-show="selected.length">
                         <template x-for="s in selected" :key="s">
-                            <span class="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-xs" x-text="s"></span>
+                            <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs" x-text="s"></span>
                         </template>
                     </div>
                 </div>
@@ -131,7 +131,7 @@ function districtPicker(){
                 <x-input-label for="cv" value="السيرة الذاتية (PDF/Word)" />
                 <input id="cv" name="cv" type="file" class="mt-1 block w-full" accept=".pdf,.doc,.docx" />
                 @if(!empty($js->cv_file))
-                    <p class="text-sm mt-1">الملف الحالي: <a href="{{ Storage::url($js->cv_file) }}" class="text-indigo-600" target="_blank">عرض</a></p>
+                    <p class="text-sm mt-1">الملف الحالي: <a href="{{ Storage::url($js->cv_file) }}" class="text-primary" target="_blank">عرض</a></p>
                 @endif
             </div>
 

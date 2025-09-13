@@ -72,7 +72,16 @@ class JobPublicController extends Controller
     public function show(Job $job): View
     {
         abort_if(!$job->approved_by_admin || $job->status !== 'open', 404);
-        return view('public.jobs.show', compact('job'));
+
+        $isSaved = false;
+        if (Auth::check() && Auth::user()->role === 'jobseeker') {
+            $isSaved = DB::table('saved_jobs')
+                ->where('user_id', Auth::id())
+                ->where('job_id', $job->id)
+                ->exists();
+        }
+
+        return view('public.jobs.show', compact('job','isSaved'));
     }
 
     public function save(Job $job)

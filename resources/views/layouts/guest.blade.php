@@ -49,7 +49,7 @@
         <header class="w-full bg-white/80 backdrop-blur border-b">
             <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
                 <a href="/" class="flex items-center gap-2">
-                    <x-application-logo class="w-8 h-8 fill-current text-gray-700" />
+                    <x-application-logo class="h-10 w-auto" />
                     <span class="font-semibold text-gray-800">Connect Jobs</span>
                 </a>
                 <div class="flex items-center gap-2">
@@ -65,7 +65,7 @@
                 </a>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
+            <div class="w-full sm:max-w-6xl mt-6 px-0 py-0 bg-transparent shadow-none overflow-visible">
                 {{ $slot }}
             </div>
         </div>

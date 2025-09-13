@@ -45,7 +45,7 @@
         <script>(function(){var t=localStorage.getItem('theme')||'brand';document.documentElement.setAttribute('data-theme',t);})();</script>
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gradient-to-br from-sky-50 via-indigo-50 to-fuchsia-50">
+        <div class="min-h-screen bg-base-200">
             @include('layouts.navigation')
 
             @if (session('status'))
