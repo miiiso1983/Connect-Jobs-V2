@@ -1,30 +1,45 @@
 <x-guest-layout>
     <!-- Hero -->
-    <section class="bg-gradient-to-br from-sky-500 via-indigo-500 to-fuchsia-500 text-white py-20 w-full">
-        <div class="max-w-6xl mx-auto px-4 text-center">
+    <section class="relative overflow-hidden bg-gradient-to-br from-sky-500 via-indigo-500 to-fuchsia-500 text-white py-20 w-full">
+        <div class="absolute -top-20 -left-20 h-72 w-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute -bottom-16 -right-24 h-80 w-80 bg-black/10 dark:bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="relative max-w-6xl mx-auto px-4 text-center">
             <div class="flex items-center justify-center gap-3 mb-6">
                 <img src="/images/logo.svg" alt="Connect Jobs" class="h-12 w-auto">
                 <span class="font-bold tracking-wide text-2xl">Connect Jobs</span>
             </div>
-            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">منصة وظائف تربطك بأفضل الفرص</h1>
-            <p class="text-lg md:text-xl/relaxed opacity-95 mb-10">انطلق في مسيرتك المهنية أو اعثر على الكفاءات المناسبة لشركتك</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
+                منصة وظائف تربطك بأفضل الفرص
+            </h1>
+            <p class="text-lg md:text-xl/relaxed opacity-95 mb-8">
+                انطلق في مسيرتك المهنية أو اعثر على الكفاءات المناسبة لشركتك
+            </p>
 
-            <div class="mt-1 flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="/jobs" class="btn btn-primary btn-lg">تصفح الوظائف</a>
-                <a href="/register" class="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-indigo-600">إنشاء حساب</a>
+            <!-- Quick Search -->
+            <form method="GET" action="/jobs" class="max-w-2xl mx-auto flex items-stretch gap-2 bg-white/10 backdrop-blur rounded-2xl p-2">
+                <label for="q" class="sr-only">ابحث عن وظيفة</label>
+                <input id="q" name="q" type="text" placeholder="ابحث عن مسمى وظيفي..." class="flex-1 rounded-xl bg-white/90 text-gray-800 placeholder-gray-500 px-4 py-2 focus:outline-none">
+                <button class="px-5 py-2 rounded-xl bg-white text-indigo-700 font-semibold hover:bg-gray-100 transition">
+                    ابحث
+                </button>
+            </form>
+
+            <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="/jobs" class="px-6 py-3 rounded-xl bg-white text-indigo-700 font-semibold hover:bg-gray-100 transition">تصفح الوظائف</a>
+                <a href="/register" class="px-6 py-3 rounded-xl border border-white/80 hover:bg-white hover:text-indigo-600 transition">إنشاء حساب</a>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-14">
                 <div class="text-center">
-                    <div class="text-4xl font-extrabold">1000+</div>
+                    <div class="text-4xl font-extrabold">{{ ($jobsCount ?? 0) > 0 ? number_format($jobsCount) : '1000+' }}</div>
                     <div class="opacity-90">وظيفة متاحة</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl font-extrabold">500+</div>
+                    <div class="text-4xl font-extrabold">{{ ($companiesCount ?? 0) > 0 ? number_format($companiesCount) : '500+' }}</div>
                     <div class="opacity-90">شركة</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl font-extrabold">5000+</div>
+                    <div class="text-4xl font-extrabold">{{ ($seekersCount ?? 0) > 0 ? number_format($seekersCount) : '5000+' }}</div>
                     <div class="opacity-90">باحث عن عمل</div>
                 </div>
                 <div class="text-center">
@@ -74,8 +89,8 @@
             <h2 class="text-3xl md:text-4xl font-extrabold mb-4">ابدأ رحلتك اليوم</h2>
             <p class="opacity-95 mb-6">انضم إلى آلاف المستخدمين الذين وجدوا فرصهم عبر Connect Jobs</p>
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="/register?type=jobseeker" class="btn btn-white">سجل كباحث عن عمل</a>
-                <a href="/register?type=company" class="btn btn-outline text-white border-white hover:bg-white hover:text-indigo-600">سجل كشركة</a>
+                <a href="/register?type=jobseeker" class="px-6 py-3 rounded-xl bg-white text-indigo-700 font-semibold hover:bg-gray-100 transition">سجل كباحث عن عمل</a>
+                <a href="/register?type=company" class="px-6 py-3 rounded-xl border border-white/80 hover:bg-white hover:text-indigo-600 transition">سجل كشركة</a>
             </div>
         </div>
     </section>

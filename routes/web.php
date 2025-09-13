@@ -24,7 +24,10 @@ Route::middleware(['setlocale'])->get('/', function () {
         };
         return redirect()->route($dest);
     }
-    return view('landing');
+    $jobsCount = \App\Models\Job::where('approved_by_admin', true)->where('status','open')->count();
+    $companiesCount = \App\Models\Company::count();
+    $seekersCount = \App\Models\JobSeeker::count();
+    return view('landing', compact('jobsCount','companiesCount','seekersCount'));
 });
 
 // Public jobs
