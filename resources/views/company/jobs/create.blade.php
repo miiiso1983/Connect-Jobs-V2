@@ -36,6 +36,17 @@
                 </datalist>
                 <x-input-error :messages="$errors->get('title')" class="mt-1" />
             </div>
+                <div>
+                    <x-input-label for="speciality" value="التخصص" />
+                    <input list="specialities" id="speciality" name="speciality" value="{{ old('speciality') }}" class="input input-bordered w-full" placeholder="اختر أو اكتب التخصص" />
+                    <datalist id="specialities">
+                        @foreach ($specialities as $s)
+                            <option value="{{ $s }}" />
+                        @endforeach
+                    </datalist>
+                    <x-input-error :messages="$errors->get('speciality')" class="mt-1" />
+                </div>
+
             <div x-data="districtPicker()" x-init="init('{{ old('province') }}', @js(old('districts', [])))">
                 <x-input-label for="province" value="المحافظة" />
                 <select id="province" name="province" @change="load()" class="select select-bordered w-full">
