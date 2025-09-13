@@ -4,7 +4,7 @@
             <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6">الوظائف المتاحة</h1>
 
             <!-- Filters Bar -->
-            <form method="GET" action="{{ route('jobs.index') }}" class="bg-white dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 md:p-6 shadow mb-6">
+            <form id="jobs-filter-form" method="GET" action="{{ route('jobs.index') }}" class="bg-white dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 md:p-6 shadow mb-6">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div class="md:col-span-2">
                         <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">ابحث</label>
@@ -27,22 +27,62 @@
                         </select>
                     </div>
                 </div>
+                <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">القطاع/الصناعة</label>
+                        <select name="industry" class="w-full rounded-xl border-gray-300 dark:bg-gray-900 dark:border-gray-700">
+                            <option value="">الكل</option>
+                            @foreach(($industries ?? collect()) as $ind)
+                                <option value="{{ $ind }}" @selected(($industry ?? '')===$ind)>{{ $ind }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">المسمى الوظيفي</label>
+                        <select name="job_title" class="w-full rounded-xl border-gray-300 dark:bg-gray-900 dark:border-gray-700">
+                            <option value="">الكل</option>
+                            @foreach(($jobTitles ?? collect())->sort() as $t)
+                                <option value="{{ $t }}" @selected(($jobTitleFilter ?? '')===$t)>{{ $t }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
                 <div class="mt-4 flex gap-3">
                     <button class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white">تطبيق</button>
                     <a href="{{ route('jobs.index') }}" class="px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">إعادة ضبط</a>
                 </div>
             </form>
 
+            <!-- Skeleton (shown on navigation) -->
+            <div id="jobs-skeleton" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                @for($i=0;$i<6;$i++)
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow animate-pulse">
+                    <div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    <div class="mt-2 h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    <div class="mt-4 space-y-2">
+                        <div class="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+                        <div class="h-3 w-5/6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                        <div class="h-3 w-2/3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    </div>
+                </div>
+                @endfor
+            </div>
+
             <!-- Jobs Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div id="jobs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 @forelse($jobs as $job)
-                    <a href="{{ route('jobs.show',$job) }}" class="group block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow hover:shadow-lg transition relative overflow-hidden">
+                    <div class="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow hover:shadow-lg transition relative overflow-hidden">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <div class="text-base text-indigo-600 font-semibold group-hover:underline">{{ $job->title }}</div>
-                                <div class="text-xs text-gray-500">{{ optional($job->company)->company_name ?? '—' }}</div>
+                                <a href="{{ route('jobs.show',$job) }}" class="text-base text-indigo-600 font-semibold hover:underline">{{ $job->title }}</a>
+                                <div class="text-xs text-gray-500">{{ optional($job->company)->company_name ?? '—' }} @if(optional($job->company)->industry) · {{ optional($job->company)->industry }} @endif</div>
                             </div>
-                            <span class="px-2 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700">{{ $job->province }}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700">{{ $job->province }}</span>
+                                @if(!empty($job->created_at) && now()->diffInHours($job->created_at) <= 72)
+                                    <span class="px-2 py-1 rounded-full text-xs bg-pink-50 text-pink-700">جديد</span>
+                                @endif
+                            </div>
                         </div>
                         <div class="mt-3 text-sm text-gray-700 dark:text-gray-300 line-clamp-3">{{ $job->description }}</div>
                         @if(!empty($job->districts))
@@ -52,16 +92,45 @@
                                 @endforeach
                             </div>
                         @endif
-                        <div class="mt-4 text-[11px] text-gray-500">#{{ $job->id }}</div>
-                    </a>
+                        <div class="mt-4 flex items-center justify-between text-[12px] text-gray-500">
+                            <div>المتقدمون: <strong>{{ $job->applications_count ?? 0 }}</strong></div>
+                            @auth
+                                @if(auth()->user()->role==='jobseeker')
+                                    @php $isSaved = in_array($job->id, $savedIds ?? []); @endphp
+                                    <form method="POST" action="{{ $isSaved ? route('jobs.unsave',$job) : route('jobs.save',$job) }}">
+                                        @csrf
+                                        @if($isSaved)
+                                            @method('DELETE')
+                                        @endif
+                                        <button class="text-indigo-600 hover:text-indigo-800" type="submit">{{ $isSaved ? 'إلغاء الحفظ' : 'حفظ لاحقاً' }}</button>
+                                    </form>
+                                @endif
+                            @endauth
+                        </div>
+                        <div class="mt-1 text-[11px] text-gray-500">#{{ $job->id }}</div>
+                    </div>
                 @empty
                     <div class="col-span-full text-center text-gray-500">لا توجد وظائف متاحة حالياً.</div>
                 @endforelse
             </div>
 
             <!-- Pagination -->
-            <div class="mt-8">{{ $jobs->links() }}</div>
+            <div id="jobs-pagination" class="mt-8">{{ $jobs->links() }}</div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+    (function(){
+      const form = document.getElementById('jobs-filter-form');
+      const grid = document.getElementById('jobs-grid');
+      const skel = document.getElementById('jobs-skeleton');
+      const pag = document.getElementById('jobs-pagination');
+      function showSkeleton(){ if(skel){ skel.classList.remove('hidden'); } if(grid){ grid.classList.add('opacity-30','pointer-events-none'); } }
+      if(form){ form.addEventListener('submit', function(){ showSkeleton(); }); }
+      if(pag){ pag.addEventListener('click', function(e){ const t = e.target.closest('a'); if(t){ showSkeleton(); } }, true); }
+    })();
+    </script>
+    @endpush
 </x-guest-layout>
 

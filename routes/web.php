@@ -42,6 +42,13 @@ Route::middleware(['auth'])->get('/logout', function(){
     Route::get('/jobs/{job}', [\App\Http\Controllers\Public\JobPublicController::class,'show'])->name('jobs.show');
 });
 
+    // Save/Unsave jobs (jobseeker only)
+    Route::middleware(['auth','role:jobseeker'])->group(function(){
+        Route::post('/jobs/{job}/save', [\App\Http\Controllers\Public\JobPublicController::class,'save'])->name('jobs.save');
+        Route::delete('/jobs/{job}/save', [\App\Http\Controllers\Public\JobPublicController::class,'unsave'])->name('jobs.unsave');
+    });
+
+
 // Generic dashboard redirects to role dashboards
 Route::get('/dashboard', function () {
     $user = auth()->user();
