@@ -7,12 +7,14 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('districts', function (Blueprint $table) {
-            $table->id();
-            $table->string('province', 100);
-            $table->string('name', 150);
-            $table->unique(['province','name'], 'districts_province_name_unique');
-        });
+        if (! Schema::hasTable('districts')) {
+            Schema::create('districts', function (Blueprint $table) {
+                $table->id();
+                $table->string('province', 100);
+                $table->string('name', 150);
+                $table->unique(['province','name'], 'districts_province_name_unique');
+            });
+        }
 
         Schema::table('job_seekers', function (Blueprint $table) {
             if (!Schema::hasColumn('job_seekers','districts')) {
