@@ -37,14 +37,14 @@
                 <x-input-error :messages="$errors->get('title')" class="mt-1" />
             </div>
                 <div>
-                    <x-input-label for="speciality" value="التخصص" />
-                    <input list="specialities" id="speciality" name="speciality" value="{{ old('speciality') }}" class="input input-bordered w-full" placeholder="اختر أو اكتب التخصص" />
-                    <datalist id="specialities">
+                    <x-input-label for="specialities" value="التخصصات (اختر أكثر من واحد)" />
+                    <select id="specialities" name="specialities[]" multiple size="5" class="select select-bordered w-full">
                         @foreach ($specialities as $s)
-                            <option value="{{ $s }}" />
+                            <option value="{{ $s }}" @selected(collect(old('specialities', []))->contains($s))>{{ $s }}</option>
                         @endforeach
-                    </datalist>
-                    <x-input-error :messages="$errors->get('speciality')" class="mt-1" />
+                    </select>
+                    <div class="text-xs text-gray-500 mt-1">يمكنك اختيار أكثر من تخصص بالضغط على Ctrl/⌘ أثناء التحديد.</div>
+                    <x-input-error :messages="$errors->get('specialities')" class="mt-1" />
                 </div>
 
             <div x-data="districtPicker()" x-init="init('{{ old('province') }}', @js(old('districts', [])))">

@@ -12,11 +12,12 @@ class Job extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'company_id','title','speciality','description','requirements','province','districts','status','approved_by_admin','jd_file'
+        'company_id','title','speciality','specialities','description','requirements','province','districts','status','approved_by_admin','jd_file'
     ];
 
     protected $casts = [
         'districts' => 'array',
+        'specialities' => 'array',
     ];
 
     public function company(){ return $this->belongsTo(Company::class); }

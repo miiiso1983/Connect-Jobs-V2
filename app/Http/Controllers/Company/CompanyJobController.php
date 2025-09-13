@@ -47,7 +47,8 @@ class CompanyJobController extends Controller
             'districts' => 'nullable|array',
             'districts.*' => 'string|max:150',
             'jd_file' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
-            'speciality' => 'nullable|string|max:150',
+            'specialities' => 'nullable|array',
+            'specialities.*' => 'string|max:150',
         ]);
 
         $companyId = Auth::user()->company?->id;
@@ -65,7 +66,7 @@ class CompanyJobController extends Controller
             'status' => 'draft',
             'approved_by_admin' => false,
             'jd_file' => $path,
-            'speciality' => $request->speciality,
+            'specialities' => $request->input('specialities', []),
         ]);
 
         // Dispatch job alerts asynchronously and notify admin for review
