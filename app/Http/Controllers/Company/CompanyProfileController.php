@@ -11,13 +11,30 @@ class CompanyProfileController extends Controller
 {
     public function edit()
     {
-        $company = Auth::user()->company;
+        $user = Auth::user();
+        $company = $user->company;
+        if (!$company) {
+            // Create a minimal company profile so the page works seamlessly
+            $company = \App\Models\Company::create([
+                'user_id' => $user->id,
+                'company_name' => $user->name ?? 'شركة',
+                'status' => $user->status ?? 'active',
+            ]);
+        }
         return view('company.profile.edit', compact('company'));
     }
 
     public function update(Request $request): RedirectResponse
     {
-        $company = Auth::user()->company;
+        $user = Auth::user();
+        $company = $user->company;
+        if (!$company) {
+            $company = \App\Models\Company::create([
+                'user_id' => $user->id,
+                'company_name' => $user->name ?? 'شركة',
+                'status' => $user->status ?? 'active',
+            ]);
+        }
 
         $request->validate([
             'profile_image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048|dimensions:min_width=100,min_height=100,max_width=4000,max_height=4000',
