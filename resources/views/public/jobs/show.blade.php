@@ -7,10 +7,10 @@
     </x-slot>
 
     <div class="py-8 max-w-3xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded shadow space-y-3">
+        <div class="card bg-base-100 p-6 shadow space-y-3">
             <h1 class="text-2xl font-bold">{{ $job->title }}</h1>
-            <div class="text-gray-600">{{ $job->province }}</div>
-            <div class="prose dark:prose-invert max-w-none">
+            <div class="text-base-content/60">{{ $job->province }}</div>
+            <div class="prose max-w-none">
                 <h3>الوصف</h3>
                 <p>{{ $job->description }}</p>
                 @if($job->requirements)

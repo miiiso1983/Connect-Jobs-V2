@@ -69,10 +69,10 @@ function districtPicker(){
 </script>
 @endpush
                 <x-input-label for="jd_file" value="Job Description (PDF/Doc)" />
-                <input id="jd_file" name="jd_file" type="file" class="mt-1 block w-full text-sm" accept=".pdf,.doc,.docx" />
+                <input id="jd_file" name="jd_file" type="file" class="file-input file-input-bordered w-full mt-1" accept=".pdf,.doc,.docx" />
                 @if($job->jd_file)
                     <div class="text-xs mt-1">
-                        الملف الحالي: <a class="text-indigo-600" target="_blank" href="{{ Storage::url($job->jd_file) }}">عرض</a>
+                        الملف الحالي: <a class="text-primary" target="_blank" href="{{ Storage::url($job->jd_file) }}">عرض</a>
                     </div>
                 @endif
             </div>
@@ -82,7 +82,7 @@ function districtPicker(){
                 <form method="POST" action="{{ route('company.jobs.destroy',$job) }}" x-data="{open:false}">
                     @csrf
                     @method('DELETE')
-                    <button type="button" @click="open=true" class="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white">حذف</button>
+                    <button type="button" @click="open=true" class="btn btn-error">حذف</button>
                     <x-confirm-modal title="تأكيد الحذف" message="هل أنت متأكد من حذف هذه الوظيفة؟ لا يمكن التراجع." />
                 </form>
             </div>

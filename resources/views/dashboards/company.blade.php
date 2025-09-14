@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl text-base-content leading-tight">
             لوحة تحكم الشركة
         </h2>
     </x-slot>
@@ -25,51 +25,51 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow">
-                    <div class="text-sm text-gray-500">وظائف منشورة</div>
-                    <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-gray-100">{{ $kpis['published'] ?? 0 }}</div>
+                <div class="p-6 bg-base-100 rounded-xl shadow">
+                    <div class="text-sm text-base-content/60">وظائف منشورة</div>
+                    <div class="mt-2 text-3xl font-bold text-base-content">{{ $kpis['published'] ?? 0 }}</div>
                 </div>
-                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow">
-                    <div class="text-sm text-gray-500">وظائف بانتظار موافقة</div>
-                    <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-gray-100">{{ $kpis['pending'] ?? 0 }}</div>
+                <div class="p-6 bg-base-100 rounded-xl shadow">
+                    <div class="text-sm text-base-content/60">وظائف بانتظار موافقة</div>
+                    <div class="mt-2 text-3xl font-bold text-base-content">{{ $kpis['pending'] ?? 0 }}</div>
                 </div>
-                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow">
-                    <div class="text-sm text-gray-500">متقدمون هذا الأسبوع</div>
-                    <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-gray-100">{{ $kpis['apps_week'] ?? 0 }}</div>
+                <div class="p-6 bg-base-100 rounded-xl shadow">
+                    <div class="text-sm text-base-content/60">متقدمون هذا الأسبوع</div>
+                    <div class="mt-2 text-3xl font-bold text-base-content">{{ $kpis['apps_week'] ?? 0 }}</div>
                 </div>
-                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow">
-                    <div class="text-sm text-gray-500">متوسط المطابقة</div>
-                    <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-gray-100">{{ $kpis['avg_match'] ?? 0 }}%</div>
+                <div class="p-6 bg-base-100 rounded-xl shadow">
+                    <div class="text-sm text-base-content/60">متوسط المطابقة</div>
+                    <div class="mt-2 text-3xl font-bold text-base-content">{{ $kpis['avg_match'] ?? 0 }}%</div>
                 </div>
             </div>
         </div>
     </div>
-            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow" x-data='{ prov: @js($charts["by_province"]), spec: @js($charts["by_speciality"]) }'>
+            <div class="p-6 bg-base-100 rounded-xl shadow" x-data='{ prov: @js($charts["by_province"]), spec: @js($charts["by_speciality"]) }'>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <div class="text-sm text-gray-500 mb-2">أعلى المحافظات</div>
+                        <div class="text-sm text-base-content/60 mb-2">أعلى المحافظات</div>
                         <div class="space-y-2">
                             <template x-for="row in prov" :key="row.province">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-28 text-xs text-gray-600" x-text="row.province || 'غير محدد'"></div>
-                                    <div class="flex-1 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                                    <div class="w-28 text-xs text-base-content/70" x-text="row.province || 'غير محدد'"></div>
+                                    <div class="flex-1 h-2 rounded-full bg-base-200">
                                         <div class="h-2 rounded-full bg-gradient-to-r from-[#0D2660] to-[#102E66]" :style="`width: ${Math.min(100, (row.c / (prov[0]?.c||1)) * 100)}%`"></div>
                                     </div>
-                                    <div class="w-10 text-xs text-gray-500" x-text="row.c"></div>
+                                    <div class="w-10 text-xs text-base-content/60" x-text="row.c"></div>
                                 </div>
                             </template>
                         </div>
                     </div>
                     <div>
-                        <div class="text-sm text-gray-500 mb-2">أعلى التخصصات</div>
+                        <div class="text-sm text-base-content/60 mb-2">أعلى التخصصات</div>
                         <div class="space-y-2">
                             <template x-for="row in spec" :key="row.speciality">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-28 text-xs text-gray-600" x-text="row.speciality || 'غير محدد'"></div>
-                                    <div class="flex-1 h-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                                    <div class="w-28 text-xs text-base-content/70" x-text="row.speciality || 'غير محدد'"></div>
+                                    <div class="flex-1 h-2 rounded-full bg-base-200">
                                         <div class="h-2 rounded-full bg-gradient-to-r from-[#D2A85A] to-[#B7792A]" :style="`width: ${Math.min(100, (row.c / (spec[0]?.c||1)) * 100)}%`"></div>
                                     </div>
-                                    <div class="w-10 text-xs text-gray-500" x-text="row.c"></div>
+                                    <div class="w-10 text-xs text-base-content/60" x-text="row.c"></div>
                                 </div>
                             </template>
                         </div>

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">وظائف الشركة</h2>
+        <h2 class="font-semibold text-xl text-base-content leading-tight">وظائف الشركة</h2>
     </x-slot>
 
     <div class="py-8 max-w-6xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -10,11 +10,11 @@
 
         <div class="flex flex-wrap gap-3">
             <a href="{{ route('company.jobs.create') }}" class="btn btn-primary">وظيفة جديدة</a>
-            <a href="{{ route('company.applicants.index') }}" class="btn">فلترة المتقدمين</a>
+            <a href="{{ route('company.applicants.index') }}" class="btn btn-secondary">فلترة المتقدمين</a>
         </div>
 
         <div class="overflow-x-auto card bg-base-100 shadow">
-            <table class="table">
+            <table class="table table-zebra">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -27,7 +27,7 @@
                         <th>إجراءات</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                <tbody>
                     @foreach ($jobs as $j)
                         <tr>
                             <td class="px-4 py-2">{{ $j->id }}</td>
@@ -51,8 +51,11 @@
                             </td>
                             <td class="px-4 py-2"><span class="badge {{ $j->status==='open' ? 'badge-success':'badge-ghost' }}">{{ $j->status }}</span></td>
                             <td class="px-4 py-2">
+                                <span class="badge {{ $j->approved_by_admin ? 'badge-primary' : 'badge-ghost' }}">{{ $j->approved_by_admin ? 'مقبول' : 'بانتظار' }}</span>
+                            </td>
+                            <td class="px-4 py-2">
                                 <div class="flex flex-wrap gap-2">
-                                    <a href="{{ route('company.jobs.show',$j) }}" class="btn btn-xs">تفاصيل</a>
+                                    <a href="{{ route('company.jobs.show',$j) }}" class="btn btn-xs btn-ghost">تفاصيل</a>
                                     <a href="{{ route('company.jobs.edit',$j) }}" class="btn btn-xs btn-primary">تعديل</a>
                                     <form method="POST" action="{{ route('company.jobs.destroy',$j) }}" x-data="{open:false}">
                                         @csrf
@@ -62,7 +65,6 @@
                                     </form>
                                 </div>
                             </td>
-                            <td class="px-4 py-2">{{ $j->approved_by_admin ? 'نعم' : 'بانتظار' }}</td>
                         </tr>
                     @endforeach
                 </tbody>
