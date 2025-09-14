@@ -20,6 +20,14 @@
             </div>
             @endif
 
+            @if (session('status'))
+            <div class="alert alert-warning shadow">
+                <div>
+                    <span>{{ session('status') }}</span>
+                </div>
+            </div>
+            @endif
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <a href="{{ route('company.jobs.index') }}" class="group p-6 rounded-xl bg-gradient-to-br from-[#0D2660] to-[#102E66] text-white shadow hover:shadow-lg">
                     <div class="text-sm opacity-90">الوظائف</div>
