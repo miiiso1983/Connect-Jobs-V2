@@ -15,13 +15,15 @@ class CompanyProfileController extends Controller
         $company = $user->company;
         if (!$company) {
             // Create a minimal company profile so the page works seamlessly
-            $company = \App\Models\Company::create([
-                'user_id' => $user->id,
-                'company_name' => $user->name ?? 'شركة',
-                'province' => 'بغداد',
-                'industry' => 'أخرى',
-                'status' => $user->status ?? 'active',
-            ]);
+            $company = \App\Models\Company::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'company_name' => $user->name ?? 'شركة',
+                    'province' => 'بغداد',
+                    'industry' => 'أخرى',
+                    'status' => $user->status ?? 'active',
+                ]
+            );
         }
         return view('company.profile.edit', compact('company'));
     }
@@ -31,13 +33,15 @@ class CompanyProfileController extends Controller
         $user = Auth::user();
         $company = $user->company;
         if (!$company) {
-            $company = \App\Models\Company::create([
-                'user_id' => $user->id,
-                'company_name' => $user->name ?? 'شركة',
-                'province' => 'بغداد',
-                'industry' => 'أخرى',
-                'status' => $user->status ?? 'active',
-            ]);
+            $company = \App\Models\Company::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'company_name' => $user->name ?? 'شركة',
+                    'province' => 'بغداد',
+                    'industry' => 'أخرى',
+                    'status' => $user->status ?? 'active',
+                ]
+            );
         }
 
         $request->validate([
