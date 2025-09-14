@@ -18,22 +18,22 @@
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <style>
             :root[data-theme='brand']{
-                --p: 39 57% 59%; /* gold primary */
-                --pc: 222 76% 21%; /* primary content (navy) */
-                --s: 222 76% 21%; /* secondary (navy) */
-                --sc: 0 0% 100%;  /* secondary content (white) */
-                --a: 44 72% 66%;  /* accent (gold light) */
+                --p: 222 76% 21%; /* primary (navy) */
+                --pc: 0 0% 100%;   /* primary content (white) */
+                --s: 39 57% 59%;   /* secondary (gold) */
+                --sc: 222 76% 21%; /* secondary content (navy) */
+                --a: 44 72% 66%;   /* accent (gold light) */
                 --ac: 222 76% 21%;
-                --b1: 0 0% 100%;  /* base-100 */
+                --b1: 0 0% 100%;   /* base-100 */
                 --b2: 220 20% 98%;
                 --b3: 220 14% 96%;
-                --bc: 222 43% 20%; /* base-content */
+                --bc: 222 43% 20%;  /* base-content */
             }
             :root[data-theme='brand-dark']{
-                --p: 39 57% 59%;
-                --pc: 220 34% 16%;
-                --s: 222 76% 21%;
-                --sc: 0 0% 100%;
+                --p: 222 76% 21%;  /* primary (navy) */
+                --pc: 0 0% 100%;   /* white */
+                --s: 39 57% 59%;   /* secondary (gold) */
+                --sc: 222 76% 21%; /* navy */
                 --a: 44 72% 66%;
                 --ac: 220 34% 16%;
                 --b1: 220 34% 16%;

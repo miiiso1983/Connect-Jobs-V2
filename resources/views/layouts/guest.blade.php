@@ -18,11 +18,11 @@
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <style>
             :root[data-theme='brand']{
-                --p: 39 57% 59%; /* gold primary */
-                --pc: 222 76% 21%; /* primary content (navy) */
-                --s: 222 76% 21%; /* secondary (navy) */
-                --sc: 0 0% 100%;  /* secondary content (white) */
-                --a: 44 72% 66%;  /* accent (gold light) */
+                --p: 222 76% 21%; /* primary (navy) */
+                --pc: 0 0% 100%;   /* primary content (white) */
+                --s: 39 57% 59%;   /* secondary (gold) */
+                --sc: 222 76% 21%; /* secondary content (navy) */
+                --a: 44 72% 66%;   /* accent (gold light) */
                 --ac: 222 76% 21%;
                 --b1: 0 0% 100%;
                 --b2: 220 20% 98%;
@@ -30,10 +30,10 @@
                 --bc: 222 43% 20%;
             }
             :root[data-theme='brand-dark']{
-                --p: 39 57% 59%;
-                --pc: 220 34% 16%;
-                --s: 222 76% 21%;
-                --sc: 0 0% 100%;
+                --p: 222 76% 21%;  /* primary (navy) */
+                --pc: 0 0% 100%;   /* white */
+                --s: 39 57% 59%;   /* secondary (gold) */
+                --sc: 222 76% 21%; /* navy */
                 --a: 44 72% 66%;
                 --ac: 220 34% 16%;
                 --b1: 220 34% 16%;
@@ -46,15 +46,15 @@
     </head>
     <body class="font-sans antialiased">
         <!-- Top Guest Header with Login/Register -->
-        <header class="w-full bg-white/80 backdrop-blur border-b">
+        <header class="w-full text-white bg-gradient-to-r from-[#0D2660] via-[#102E66] to-[#0A1E46]">
             <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
                 <a href="/" class="flex items-center gap-2">
                     <x-application-logo class="h-10 w-auto" />
-                    <span class="font-semibold text-gray-800">Connect Jobs</span>
+                    <span class="font-semibold text-white">Connect Jobs</span>
                 </a>
                 <div class="flex items-center gap-2">
-                    <a href="{{ route('login') }}" class="btn btn-ghost btn-sm">تسجيل الدخول</a>
-                    <a href="{{ route('register') }}" class="btn btn-primary btn-sm">إنشاء حساب</a>
+                    <a href="{{ route('login') }}" class="btn btn-ghost btn-sm text-white">تسجيل الدخول</a>
+                    <a href="{{ route('register') }}" class="btn btn-secondary btn-sm">إنشاء حساب</a>
                 </div>
             </div>
         </header>

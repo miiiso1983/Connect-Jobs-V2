@@ -4,15 +4,15 @@
             <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6">الوظائف المتاحة</h1>
 
             <!-- Filters Bar -->
-            <form id="jobs-filter-form" method="GET" action="{{ route('jobs.index') }}" class="bg-white dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 md:p-6 shadow mb-6">
+            <form id="jobs-filter-form" method="GET" action="{{ route('jobs.index') }}" class="bg-base-100 border border-base-200 rounded-2xl p-4 md:p-6 shadow mb-6">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div class="md:col-span-2">
                         <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">ابحث</label>
-                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="كلمة مفتاحية، مسمى وظيفي..." class="w-full rounded-xl border-gray-300 dark:bg-gray-900 dark:border-gray-700">
+                        <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="كلمة مفتاحية، مسمى وظيفي..." class="input input-bordered w-full"/>
                     </div>
                     <div>
                         <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">المحافظة</label>
-                        <select name="province" class="w-full rounded-xl border-gray-300 dark:bg-gray-900 dark:border-gray-700">
+                        <select name="province" class="select select-bordered w-full">
                             <option value="">الكل</option>
                             @foreach(($provinces ?? collect())->sort() as $p)
                                 <option value="{{ $p }}" @selected(($province ?? '')===$p)>{{ $p }}</option>
@@ -21,7 +21,7 @@
                     </div>
                     <div>
                         <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">ترتيب</label>
-                        <select name="sort" class="w-full rounded-xl border-gray-300 dark:bg-gray-900 dark:border-gray-700">
+                        <select name="sort" class="select select-bordered w-full">
                             <option value="latest" @selected(($sort ?? 'latest')==='latest')>الأحدث</option>
                             <option value="oldest" @selected(($sort ?? '')==='oldest')>الأقدم</option>
                         </select>
@@ -30,7 +30,7 @@
                 <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
                         <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">القطاع/الصناعة</label>
-                        <select name="industry" class="w-full rounded-xl border-gray-300 dark:bg-gray-900 dark:border-gray-700">
+                        <select name="industry" class="select select-bordered w-full">
                             <option value="">الكل</option>
                             @foreach(($industries ?? collect()) as $ind)
                                 <option value="{{ $ind }}" @selected(($industry ?? '')===$ind)>{{ $ind }}</option>
@@ -39,7 +39,7 @@
                     </div>
                     <div>
                         <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">المسمى الوظيفي</label>
-                        <select name="job_title" class="w-full rounded-xl border-gray-300 dark:bg-gray-900 dark:border-gray-700">
+                        <select name="job_title" class="select select-bordered w-full">
                             <option value="">الكل</option>
                             @foreach(($jobTitles ?? collect())->sort() as $t)
                                 <option value="{{ $t }}" @selected(($jobTitleFilter ?? '')===$t)>{{ $t }}</option>
@@ -48,8 +48,8 @@
                     </div>
                 </div>
                 <div class="mt-4 flex gap-3">
-                    <button class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white">تطبيق</button>
-                    <a href="{{ route('jobs.index') }}" class="px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">إعادة ضبط</a>
+                    <button class="btn btn-primary">تطبيق</button>
+                    <a href="{{ route('jobs.index') }}" class="btn btn-ghost">إعادة ضبط</a>
                 </div>
             </form>
 
@@ -74,7 +74,7 @@
                     <div class="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow hover:shadow-lg transition relative overflow-hidden">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <a href="{{ route('jobs.show',$job) }}" class="text-base text-indigo-600 font-semibold hover:underline">{{ $job->title }}</a>
+                                <a href="{{ route('jobs.show',$job) }}" class="text-base text-primary font-semibold hover:underline">{{ $job->title }}</a>
                                 <div class="text-xs text-gray-500">{{ optional($job->company)->company_name ?? '—' }} @if(optional($job->company)->industry) · {{ optional($job->company)->industry }} @endif</div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -102,7 +102,7 @@
                                         @if($isSaved)
                                             @method('DELETE')
                                         @endif
-                                        <button class="text-indigo-600 hover:text-indigo-800" type="submit">{{ $isSaved ? 'إلغاء الحفظ' : 'حفظ لاحقاً' }}</button>
+                                        <button class="text-primary hover:underline" type="submit">{{ $isSaved ? 'إلغاء الحفظ' : 'حفظ لاحقاً' }}</button>
                                     </form>
                                 @endif
                             @endauth
