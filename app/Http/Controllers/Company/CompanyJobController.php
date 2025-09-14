@@ -21,7 +21,7 @@ class CompanyJobController extends Controller
         return view('company.jobs.index', compact('jobs'));
     }
 
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
         if ($resp = $this->ensureSubscriptionActive()) { return $resp; }
         $titles = MasterSetting::where('setting_type','job_title')->pluck('value');
