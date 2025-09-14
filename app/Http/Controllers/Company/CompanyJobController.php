@@ -185,8 +185,17 @@ class CompanyJobController extends Controller
     {
         $company = Auth::user()->company;
         if (!$company) {
-            // No company profile yet; guide the user to complete company profile
-            return redirect()->route('company.profile.edit')->with('status','يرجى إكمال ملف الشركة أولاً قبل إنشاء أو إدارة الوظائف.');
+            // Auto-create minimal company profile to keep the flow on the same page
+            $user = Auth::user();
+            $company = \App\Models\Company::firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'company_name' => $user->name ?? 'شركة',
+                    'province' => 'بغداد',
+                    'industry' => 'أخرى',
+                    'status' => $user->status ?? 'active',
+                ]
+            );
         }
         $expiresAt = $company->subscription_expires_at
             ?: ($company->subscription_expiry ? Carbon::parse($company->subscription_expiry)->endOfDay() : null);
