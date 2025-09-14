@@ -18,6 +18,8 @@ class CompanyProfileController extends Controller
             $company = \App\Models\Company::create([
                 'user_id' => $user->id,
                 'company_name' => $user->name ?? 'شركة',
+                'province' => 'بغداد',
+                'industry' => 'أخرى',
                 'status' => $user->status ?? 'active',
             ]);
         }
@@ -32,6 +34,8 @@ class CompanyProfileController extends Controller
             $company = \App\Models\Company::create([
                 'user_id' => $user->id,
                 'company_name' => $user->name ?? 'شركة',
+                'province' => 'بغداد',
+                'industry' => 'أخرى',
                 'status' => $user->status ?? 'active',
             ]);
         }
