@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Carbon\Carbon;
 
 class CompanyAdminController extends Controller
 {
@@ -37,8 +38,22 @@ class CompanyAdminController extends Controller
         $request->validate([
             'subscription_plan' => 'required|in:free,basic,pro,enterprise',
             'subscription_expiry' => 'nullable|date',
+            'subscription_expires_at' => 'nullable|date',
         ]);
-        $company->update($request->only('subscription_plan','subscription_expiry'));
+
+        $expiresAt = null;
+        if ($request->filled('subscription_expires_at')) {
+            $expiresAt = Carbon::parse($request->input('subscription_expires_at'));
+        } elseif ($request->filled('subscription_expiry')) {
+            $expiresAt = Carbon::parse($request->input('subscription_expiry'))->endOfDay();
+        }
+
+        $company->update(array_filter([
+            'subscription_plan' => $request->input('subscription_plan'),
+            'subscription_expiry' => $request->input('subscription_expiry'),
+            'subscription_expires_at' => $expiresAt,
+        ], fn($v) => !is_null($v)));
+
         return back()->with('status','تم تحديث خطة الاشتراك.');
     }
 }

@@ -51,6 +51,7 @@ class ProfileController extends Controller
             'languages' => 'nullable|string',
             'skills' => 'nullable|string',
             'cv' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'profile_image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048|dimensions:min_width=100,min_height=100,max_width=4000,max_height=4000',
         ]);
 
         $js = JobSeeker::firstOrCreate(['user_id'=>Auth::id()], [
@@ -61,6 +62,10 @@ class ProfileController extends Controller
         $cvPath = $js->cv_file;
         if ($request->hasFile('cv')) {
             $cvPath = $request->file('cv')->store('cv','public');
+        }
+        $imagePath = $js->profile_image;
+        if ($request->hasFile('profile_image')) {
+            $imagePath = $request->file('profile_image')->store('profile-images','public');
         }
 
         $js->update([
@@ -78,6 +83,7 @@ class ProfileController extends Controller
             'languages' => $request->input('languages', []),
             'skills' => $request->skills,
             'cv_file' => $cvPath,
+            'profile_image' => $imagePath,
             'profile_completed' => true,
         ]);
 

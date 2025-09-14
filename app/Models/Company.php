@@ -12,7 +12,11 @@ class Company extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'user_id','company_name','scientific_office_name','company_job_title','mobile_number','province','industry','subscription_plan','subscription_expiry','status'
+        'user_id','company_name','scientific_office_name','company_job_title','mobile_number','province','industry','subscription_plan','subscription_expiry','subscription_expires_at','status','profile_image'
+    ];
+
+    protected $casts = [
+        'subscription_expires_at' => 'datetime',
     ];
 
     public function user(){ return $this->belongsTo(User::class); }

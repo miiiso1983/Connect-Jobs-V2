@@ -6,6 +6,20 @@
     </x-slot>
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            @if(($subscription['status'] ?? 'active') === 'expired')
+            <div class="alert alert-error shadow">
+                <div>
+                    <span>انتهى اشتراك شركتك. بعض الميزات مثل إنشاء الوظائف ورؤية المتقدمين متوقفة حتى التجديد.</span>
+                </div>
+            </div>
+            @elseif(($subscription['status'] ?? 'active') === 'expiring')
+            <div class="alert alert-warning shadow">
+                <div>
+                    <span>سينتهي الاشتراك خلال {{ $subscription['days_left'] }} يوم. يُنصح بالتجديد مبكرًا.</span>
+                </div>
+            </div>
+            @endif
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <a href="{{ route('company.jobs.index') }}" class="group p-6 rounded-xl bg-gradient-to-br from-[#0D2660] to-[#102E66] text-white shadow hover:shadow-lg">
                     <div class="text-sm opacity-90">الوظائف</div>

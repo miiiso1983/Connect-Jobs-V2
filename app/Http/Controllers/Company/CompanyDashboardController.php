@@ -15,7 +15,16 @@ class CompanyDashboardController extends Controller
 {
     public function __invoke(): View
     {
-        $companyId = Auth::user()->company?->id;
+        $company = Auth::user()->company;
+        $companyId = $company?->id;
+
+        // Subscription status
+        $expiresAt = optional($company)->subscription_expires_at
+            ?: (optional($company)->subscription_expiry ? Carbon::parse($company->subscription_expiry)->endOfDay() : null);
+        $status = 'active';
+        if ($expiresAt && now()->greaterThan($expiresAt)) { $status = 'expired'; }
+        elseif ($expiresAt && now()->diffInDays($expiresAt) <= 10) { $status = 'expiring'; }
+        $daysLeft = $expiresAt ? now()->diffInDays($expiresAt, false) : null;
 
         // KPIs
         $publishedJobs = Job::where('company_id', $companyId)->where('status', 'open')->count();
@@ -46,6 +55,11 @@ class CompanyDashboardController extends Controller
             'charts' => [
                 'by_province' => $byProvince,
                 'by_speciality' => $bySpeciality,
+            ],
+            'subscription' => [
+                'expires_at' => $expiresAt,
+                'status' => $status,
+                'days_left' => $daysLeft,
             ],
         ]);
     }

@@ -10,6 +10,23 @@
         <form method="POST" action="{{ route('jobseeker.profile.update') }}" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 p-6 rounded shadow grid grid-cols-1 md:grid-cols-2 gap-4">
             @csrf
 
+            <div class="md:col-span-2 flex items-center gap-4">
+                <div class="avatar">
+                    <div class="w-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden">
+                        @if(!empty($js->profile_image))
+                            <img src="{{ Storage::url($js->profile_image) }}" alt="Avatar" />
+                        @else
+                            <img src="https://api.dicebear.com/7.x/initials/svg?seed={{ urlencode($js->full_name ?? auth()->user()->name) }}" alt="Avatar" />
+                        @endif
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <x-input-label for="profile_image" value="الصورة الشخصية (PNG/JPG/WebP، حتى 2MB)" />
+                    <input id="profile_image" name="profile_image" type="file" class="mt-1 block w-full" accept="image/png,image/jpeg,image/webp" />
+                    <p class="text-xs text-gray-500 mt-1">سيتم حفظ الصورة في النظام وتستخدم كالصورة الرمزية.</p>
+                </div>
+            </div>
+
             <div>
                 <x-input-label for="full_name" value="الاسم الكامل" />
                 <x-text-input id="full_name" name="full_name" class="block mt-1 w-full" value="{{ old('full_name', $js->full_name ?? '') }}" />

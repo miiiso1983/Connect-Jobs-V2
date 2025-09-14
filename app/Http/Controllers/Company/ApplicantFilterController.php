@@ -12,6 +12,14 @@ class ApplicantFilterController extends Controller
 {
     public function index(Request $request): View
     {
+        // Subscription check: restrict access if company's subscription expired
+        $company = auth()->user()->company;
+        $expiresAt = optional($company)->subscription_expires_at
+            ?: (optional($company)->subscription_expiry ? \Carbon\Carbon::parse($company->subscription_expiry)->endOfDay() : null);
+        if ($expiresAt && now()->greaterThan($expiresAt)) {
+            return redirect()->route('company.dashboard')->with('status','انتهى اشتراكك. الرجاء تجديد الاشتراك للوصول إلى المتقدمين.');
+        }
+
         $filters = $request->only(['job_id','job_title','province','districts','specialities','own_car','gender']);
         $filters = array_merge([
             'job_id' => null,

@@ -146,6 +146,9 @@ Route::middleware(['setlocale','auth','role:company','company.approved'])->prefi
 
     Route::get('/applicants/{jobSeeker}', \App\Http\Controllers\Company\ApplicantShowController::class)->name('applicants.show');
 
+    // Company profile (logo/avatar)
+    Route::get('/profile', [\App\Http\Controllers\Company\CompanyProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [\App\Http\Controllers\Company\CompanyProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/applicants', [\App\Http\Controllers\Company\ApplicantFilterController::class, 'index'])->name('applicants.index');
     Route::put('/applications/{application}', [\App\Http\Controllers\Company\ApplicantActionController::class, 'update'])->name('applications.update');

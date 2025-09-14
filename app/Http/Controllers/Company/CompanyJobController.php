@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 class CompanyJobController extends Controller
 {
@@ -22,6 +23,7 @@ class CompanyJobController extends Controller
 
     public function create(): View
     {
+        if ($resp = $this->ensureSubscriptionActive()) { return $resp; }
         $titles = MasterSetting::where('setting_type','job_title')->pluck('value');
         if ($titles->isEmpty()) {
             $titles = collect(['صيدلاني','صيدلاني مساعد','مندوب مبيعات طبية','فني مختبر','محاسب','سكرتير/ة']);
@@ -39,6 +41,7 @@ class CompanyJobController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        if ($resp = $this->ensureSubscriptionActive()) { return $resp; }
         $request->validate([
             'title' => 'required|string|max:200',
             'description' => 'required|string',
@@ -89,6 +92,7 @@ class CompanyJobController extends Controller
 
     public function togglePublish(Job $job): RedirectResponse
     {
+        if ($resp = $this->ensureSubscriptionActive()) { return $resp; }
         // Enforce ownership: only the company that owns the job can toggle it
         $companyId = Auth::user()->company?->id;
         if ($job->company_id !== $companyId) {
@@ -175,6 +179,18 @@ class CompanyJobController extends Controller
         }
         $job->delete();
         return redirect()->route('company.jobs.index')->with('status','تم حذف الوظيفة');
+    }
+
+    private function ensureSubscriptionActive(): ?\Illuminate\Http\RedirectResponse
+    {
+        $company = Auth::user()->company;
+        if (!$company) { return redirect()->route('company.dashboard'); }
+        $expiresAt = $company->subscription_expires_at
+            ?: ($company->subscription_expiry ? Carbon::parse($company->subscription_expiry)->endOfDay() : null);
+        if ($expiresAt && now()->greaterThan($expiresAt)) {
+            return redirect()->route('company.dashboard')->with('status','انتهى اشتراكك. الرجاء تجديد الاشتراك للمتابعة.');
+        }
+        return null;
     }
 
 }

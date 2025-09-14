@@ -245,7 +245,20 @@
                             @forelse ($applicants as $a)
                                 <tr class="hover">
                                     <td class="font-mono text-sm">{{ $a->id }}</td>
-                                    <td class="font-semibold">{{ $a->full_name }}</td>
+                                    <td class="font-semibold">
+                                        <div class="flex items-center gap-2">
+                                            <div class="avatar">
+                                                <div class="w-8 h-8 rounded-full overflow-hidden">
+                                                    @if(!empty($a->profile_image))
+                                                        <img src="{{ Storage::url($a->profile_image) }}" alt="Avatar">
+                                                    @else
+                                                        <img src="https://api.dicebear.com/7.x/initials/svg?seed={{ urlencode($a->full_name) }}" alt="Avatar">
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <span>{{ $a->full_name }}</span>
+                                        </div>
+                                    </td>
                                     <td>{{ $a->job_title }}</td>
                                     <td>{{ $a->province }}</td>
                                     <td>
@@ -333,7 +346,18 @@
                             <div class="card-body p-4">
                                 <div class="flex justify-between items-start mb-3">
                                     <div>
-                                        <h4 class="font-semibold text-lg">{{ $a->full_name }}</h4>
+                                        <div class="flex items-center gap-2">
+                                            <div class="avatar">
+                                                <div class="w-10 h-10 rounded-full overflow-hidden">
+                                                    @if(!empty($a->profile_image))
+                                                        <img src="{{ Storage::url($a->profile_image) }}" alt="Avatar">
+                                                    @else
+                                                        <img src="https://api.dicebear.com/7.x/initials/svg?seed={{ urlencode($a->full_name) }}" alt="Avatar">
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <h4 class="font-semibold text-lg">{{ $a->full_name }}</h4>
+                                        </div>
                                         <p class="text-sm text-gray-600">{{ $a->job_title }}</p>
                                         <p class="text-xs text-gray-500">#{{ $a->id }}</p>
                                     </div>

@@ -49,8 +49,28 @@
                             <td class="px-4 py-2">{{ $c->company_name }}</td>
                             <td class="px-4 py-2">{{ $c->province }}</td>
                             <td class="px-4 py-2">{{ $c->subscription_plan }}</td>
-                            <td class="px-4 py-2">{{ $c->subscription_expiry }}</td>
-                            <td class="px-4 py-2"><span class="px-2 py-1 rounded-full text-xs {{ $c->status==='active'?'bg-green-100 text-green-800':'bg-yellow-100 text-yellow-800' }}">{{ $c->status }}</span></td>
+                            <td class="px-4 py-2">
+                                @php($expAt = $c->subscription_expires_at ?? ($c->subscription_expiry ? \Carbon\Carbon::parse($c->subscription_expiry)->endOfDay() : null))
+                                @if($expAt)
+                                    <div class="flex items-center gap-2">
+                                        <span>{{ $expAt->toDateString() }}</span>
+                                        <span class="text-xs text-gray-500">({{ $expAt->isPast() ? 'منتهي' : 'متبقّي '.now()->diffInDays($expAt).' يوم' }})</span>
+                                    </div>
+                                @else
+                                    <span class="text-gray-400">—</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-2">
+                                @php($statusColor = 'bg-green-100 text-green-800')
+                                @if(isset($expAt) && $expAt)
+                                    @if($expAt->isPast())
+                                        @php($statusColor = 'bg-red-100 text-red-800')
+                                    @elseif(now()->diffInDays($expAt) <= 10)
+                                        @php($statusColor = 'bg-amber-100 text-amber-800')
+                                    @endif
+                                @endif
+                                <span class="px-2 py-1 rounded-full text-xs {{ $statusColor }}">{{ isset($expAt) && $expAt && $expAt->isPast() ? 'منتهي' : 'فعال' }}</span>
+                            </td>
                             <td class="px-4 py-2 flex flex-wrap gap-2">
                                 <form method="POST" action="{{ route('admin.companies.approve',$c) }}">
                                     @csrf
@@ -64,7 +84,8 @@
                                             <option value="{{ $plan }}" @selected($c->subscription_plan==$plan)>{{ $plan }}</option>
                                         @endforeach
                                     </select>
-                                    <input type="date" name="subscription_expiry" value="{{ $c->subscription_expiry }}" class="rounded-lg text-xs border-gray-300 dark:bg-gray-800 dark:border-gray-700">
+                                    <input type="date" name="subscription_expiry" value="{{ $c->subscription_expiry }}" class="rounded-lg text-xs border-gray-300 dark:bg-gray-800 dark:border-gray-700" title="تاريخ الانتهاء (سيتم اعتباره نهاية اليوم)">
+                                    <input type="datetime-local" name="subscription_expires_at" value="{{ $c->subscription_expires_at ? $c->subscription_expires_at->format('Y-m-d\\TH:i') : '' }}" class="rounded-lg text-xs border-gray-300 dark:bg-gray-800 dark:border-gray-700" title="تاريخ ووقت الانتهاء">
                                     <button class="px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-800 text-white text-xs">تحديث</button>
                                 </form>
                             </td>
