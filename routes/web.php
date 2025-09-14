@@ -144,6 +144,8 @@ Route::middleware(['setlocale','auth','role:company','company.approved'])->prefi
     // Route::put('/jobs/{job}', [\App\Http\Controllers\Company\CompanyJobController::class, 'update'])->middleware('job.owner')->name('jobs.update');
     // Route::delete('/jobs/{job}', [\App\Http\Controllers\Company\CompanyJobController::class, 'destroy'])->middleware('job.owner')->name('jobs.destroy');
 
+    Route::get('/applicants/{jobSeeker}', \App\Http\Controllers\Company\ApplicantShowController::class)->name('applicants.show');
+
 
     Route::get('/applicants', [\App\Http\Controllers\Company\ApplicantFilterController::class, 'index'])->name('applicants.index');
     Route::put('/applications/{application}', [\App\Http\Controllers\Company\ApplicantActionController::class, 'update'])->name('applications.update');

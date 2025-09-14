@@ -277,6 +277,8 @@
                                     <td>
                                         @php($application = \App\Models\Application::where('job_seeker_id',$a->id)->latest('applied_at')->first())
                                         <div class="flex flex-wrap gap-1">
+                                            <a href="{{ route('company.applicants.show', $a) }}" class="btn btn-xs btn-ghost" title="عرض">عرض</a>
+
                                             <form method="POST" action="{{ route('company.applications.update', $application) }}" class="inline">
                                                 @csrf @method('PUT')
                                                 <input type="hidden" name="action" value="accept">
@@ -375,6 +377,8 @@
 
                                 @php($application = \App\Models\Application::where('job_seeker_id',$a->id)->latest('applied_at')->first())
                                 <div class="flex gap-2">
+                                    <a href="{{ route('company.applicants.show', $a) }}" class="btn btn-ghost btn-sm">عرض</a>
+
                                     <form method="POST" action="{{ route('company.applications.update', $application) }}" class="flex-1">
                                         @csrf @method('PUT')
                                         <input type="hidden" name="action" value="accept">

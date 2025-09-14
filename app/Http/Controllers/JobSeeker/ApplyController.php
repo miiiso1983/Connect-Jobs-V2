@@ -53,8 +53,8 @@ class ApplyController extends Controller
         $percentage = $total ? round(($score/$total)*100,2) : 0;
 
         $application = Application::updateOrCreate(
-            ['job_id'=>$job->id,'job_seeker_id'=>$js->id],
-            ['cv_file'=>$js->cv_file,'matching_percentage'=>$percentage]
+            ['job_id' => $job->id, 'job_seeker_id' => $js->id],
+            ['cv_file' => $js->cv_file, 'matching_percentage' => $percentage, 'applied_at' => now()]
         );
 
         // Notify jobseeker
@@ -65,16 +65,33 @@ class ApplyController extends Controller
 
         // Email the company asynchronously
         if ($job->company?->user?->email && optional($job->company->user)->application_notifications_opt_in !== false) {
-            \Mail::to([$job->company->user->email => $job->company->company_name ?? 'Company'])
-                ->queue(new \App\Mail\NewApplicationMail($application));
-            \DB::table('email_logs')->insert([
-                'mailable' => \App\Mail\NewApplicationMail::class,
-                'to_email' => $job->company->user->email,
-                'to_name' => $job->company->company_name ?? 'Company',
-                'payload' => json_encode(['application_id' => $application->id]),
-                'status' => 'queued',
-                'queued_at' => now(),
-            ]);
+            try {
+                \Mail::to([$job->company->user->email => $job->company->company_name ?? 'Company'])
+                    ->queue(new \App\Mail\NewApplicationMail($application));
+                \DB::table('email_logs')->insert([
+                    'mailable' => \App\Mail\NewApplicationMail::class,
+                    'to_email' => $job->company->user->email,
+                    'to_name' => $job->company->company_name ?? 'Company',
+                    'payload' => json_encode(['application_id' => $application->id]),
+                    'status' => 'queued',
+                    'queued_at' => now(),
+                ]);
+            } catch (\Throwable $e) {
+                \Log::error('Failed to queue NewApplicationMail: '.$e->getMessage(), [
+                    'application_id' => $application->id,
+                    'company_user_id' => optional($job->company->user)->id,
+                ]);
+                try {
+                    \DB::table('email_logs')->insert([
+                        'mailable' => \App\Mail\NewApplicationMail::class,
+                        'to_email' => $job->company->user->email,
+                        'to_name' => $job->company->company_name ?? 'Company',
+                        'payload' => json_encode(['application_id' => $application->id]),
+                        'status' => 'failed',
+                        'queued_at' => now(),
+                    ]);
+                } catch (\Throwable $ignore) {}
+            }
         }
 
         return back()->with('status','تم التقديم. نسبة المطابقة: '.$percentage.'%');

@@ -25,6 +25,8 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'application_notifications_opt_in' => ['sometimes','boolean'],
+            'profile_view_notifications_opt_in' => ['sometimes','boolean'],
         ];
     }
 }
