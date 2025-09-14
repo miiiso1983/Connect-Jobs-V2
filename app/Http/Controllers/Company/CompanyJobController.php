@@ -184,7 +184,10 @@ class CompanyJobController extends Controller
     private function ensureSubscriptionActive(): ?\Illuminate\Http\RedirectResponse
     {
         $company = Auth::user()->company;
-        if (!$company) { return redirect()->route('company.dashboard'); }
+        if (!$company) {
+            // No company profile yet; guide the user to complete company profile
+            return redirect()->route('company.profile.edit')->with('status','يرجى إكمال ملف الشركة أولاً قبل إنشاء أو إدارة الوظائف.');
+        }
         $expiresAt = $company->subscription_expires_at
             ?: ($company->subscription_expiry ? Carbon::parse($company->subscription_expiry)->endOfDay() : null);
         if ($expiresAt && now()->greaterThan($expiresAt)) {
