@@ -35,6 +35,7 @@
                     <tr>
                         <th class="px-4 py-2 text-start">#</th>
                         <th class="px-4 py-2 text-start">الشركة</th>
+                        <th class="px-4 py-2 text-start">البريد الإلكتروني</th>
                         <th class="px-4 py-2 text-start">المحافظة</th>
                         <th class="px-4 py-2 text-start">الخطة</th>
                         <th class="px-4 py-2 text-start">انتهاء الاشتراك</th>
@@ -47,6 +48,13 @@
                         <tr class="border-t border-gray-100 dark:border-gray-700">
                             <td class="px-4 py-2">{{ $c->id }}</td>
                             <td class="px-4 py-2">{{ $c->company_name }}</td>
+                            <td class="px-4 py-2">
+                                @if($c->user && $c->user->email)
+                                    <a href="mailto:{{ $c->user->email }}" class="text-primary hover:underline">{{ $c->user->email }}</a>
+                                @else
+                                    <span class="text-gray-400">—</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-2">{{ $c->province }}</td>
                             <td class="px-4 py-2">{{ $c->subscription_plan }}</td>
                             <td class="px-4 py-2">
