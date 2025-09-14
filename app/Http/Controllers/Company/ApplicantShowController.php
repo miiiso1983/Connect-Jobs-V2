@@ -55,7 +55,7 @@ class ApplicantShowController extends Controller
                         'status' => 'failed',
                         'queued_at' => now(),
                     ]);
-                } catch (\\Throwable $ignore) {}
+                } catch (\Throwable $ignore) {}
             }
         }
 
