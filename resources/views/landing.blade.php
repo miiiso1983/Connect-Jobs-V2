@@ -84,13 +84,13 @@
     </section>
 
     <!-- CTA -->
-    <section class="bg-gradient-to-r from-indigo-600 via-sky-500 to-emerald-500 text-white py-16">
+    <section class="bg-gradient-to-r from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white py-16">
         <div class="max-w-6xl mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-4xl font-extrabold mb-4">ابدأ رحلتك اليوم</h2>
             <p class="opacity-95 mb-6">انضم إلى آلاف المستخدمين الذين وجدوا فرصهم عبر Connect Jobs</p>
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="/register?type=jobseeker" class="px-6 py-3 rounded-xl bg-white text-indigo-700 font-semibold hover:bg-gray-100 transition">سجل كباحث عن عمل</a>
-                <a href="/register?type=company" class="px-6 py-3 rounded-xl border border-white/80 hover:bg-white hover:text-indigo-600 transition">سجل كشركة</a>
+                <a href="/register?type=jobseeker" class="btn btn-secondary">سجل كباحث عن عمل</a>
+                <a href="/register?type=company" class="btn btn-outline text-white border-white hover:bg-white hover:text-[#0D2660]">سجل كشركة</a>
             </div>
         </div>
     </section>
