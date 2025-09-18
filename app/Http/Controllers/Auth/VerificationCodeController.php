@@ -64,10 +64,26 @@ class VerificationCodeController extends Controller
                 }
                 try {
                     $client = new Client(config('services.twilio.sid'), config('services.twilio.token'));
-                    $client->messages->create('whatsapp:'.$to, [
-                        'from' => config('services.twilio.whatsapp_from'),
-                        'body' => "رمز التفعيل: {$code} (صالح لمدة 15 دقيقة)",
-                    ]);
+                    $templateSid = config('services.twilio.content_sid');
+                    if ($templateSid) {
+                        $client->messages->create('whatsapp:'.$to, [
+                            'from' => config('services.twilio.whatsapp_from'),
+                            'contentSid' => $templateSid,
+                            'contentVariables' => json_encode(['1' => $code, '2' => 15]),
+                        ]);
+                    } else {
+                        $client->messages->create('whatsapp:'.$to, [
+                            'from' => config('services.twilio.whatsapp_from'),
+                            'body' => "رمز التفعيل: {$code} (صالح لمدة 15 دقيقة)",
+                        ]);
+                    }
+                } catch (\Twilio\Exceptions\RestException $e) {
+                    $msg = $e->getMessage();
+                    if (str_contains($msg, '24-hour')) {
+                        return back()->with('status','أرسل كلمة "مرحبا" إلى واتساب +9647778854530 ثم أعد المحاولة خلال 24 ساعة.');
+                    }
+                    Log::error('Twilio WhatsApp send failed: '.$msg, ['user_id' => $user->id]);
+                    return back()->with('status','تعذر إرسال واتساب عبر Twilio حالياً.');
                 } catch (\Throwable $e) {
                     Log::error('Twilio WhatsApp send failed: '.$e->getMessage(), ['user_id' => $user->id]);
                     return back()->with('status','تعذر إرسال واتساب عبر Twilio حالياً.');

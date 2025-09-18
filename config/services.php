@@ -48,6 +48,7 @@ return [
         'sid' => env('TWILIO_SID'),
         'token' => env('TWILIO_TOKEN'),
         'whatsapp_from' => env('TWILIO_WHATSAPP_FROM'),
+        'content_sid' => env('TWILIO_CONTENT_SID'), // optional approved template
     ],
 
 ];
