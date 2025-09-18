@@ -36,33 +36,42 @@ class ApplicantShowController extends Controller
         // Send profile-viewed mail to jobseeker (respect opt-out if present)
         $jsUser = $jobSeeker->user;
         if ($jsUser && data_get($jsUser, 'profile_view_notifications_opt_in', true) !== false) {
-            try {
-                Mail::to([$jsUser->email => $jobSeeker->full_name ?? $jsUser->name])
-                    ->queue(new ProfileViewedMail($jobSeeker, $application->job, $company->company_name ?? 'Company'));
-                // log queued email
-                DB::table('email_logs')->insert([
-                    'mailable' => \App\Mail\ProfileViewedMail::class,
-                    'to_email' => $jsUser->email,
-                    'to_name' => $jobSeeker->full_name ?? $jsUser->name,
-                    'payload' => json_encode(['job_seeker_id' => $jobSeeker->id, 'job_id' => $application->job_id]),
-                    'status' => 'queued',
-                    'queued_at' => now(),
-                ]);
-            } catch (\Throwable $e) {
-                Log::error('Failed to queue ProfileViewedMail: '.$e->getMessage(), [
-                    'job_seeker_id' => $jobSeeker->id,
-                    'company_id' => $company->id,
-                ]);
+            $email = trim((string) ($jsUser->email ?? ''));
+            $name = $jobSeeker->full_name ?? $jsUser->name ?? 'User';
+            if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 try {
+                    Mail::to([$email => $name])
+                        ->queue(new ProfileViewedMail($jobSeeker, $application->job, $company->company_name ?? 'Company'));
+                    // log queued email
                     DB::table('email_logs')->insert([
                         'mailable' => \App\Mail\ProfileViewedMail::class,
-                        'to_email' => $jsUser->email,
-                        'to_name' => $jobSeeker->full_name ?? $jsUser->name,
+                        'to_email' => $email,
+                        'to_name' => $name,
                         'payload' => json_encode(['job_seeker_id' => $jobSeeker->id, 'job_id' => $application->job_id]),
-                        'status' => 'failed',
+                        'status' => 'queued',
                         'queued_at' => now(),
                     ]);
-                } catch (\Throwable $ignore) {}
+                } catch (\Throwable $e) {
+                    Log::error('Failed to queue ProfileViewedMail: '.$e->getMessage(), [
+                        'job_seeker_id' => $jobSeeker->id,
+                        'company_id' => $company->id,
+                    ]);
+                    try {
+                        DB::table('email_logs')->insert([
+                            'mailable' => \App\Mail\ProfileViewedMail::class,
+                            'to_email' => $email,
+                            'to_name' => $name,
+                            'payload' => json_encode(['job_seeker_id' => $jobSeeker->id, 'job_id' => $application->job_id]),
+                            'status' => 'failed',
+                            'queued_at' => now(),
+                        ]);
+                    } catch (\Throwable $ignore) {}
+                }
+            } else {
+                Log::warning('Skipping ProfileViewedMail due to invalid email', [
+                    'email' => $email,
+                    'job_seeker_id' => $jobSeeker->id,
+                ]);
             }
         }
 
