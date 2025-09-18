@@ -53,6 +53,11 @@ Route::middleware(['setlocale','auth'])->group(function () {
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
     Route::get('verify-code', [\App\Http\Controllers\Auth\VerificationCodeController::class, 'show'])->name('verify.code.show');
+    // Some clients mistakenly hit GET on send; redirect them to the form instead of 405
+    Route::get('verify-code/send', function(){
+        return redirect()->route('verify.code.show');
+    })->name('verify.code.send.get');
+
     Route::post('verify-code/send', [\App\Http\Controllers\Auth\VerificationCodeController::class, 'send'])->name('verify.code.send');
     Route::post('verify-code/verify', [\App\Http\Controllers\Auth\VerificationCodeController::class, 'verify'])->name('verify.code.verify');
 
