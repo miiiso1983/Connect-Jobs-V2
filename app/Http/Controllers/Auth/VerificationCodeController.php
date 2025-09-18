@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class VerificationCodeController extends Controller
@@ -38,12 +39,21 @@ class VerificationCodeController extends Controller
         ]);
 
         if ($request->channel==='email') {
-            // Send via email using HTML template
-            Mail::to([$user->email => $user->name])
-                ->queue(new \App\Mail\VerifyCodeMail([
-                    'name' => $user->name,
-                    'code' => $code,
-                ]));
+            // Validate recipient email before sending
+            $email = trim((string) ($user->email ?? ''));
+            if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return back()->with('status','تعذر الإرسال: بريدك غير صالح. حدّث البريد الإلكتروني من الملف الشخصي أو اختر الواتساب.');
+            }
+            try {
+                Mail::to([$email => $user->name])
+                    ->queue(new \App\Mail\VerifyCodeMail([
+                        'name' => $user->name,
+                        'code' => $code,
+                    ]));
+            } catch (\Throwable $e) {
+                Log::error('Failed to queue VerifyCodeMail: '.$e->getMessage(), ['user_id' => $user->id]);
+                return back()->with('status','تعذر إرسال البريد حالياً. جرّب لاحقاً أو اختر الواتساب.');
+            }
         } else {
             $token = config('services.whatsapp.token');
             $phoneId = config('services.whatsapp.phone_id');
