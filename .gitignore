@@ -22,3 +22,12 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+
+# Ignore nested app workspace dependencies and caches
+app/node_modules
+app/vendor
+app/storage
+app/public/storage
+app/bootstrap/cache
+app/database/*.sqlite
