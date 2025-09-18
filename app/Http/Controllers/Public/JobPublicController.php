@@ -73,6 +73,9 @@ class JobPublicController extends Controller
     {
         abort_if(!$job->approved_by_admin || $job->status !== 'open', 404);
 
+        // Ensure company relation is available for SEO schema
+        $job->load('company');
+
         $isSaved = false;
         if (Auth::check() && Auth::user()->role === 'jobseeker') {
             $isSaved = DB::table('saved_jobs')

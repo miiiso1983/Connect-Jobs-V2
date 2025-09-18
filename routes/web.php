@@ -30,7 +30,7 @@ Route::middleware(['setlocale'])->get('/', function () {
     return view('landing', compact('jobsCount','companiesCount','seekersCount'));
 });
 
-// Public jobs
+// Public jobs + sitemap
 Route::middleware('setlocale')->group(function(){
 // Optional: GET logout that redirects to POST logout for convenience in old links
 Route::middleware(['auth'])->get('/logout', function(){
@@ -43,6 +43,7 @@ Route::middleware(['auth'])->get('/logout', function(){
 
     Route::get('/jobs', [\App\Http\Controllers\Public\JobPublicController::class,'index'])->name('jobs.index');
     Route::get('/jobs/{job}', [\App\Http\Controllers\Public\JobPublicController::class,'show'])->name('jobs.show');
+    Route::get('/sitemap.xml', \App\Http\Controllers\Public\SitemapController::class)->name('sitemap');
 });
 
     // Save/Unsave jobs (jobseeker only)
@@ -168,5 +169,11 @@ Route::middleware(['setlocale','auth','role:jobseeker'])->prefix('jobseeker')->n
 
     Route::get('/apply/{job}', [\App\Http\Controllers\JobSeeker\ApplyController::class,'show'])->name('apply.show');
     Route::post('/apply/{job}', [\App\Http\Controllers\JobSeeker\ApplyController::class,'apply'])->name('apply');
+
+    // Job Alerts
+    Route::get('/alerts', [\App\Http\Controllers\JobSeeker\JobAlertController::class,'index'])->name('alerts.index');
+    Route::post('/alerts', [\App\Http\Controllers\JobSeeker\JobAlertController::class,'store'])->name('alerts.store');
+    Route::put('/alerts/{id}/toggle', [\App\Http\Controllers\JobSeeker\JobAlertController::class,'toggle'])->name('alerts.toggle');
+    Route::delete('/alerts/{id}', [\App\Http\Controllers\JobSeeker\JobAlertController::class,'destroy'])->name('alerts.destroy');
 });
 

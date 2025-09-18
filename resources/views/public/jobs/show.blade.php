@@ -64,5 +64,48 @@
         </div>
     @endauth
 
+    {{-- JSON-LD JobPosting Schema --}}
+    @php
+        $orgName = optional($job->company)->company_name ?? 'Connect Jobs';
+        $desc = strip_tags((string) $job->description);
+        $desc = mb_substr($desc, 0, 500);
+        $posted = $job->created_at ? $job->created_at->toAtomString() : null;
+        $updated = $job->updated_at ? $job->updated_at->toAtomString() : null;
+        $validThrough = $job->expires_at ? $job->expires_at->toAtomString() : null;
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'JobPosting',
+            'title' => $job->title,
+            'description' => $desc,
+            'datePosted' => $posted,
+            'dateModified' => $updated,
+            'employmentType' => 'FULL_TIME',
+            'hiringOrganization' => [
+                '@type' => 'Organization',
+                'name' => $orgName,
+            ],
+            'jobLocation' => [
+                '@type' => 'Place',
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'addressCountry' => 'IQ',
+                    'addressRegion' => $job->province,
+                ]
+            ],
+            'applicantLocationRequirements' => [
+                '@type' => 'Country',
+                'name' => 'Iraq'
+            ],
+            'validThrough' => $validThrough,
+            'identifier' => [
+                '@type' => 'PropertyValue',
+                'name' => $orgName,
+                'value' => (string) $job->id,
+            ],
+            'url' => url()->current(),
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode(array_filter($schema), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
+
 </x-app-layout>
 

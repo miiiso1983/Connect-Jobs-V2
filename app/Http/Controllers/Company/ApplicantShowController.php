@@ -40,33 +40,40 @@ class ApplicantShowController extends Controller
             $email = trim((string) ($jsUser->email ?? ''));
             $name = $jobSeeker->full_name ?? $jsUser->name ?? 'User';
             if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                try {
-                    Mail::to([$email => $name])
-                        ->queue(new ProfileViewedMail($jobSeeker, $application->job, $company->company_name ?? 'Company'));
-                    // log queued email
-                    DB::table('email_logs')->insert([
-                        'mailable' => \App\Mail\ProfileViewedMail::class,
-                        'to_email' => $email,
-                        'to_name' => $name,
-                        'payload' => json_encode(['job_seeker_id' => $jobSeeker->id, 'job_id' => $application->job_id]),
-                        'status' => 'queued',
-                        'queued_at' => now(),
-                    ]);
-                } catch (\Throwable $e) {
-                    Log::error('Failed to queue ProfileViewedMail: '.$e->getMessage(), [
-                        'job_seeker_id' => $jobSeeker->id,
-                        'company_id' => $company->id,
-                    ]);
+                // Rate-limit per company+jobseeker to avoid spamming (12 hours)
+                $rateKey = 'pv:'.$company->id.':'.$jobSeeker->id;
+                if (!cache()->has($rateKey)) {
                     try {
+                        Mail::to([$email => $name])
+                            ->send(new ProfileViewedMail($jobSeeker, $application->job, $company->company_name ?? 'Company'));
+                        cache()->put($rateKey, 1, now()->addHours(12));
+                        // log sent email
                         DB::table('email_logs')->insert([
                             'mailable' => \App\Mail\ProfileViewedMail::class,
                             'to_email' => $email,
                             'to_name' => $name,
                             'payload' => json_encode(['job_seeker_id' => $jobSeeker->id, 'job_id' => $application->job_id]),
-                            'status' => 'failed',
+                            'status' => 'sent',
                             'queued_at' => now(),
                         ]);
-                    } catch (\Throwable $ignore) {}
+                    } catch (\Throwable $e) {
+                        Log::error('Failed to send ProfileViewedMail: '.$e->getMessage(), [
+                            'job_seeker_id' => $jobSeeker->id,
+                            'company_id' => $company->id,
+                        ]);
+                        try {
+                            DB::table('email_logs')->insert([
+                                'mailable' => \App\Mail\ProfileViewedMail::class,
+                                'to_email' => $email,
+                                'to_name' => $name,
+                                'payload' => json_encode(['job_seeker_id' => $jobSeeker->id, 'job_id' => $application->job_id]),
+                                'status' => 'failed',
+                                'queued_at' => now(),
+                            ]);
+                        } catch (\Throwable $ignore) {}
+                    }
+                } else {
+                    Log::info('ProfileViewedMail suppressed by rate-limit', ['company_id' => $company->id, 'job_seeker_id' => $jobSeeker->id]);
                 }
             } else {
                 Log::warning('Skipping ProfileViewedMail due to invalid email', [

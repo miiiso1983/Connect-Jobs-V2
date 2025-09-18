@@ -51,4 +51,8 @@ return [
         'content_sid' => env('TWILIO_CONTENT_SID'), // optional approved template
     ],
 
+    'google' => [
+        'site_verification' => env('GOOGLE_SITE_VERIFICATION'),
+    ],
+
 ];

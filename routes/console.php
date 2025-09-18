@@ -20,3 +20,63 @@ Artisan::command('mail:test {to}', function (string $to) {
         $this->error('Failed to send: ' . $e->getMessage());
     }
 })->purpose('Send a test email to verify MAIL_ settings');
+
+
+use App\Models\JobAlert;
+use App\Models\Job;
+use Illuminate\Support\Facades\Mail as MailFacade;
+use App\Mail\JobAlertMail;
+
+Artisan::command('alerts:send-weekly', function(){
+    $this->info('Sending weekly job alerts...');
+    $count = 0;
+    $alerts = JobAlert::with('user')
+        ->where('enabled', true)
+        ->where('frequency', 'weekly')
+        ->get();
+
+    foreach ($alerts as $alert) {
+        $user = $alert->user;
+        if (!$user) { continue; }
+        $email = trim((string) $user->email);
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) { continue; }
+
+        $q = trim((string)($alert->q ?? ''));
+        $province = trim((string)($alert->province ?? ''));
+        $industry = trim((string)($alert->industry ?? ''));
+        $jobTitle = trim((string)($alert->job_title ?? ''));
+
+        $jobsQ = Job::query()
+            ->with('company')
+            ->withCount('applications')
+            ->where('approved_by_admin', true)
+            ->where('status','open')
+            ->where('created_at', '>=', now()->subDays(7));
+
+        if ($q !== '') {
+            $jobsQ->where(function($qq) use ($q){
+                $qq->where('title','like',"%{$q}%")
+                   ->orWhere('description','like',"%{$q}%");
+            });
+        }
+        if ($province !== '') { $jobsQ->where('province', $province); }
+        if ($industry !== '') {
+            $jobsQ->whereHas('company', function($cq) use ($industry){ $cq->where('industry', $industry); });
+        }
+        if ($jobTitle !== '') { $jobsQ->where('title','like',"%{$jobTitle}%"); }
+
+        $jobs = $jobsQ->orderByDesc('id')->limit(20)->get();
+        try {
+            MailFacade::to($email)->send(new JobAlertMail([
+                'q'=>$q,'province'=>$province,'industry'=>$industry,'job_title'=>$jobTitle
+            ], $jobs));
+            $alert->last_sent_at = now();
+            $alert->save();
+            $count++;
+        } catch (\Throwable $e) {
+            $this->error('Failed to send to '.$email.': '.$e->getMessage());
+        }
+    }
+
+    $this->info('Weekly alerts sent: '.$count);
+})->purpose('Send weekly job alerts to users');
