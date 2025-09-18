@@ -15,12 +15,12 @@
                     <x-input-label value="إرسال كود التفعيل عبر" />
                     <select name="channel" class="select select-bordered">
                         <option value="email">البريد الإلكتروني</option>
-                        @if (config('services.whatsapp.token') && config('services.whatsapp.phone_id'))
+                        @if ((config('services.whatsapp.token') && config('services.whatsapp.phone_id')) || (config('services.twilio.sid') && config('services.twilio.token') && config('services.twilio.whatsapp_from')))
                             <option value="whatsapp">الواتساب</option>
                         @endif
                     </select>
-                    @unless (config('services.whatsapp.token') && config('services.whatsapp.phone_id'))
-                        <p class="text-sm text-warning mt-1">الواتساب غير مفعّل حالياً. حدّد بريدك أو فعّل إعدادات واتساب.</p>
+                    @unless ((config('services.whatsapp.token') && config('services.whatsapp.phone_id')) || (config('services.twilio.sid') && config('services.twilio.token') && config('services.twilio.whatsapp_from')))
+                        <p class="text-sm text-warning mt-1">الواتساب غير مفعّل حالياً. حدّد بريدك أو فعّل إعدادات واتساب (Meta أو Twilio).</p>
                     @endunless
                 </div>
                 <div class="form-control">

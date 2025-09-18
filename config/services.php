@@ -37,10 +37,17 @@ return [
 
 
     'whatsapp' => [
+        'driver' => env('WHATSAPP_DRIVER', 'meta'), // meta | twilio
         'token' => env('WHATSAPP_TOKEN'),
         'phone_id' => env('WHATSAPP_PHONE_ID'),
-        'from' => env('WHATSAPP_FROM', ''), // optional display
+        'from' => env('WHATSAPP_FROM', ''), // optional display (meta)
         'country_prefix' => env('WHATSAPP_DEFAULT_COUNTRY', '+964'),
+    ],
+
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_TOKEN'),
+        'whatsapp_from' => env('TWILIO_WHATSAPP_FROM'),
     ],
 
 ];

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Twilio\Rest\Client;
 
 class VerificationCodeController extends Controller
 {
@@ -55,30 +56,46 @@ class VerificationCodeController extends Controller
                 return back()->with('status','تعذر إرسال البريد حالياً. جرّب لاحقاً أو اختر الواتساب.');
             }
         } else {
-            $token = config('services.whatsapp.token');
-            $phoneId = config('services.whatsapp.phone_id');
+            $driver = config('services.whatsapp.driver', env('WHATSAPP_DRIVER', 'meta'));
             $to = $this->normalizeMsisdn($user->whatsapp_number);
-            if (!$token || !$phoneId || !$to) {
-                return back()->with('status','تعذر إرسال واتساب: إعدادات غير مكتملة أو رقم غير صالح.');
-            }
-            $payload = [
-                'messaging_product' => 'whatsapp',
-                'to' => $to,
-                'type' => 'template',
-                // مبدئياً نرسل رسالة نصية بسيطة؛ يمكنك لاحقاً إنشاء قالب template معتمد واستخدامه
-                'template' => [
-                    'name' => 'code_notification',
-                    'language' => ['code' => 'ar'],
-                    'components' => [[
-                        'type' => 'body',
-                        'parameters' => [[ 'type' => 'text', 'text' => $code ]]
-                    ]]
-                ],
-            ];
-            $resp = Http::withToken($token)
-                ->post("https://graph.facebook.com/v20.0/{$phoneId}/messages", $payload);
-            if (!$resp->successful()) {
-                return back()->with('status','فشل إرسال واتساب: '.$resp->body());
+            if ($driver === 'twilio') {
+                if (!$to || !config('services.twilio.sid') || !config('services.twilio.token') || !config('services.twilio.whatsapp_from')) {
+                    return back()->with('status','تعذر إرسال واتساب (Twilio): إعدادات غير مكتملة أو رقم غير صالح.');
+                }
+                try {
+                    $client = new Client(config('services.twilio.sid'), config('services.twilio.token'));
+                    $client->messages->create('whatsapp:'.$to, [
+                        'from' => config('services.twilio.whatsapp_from'),
+                        'body' => "رمز التفعيل: {$code} (صالح لمدة 15 دقيقة)",
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::error('Twilio WhatsApp send failed: '.$e->getMessage(), ['user_id' => $user->id]);
+                    return back()->with('status','تعذر إرسال واتساب عبر Twilio حالياً.');
+                }
+            } else {
+                $token = config('services.whatsapp.token');
+                $phoneId = config('services.whatsapp.phone_id');
+                if (!$token || !$phoneId || !$to) {
+                    return back()->with('status','تعذر إرسال واتساب (Meta): إعدادات غير مكتملة أو رقم غير صالح.');
+                }
+                $payload = [
+                    'messaging_product' => 'whatsapp',
+                    'to' => $to,
+                    'type' => 'template',
+                    'template' => [
+                        'name' => 'code_notification',
+                        'language' => ['code' => 'ar'],
+                        'components' => [[
+                            'type' => 'body',
+                            'parameters' => [[ 'type' => 'text', 'text' => $code ]]
+                        ]]
+                    ],
+                ];
+                $resp = Http::withToken($token)
+                    ->post("https://graph.facebook.com/v20.0/{$phoneId}/messages", $payload);
+                if (!$resp->successful()) {
+                    return back()->with('status','فشل إرسال واتساب: '.$resp->body());
+                }
             }
         }
 
