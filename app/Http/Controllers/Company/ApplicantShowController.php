@@ -8,6 +8,7 @@ use App\Models\Application;
 use App\Models\Job;
 use App\Models\JobSeeker;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class ApplicantShowController extends Controller
 {
-    public function __invoke(JobSeeker $jobSeeker): View
+    public function __invoke(JobSeeker $jobSeeker): View|RedirectResponse
     {
         $company = Auth::user()->company;
         abort_if(!$company, 403);
