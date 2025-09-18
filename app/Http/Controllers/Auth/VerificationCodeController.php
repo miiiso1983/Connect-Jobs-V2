@@ -45,24 +45,14 @@ class VerificationCodeController extends Controller
             if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 return back()->with('status','تعذر الإرسال: بريدك غير صالح. حدّث البريد الإلكتروني من الملف الشخصي أو اختر الواتساب.');
             }
+            // Send synchronously WITHOUT queue to avoid DB queue table issues
             try {
-                Mail::to([$email => $user->name])
-                    ->queue(new \App\Mail\VerifyCodeMail([
-                        'name' => $user->name,
-                        'code' => $code,
-                    ]));
+                Mail::send('emails.verify-code', ['name' => $user->name, 'code' => $code], function ($m) use ($email, $user) {
+                    $m->to($email, $user->name)->subject(__('رمز التفعيل | Verification Code'));
+                });
             } catch (\Throwable $e) {
-                Log::warning('Queue failed for VerifyCodeMail, falling back to sync send: '.$e->getMessage(), ['user_id' => $user->id]);
-                try {
-                    Mail::to([$email => $user->name])
-                        ->send(new \App\Mail\VerifyCodeMail([
-                            'name' => $user->name,
-                            'code' => $code,
-                        ]));
-                } catch (\Throwable $e2) {
-                    Log::error('Failed to send VerifyCodeMail (sync): '.$e2->getMessage(), ['user_id' => $user->id]);
-                    return back()->with('status','تعذر إرسال البريد حالياً. جرّب لاحقاً أو اختر الواتساب.');
-                }
+                Log::error('Failed to send VerifyCodeMail (direct): '.$e->getMessage(), ['user_id' => $user->id]);
+                return back()->with('status','تعذر إرسال البريد حالياً. جرّب لاحقاً أو اختر الواتساب.');
             }
         } else {
             $driver = config('services.whatsapp.driver', env('WHATSAPP_DRIVER', 'meta'));
