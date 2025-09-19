@@ -71,21 +71,7 @@
                 <div class="mt-4 flex flex-wrap items-center gap-3">
                     <button class="btn btn-primary">تطبيق</button>
                     <a href="{{ route('jobs.index') }}" class="btn btn-ghost">إعادة ضبط</a>
-                    @auth
-                        @if(auth()->user()->role==='jobseeker')
-                            <form method="POST" action="{{ route('jobseeker.alerts.store') }}" class="inline">
-                                @csrf
-                                <input type="hidden" name="q" value="{{ $q ?? '' }}"/>
-                                <input type="hidden" name="province" value="{{ $province ?? '' }}"/>
-                                <input type="hidden" name="industry" value="{{ $industry ?? '' }}"/>
-                                <input type="hidden" name="job_title" value="{{ $jobTitleFilter ?? '' }}"/>
-                                <button type="submit" class="btn btn-secondary">
-                                    حفظ تنبيه أسبوعي عبر البريد
-                                </button>
-                            </form>
-                            <a href="{{ route('jobseeker.alerts.index') }}" class="link link-primary text-sm">إدارة التنبيهات</a>
-                        @endif
-                    @endauth
+
                 </div>
             </form>
 
@@ -102,6 +88,24 @@
                     </div>
                 </div>
                 @endfor
+                @auth
+                    @if(auth()->user()->role==='jobseeker')
+                        <div class="mt-3 flex items-center gap-3">
+                            <form method="POST" action="{{ route('jobseeker.alerts.store') }}" class="inline">
+                                @csrf
+                                <input type="hidden" name="q" value="{{ $q ?? '' }}"/>
+                                <input type="hidden" name="province" value="{{ $province ?? '' }}"/>
+                                <input type="hidden" name="industry" value="{{ $industry ?? '' }}"/>
+                                <input type="hidden" name="job_title" value="{{ $jobTitleFilter ?? '' }}"/>
+                                <button type="submit" class="btn btn-secondary">
+                                    حفظ تنبيه أسبوعي عبر البريد
+                                </button>
+                            </form>
+                            <a href="{{ route('jobseeker.alerts.index') }}" class="link link-primary text-sm">إدارة التنبيهات</a>
+                        </div>
+                    @endif
+                @endauth
+
             </div>
 
             <!-- Jobs Grid -->
