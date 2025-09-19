@@ -50,8 +50,7 @@ Artisan::command('alerts:send-weekly', function(){
             ->with('company')
             ->withCount('applications')
             ->where('approved_by_admin', true)
-            ->where('status','open')
-            ->where('created_at', '>=', now()->subDays(7));
+            ->where('status','open');
 
         if ($q !== '') {
             $jobsQ->where(function($qq) use ($q){

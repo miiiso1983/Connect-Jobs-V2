@@ -15,9 +15,9 @@ class SitemapController extends Controller
         $urls[] = [ 'loc' => url('/'), 'changefreq' => 'daily', 'priority' => '1.0' ];
         $urls[] = [ 'loc' => route('jobs.index'), 'changefreq' => 'hourly', 'priority' => '0.9' ];
 
-        // Jobs (avoid selecting non-existent updated_at on some installs)
+        // Jobs (avoid timestamps entirely if table lacks them)
         $jobs = Job::query()
-            ->select(['id','created_at'])
+            ->select(['id'])
             ->where('approved_by_admin', true)
             ->where('status','open')
             ->orderByDesc('id')
@@ -25,10 +25,9 @@ class SitemapController extends Controller
             ->get();
 
         foreach ($jobs as $job) {
-            $lastmod = ($job->updated_at?->toAtomString()) ?? ($job->created_at?->toAtomString());
             $urls[] = [
                 'loc' => route('jobs.show', $job),
-                'lastmod' => $lastmod,
+                // 'lastmod' omitted if timestamps not available
                 'changefreq' => 'daily',
                 'priority' => '0.8',
             ];
