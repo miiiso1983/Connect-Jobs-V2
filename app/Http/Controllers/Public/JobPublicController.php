@@ -7,13 +7,14 @@ use App\Models\Company;
 use App\Models\Job;
 use App\Models\MasterSetting;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class JobPublicController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
         // Restore last used filters if no query provided (and not clearing)
         if (!$request->boolean('clear') && count($request->query()) === 0) {
