@@ -168,7 +168,6 @@
         </div>
     </div>
 
-    @push('scripts')
     <script>
     (function(){
       const form = document.getElementById('jobs-filter-form');
@@ -180,16 +179,6 @@
       if(pag){ pag.addEventListener('click', function(e){ const t = e.target.closest('a'); if(t){ showSkeleton(); } }, true); }
     })();
     </script>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "الصفحة الرئيسية", "item": "{{ url('/') }}"},
-        {"@type": "ListItem", "position": 2, "name": "الوظائف المتاحة", "item": "{{ url('/jobs') }}"}
-      ]
-    }
-    </script>
-    @endpush
+    <script type="application/ld+json">{!! $breadcrumbsJson ?? '' !!}</script
 </x-guest-layout>
 

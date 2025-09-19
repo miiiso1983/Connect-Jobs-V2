@@ -106,7 +106,16 @@ class JobPublicController extends Controller
             $savedIds = DB::table('saved_jobs')->where('user_id', Auth::id())->pluck('job_id')->all();
         }
 
-        return view('public.jobs.index2', compact('jobs','q','province','sort','provinces','industries','jobTitles','industry','jobTitleFilter','savedIds','companies','companyId','companyName'));
+        $breadcrumbsJson = json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'الصفحة الرئيسية', 'item' => url('/')],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'الوظائف المتاحة', 'item' => url('/jobs')],
+            ],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        return view('public.jobs.index', compact('jobs','q','province','sort','provinces','industries','jobTitles','industry','jobTitleFilter','savedIds','companies','companyId','companyName','breadcrumbsJson'));
     }
 
     public function show(Job $job): View
