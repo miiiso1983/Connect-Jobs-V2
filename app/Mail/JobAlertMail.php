@@ -14,11 +14,13 @@ class JobAlertMail extends Mailable
     public array $filters;
     /** @var \Illuminate\Support\Collection<int,Job> */
     public $jobs;
+    public ?string $unsubscribeToken;
 
-    public function __construct(array $filters, $jobs)
+    public function __construct(array $filters, $jobs, ?string $unsubscribeToken = null)
     {
         $this->filters = $filters;
         $this->jobs = $jobs;
+        $this->unsubscribeToken = $unsubscribeToken;
     }
 
     public function build()

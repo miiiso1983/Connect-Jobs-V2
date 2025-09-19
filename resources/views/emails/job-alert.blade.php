@@ -31,5 +31,10 @@
   @endforelse
 
   <p class="muted">يمكنك إدارة التنبيهات أو إيقافها من لوحة الباحث عن عمل &rarr; تنبيهات الوظائف.</p>
+  @if(!empty($unsubscribeToken))
+    <p class="muted" style="margin-top:8px">
+      لإيقاف هذا التنبيه مباشرة: <a href="{{ route('alerts.unsubscribe', $unsubscribeToken) }}">إلغاء الاشتراك من هذا التنبيه</a>
+    </p>
+  @endif
 @endsection
 

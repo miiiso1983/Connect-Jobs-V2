@@ -9,6 +9,16 @@
         @endif
 
         <title>{{ config('app.name', 'Connect Jobs') }}</title>
+        <link rel="canonical" href="{{ url()->current() }}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="@yield('meta_title', config('app.name','Connect Jobs'))" />
+        <meta property="og:description" content="@yield('meta_description','منصة وظائف تربط الشركات بالكوادر الموهوبة في العراق والشرق الأوسط')" />
+        <meta property="og:url" content="{{ request()->fullUrl() }}" />
+        <meta property="og:site_name" content="{{ config('app.name','Connect Jobs') }}" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="@yield('meta_title', config('app.name','Connect Jobs'))" />
+        <meta name="twitter:description" content="@yield('meta_description','منصة وظائف تربط الشركات بالكوادر الموهوبة في العراق والشرق الأوسط')" />
+
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

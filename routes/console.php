@@ -68,7 +68,7 @@ Artisan::command('alerts:send-weekly', function(){
         try {
             MailFacade::to($email)->send(new JobAlertMail([
                 'q'=>$q,'province'=>$province,'industry'=>$industry,'job_title'=>$jobTitle
-            ], $jobs));
+            ], $jobs, $alert->unsubscribe_token));
             $alert->last_sent_at = now();
             $alert->save();
             $count++;

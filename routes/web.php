@@ -28,7 +28,7 @@ Route::middleware(['setlocale'])->get('/', function () {
     $companiesCount = \App\Models\Company::count();
     $seekersCount = \App\Models\JobSeeker::count();
     return view('landing', compact('jobsCount','companiesCount','seekersCount'));
-});
+})->name('home');
 
 // Public jobs + sitemap
 Route::middleware('setlocale')->group(function(){
@@ -44,6 +44,17 @@ Route::middleware(['auth'])->get('/logout', function(){
     Route::get('/jobs', [\App\Http\Controllers\Public\JobPublicController::class,'index'])->name('jobs.index');
     Route::get('/jobs/{job}', [\App\Http\Controllers\Public\JobPublicController::class,'show'])->name('jobs.show');
     Route::get('/sitemap.xml', \App\Http\Controllers\Public\SitemapController::class)->name('sitemap');
+    Route::get('/alerts/unsubscribe/{token}', \App\Http\Controllers\Public\UnsubscribeAlertController::class)->name('alerts.unsubscribe');
+});
+
+// robots.txt
+Route::get('/robots.txt', function(){
+    $lines = [
+        'User-agent: *',
+        'Allow: /',
+        'Sitemap: '.url('/sitemap.xml'),
+    ];
+    return response(implode("\n", $lines), 200)->header('Content-Type','text/plain');
 });
 
     // Save/Unsave jobs (jobseeker only)
