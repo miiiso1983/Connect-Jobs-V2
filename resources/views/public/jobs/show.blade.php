@@ -52,7 +52,7 @@
                 @endif
             </div>
 
-            @auth
+            @if(auth()->check())
                 @if(auth()->user()->role==='jobseeker')
                     <form method="POST" action="{{ route('jobseeker.apply',$job) }}">
                         @csrf
@@ -61,13 +61,13 @@
                 @else
                     <div class="text-sm text-gray-600">سجّل دخول كباحث عن عمل للتقديم.</div>
                 @endif
-            @endauth
-            @guest
+            @endif
+            @unless(auth()->check())
                 <a href="{{ route('login') }}" class="btn btn-primary">سجّل للدخول للتقديم</a>
-            @endguest
+            @endunless
         </div>
     </div>
-    @auth
+    @if(auth()->check())
         @if(auth()->user()->role==='jobseeker')
             <div class="fixed bottom-4 inset-x-0 flex justify-center z-40">
                 <div class="bg-base-100/90 backdrop-blur border rounded-full shadow-lg px-3 py-2 flex items-center gap-3">
@@ -89,12 +89,12 @@
                 </div>
             </div>
         @endif
-    @endauth
-    @guest
+    @endif
+    @unless(auth()->check())
         <div class="fixed bottom-4 inset-x-0 flex justify-center z-40">
             <a href="{{ route('login') }}" class="btn btn-primary btn-sm rounded-full">سجّل للدخول للتقديم</a>
         </div>
-    @endguest
+    @endunless
 
     {{-- JSON-LD JobPosting Schema --}}
     @php
