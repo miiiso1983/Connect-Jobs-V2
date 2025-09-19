@@ -179,6 +179,6 @@
       if(pag){ pag.addEventListener('click', function(e){ const t = e.target.closest('a'); if(t){ showSkeleton(); } }, true); }
     })();
     </script>
-    <script type="application/ld+json">{!! $breadcrumbsJson ?? '' !!}</script
+    <script type="application/ld+json">{!! $breadcrumbsJson ?? '' !!}</script>
 </x-guest-layout>
 
