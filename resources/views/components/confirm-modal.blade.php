@@ -1,6 +1,6 @@
 @props(['title' => 'تأكيد', 'message' => 'هل أنت متأكد؟'])
 
-<div x-show="open" x-transition class="fixed inset-0 z-50 flex items-center justify-center">
+<div x-show="open" x-transition x-cloak class="fixed inset-0 z-50 flex items-center justify-center">
     <div class="absolute inset-0 bg-black/50" @click="open=false"></div>
     <div class="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6">
         <h3 class="text-lg font-semibold mb-2">{{ $title }}</h3>

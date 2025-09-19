@@ -103,12 +103,6 @@
                                     <x-confirm-modal title="تأكيد الحذف" message="سيتم حذف الشركة وجميع وظائفها. هل أنت متأكد؟" />
                                 </form>
                             </td>
-                                    <form method="POST" action="{{ route('admin.companies.destroy',$c) }}" x-data="{open:false}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" @click="open=true" class="px-3 py-1.5 rounded-lg bg-red-700 hover:bg-red-800 text-white text-xs">حذف الشركة</button>
-                                        <x-confirm-modal title="تأكيد الحذف" message="سيتم حذف الشركة وجميع وظائفها. هل أنت متأكد؟" />
-                                    </form>
 
                         </tr>
                     @endforeach
