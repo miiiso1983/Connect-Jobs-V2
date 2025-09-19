@@ -106,6 +106,26 @@
             'identifier' => [
                 '@type' => 'PropertyValue',
                 'name' => $orgName,
+    {{-- JSON-LD Breadcrumbs --}}
+    @php
+        $crumbs = [
+            ['@type'=>'ListItem','position'=>1,'name'=>'الرئيسية','item'=>url('/')],
+            ['@type'=>'ListItem','position'=>2,'name'=>'الوظائف','item'=>route('jobs.index')],
+        ];
+        if ($job->company) {
+            $crumbs[] = ['@type'=>'ListItem','position'=>3,'name'=>$job->company->company_name,'item'=>route('public.company.show',$job->company)];
+            $crumbs[] = ['@type'=>'ListItem','position'=>4,'name'=>$job->title,'item'=>route('jobs.show',$job)];
+        } else {
+            $crumbs[] = ['@type'=>'ListItem','position'=>3,'name'=>$job->title,'item'=>route('jobs.show',$job)];
+        }
+        $breadcrumbSchema = [
+            '@context'=>'https://schema.org',
+            '@type'=>'BreadcrumbList',
+            'itemListElement'=>$crumbs,
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($breadcrumbSchema, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
+
                 'value' => (string) $job->id,
             ],
             'url' => url()->current(),

@@ -79,3 +79,17 @@ Artisan::command('alerts:send-weekly', function(){
 
     $this->info('Weekly alerts sent: '.$count);
 })->purpose('Send weekly job alerts to users');
+
+Artisan::command('alerts:backfill-unsubscribe-tokens', function(){
+    $count = 0;
+    $missing = \App\Models\JobAlert::whereNull('unsubscribe_token')->orWhere('unsubscribe_token','')->get();
+    foreach ($missing as $alert) {
+        try {
+            $alert->unsubscribe_token = bin2hex(random_bytes(16));
+            $alert->save();
+            $count++;
+        } catch (\Throwable $e) {}
+    }
+    $this->info('Backfilled unsubscribe_token for '.$count.' alerts.');
+})->purpose('Generate unsubscribe_token for old job alerts');
+

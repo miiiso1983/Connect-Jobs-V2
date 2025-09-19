@@ -20,6 +20,8 @@ class JobPublicController extends Controller
         $sort = $request->query('sort', 'latest');
         $industry = trim((string)$request->query('industry', ''));
         $jobTitleFilter = trim((string)$request->query('job_title', ''));
+        $companyId = (int) $request->query('company_id', 0);
+        $companyName = trim((string)$request->query('company', ''));
 
         $jobsQ = Job::query()
             ->with('company')
@@ -38,6 +40,11 @@ class JobPublicController extends Controller
         }
         if ($industry !== '') {
             $jobsQ->whereHas('company', function($cq) use ($industry){ $cq->where('industry', $industry); });
+        }
+        if ($companyId > 0) {
+            $jobsQ->where('company_id', $companyId);
+        } elseif ($companyName !== '') {
+            $jobsQ->whereHas('company', function($cq) use ($companyName){ $cq->where('company_name','like',"%{$companyName}%"); });
         }
         if ($jobTitleFilter !== '') {
             // Filter by standardized job title value against free-text title
@@ -59,6 +66,10 @@ class JobPublicController extends Controller
         $jobTitles = MasterSetting::where('setting_type','job_title')->pluck('value');
         if ($jobTitles->isEmpty()) { $jobTitles = collect(['صيدلاني','صيدلاني مساعد','مندوب مبيعات طبية','فني مختبر','محاسب','سكرتير/ة']); }
         $industries = Company::query()->whereNotNull('industry')->distinct()->orderBy('industry')->pluck('industry');
+        $companies = Company::query()
+            ->whereHas('jobs', function($q){ $q->where('approved_by_admin',true)->where('status','open'); })
+            ->orderBy('company_name')
+            ->get(['id','company_name']);
 
         // Saved jobs for current user (jobseeker)
         $savedIds = [];
@@ -66,7 +77,7 @@ class JobPublicController extends Controller
             $savedIds = DB::table('saved_jobs')->where('user_id', Auth::id())->pluck('job_id')->all();
         }
 
-        return view('public.jobs.index', compact('jobs','q','province','sort','provinces','industries','jobTitles','industry','jobTitleFilter','savedIds'));
+        return view('public.jobs.index', compact('jobs','q','province','sort','provinces','industries','jobTitles','industry','jobTitleFilter','savedIds','companies','companyId','companyName'));
     }
 
     public function show(Job $job): View

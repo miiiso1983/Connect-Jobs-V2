@@ -46,6 +46,16 @@
                             @endforeach
                         </select>
                     </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1">الشركة</label>
+                        <select name="company_id" class="select select-bordered w-full">
+                            <option value="">الكل</option>
+                            @foreach(($companies ?? collect()) as $c)
+                                <option value="{{ $c->id }}" @selected(($companyId ?? 0)===$c->id)>{{ $c->company_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                 </div>
                 <div class="mt-4 flex flex-wrap items-center gap-3">
                     <button class="btn btn-primary">تطبيق</button>
@@ -90,7 +100,14 @@
                         <div class="flex items-start justify-between gap-3">
                             <div>
                                 <a href="{{ route('jobs.show',$job) }}" class="text-base text-primary font-semibold hover:underline">{{ $job->title }}</a>
-                                <div class="text-xs text-gray-500">{{ optional($job->company)->company_name ?? '—' }} @if(optional($job->company)->industry) · {{ optional($job->company)->industry }} @endif</div>
+                                <div class="text-xs text-gray-500">
+                                    @if($job->company)
+                                        <a href="{{ route('public.company.show',$job->company) }}" class="underline hover:text-primary">{{ $job->company->company_name }}</a>
+                                    @else
+                                        —
+                                    @endif
+                                    @if(optional($job->company)->industry) · {{ optional($job->company)->industry }} @endif
+                                </div>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="px-2 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700">{{ $job->province }}</span>

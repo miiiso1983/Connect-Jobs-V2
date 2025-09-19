@@ -1,11 +1,20 @@
 <x-guest-layout>
   @section('meta_title', $company->company_name.' - Connect Jobs')
   @section('meta_description', 'الملف العام لشركة '.$company->company_name.' ووظائفها المفتوحة')
+  @if(!empty($company->profile_image))
+    @section('meta_image', Storage::url($company->profile_image))
+  @endif
+
 
   <section class="bg-gradient-to-r from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white py-10">
-    <div class="max-w-6xl mx-auto px-4">
-      <h1 class="text-3xl font-extrabold">{{ $company->company_name }}</h1>
-      <p class="opacity-90 mt-1">{{ $company->industry }} · {{ $company->province }}</p>
+    <div class="max-w-6xl mx-auto px-4 flex items-center gap-4">
+      @if(!empty($company->profile_image))
+        <img src="{{ Storage::url($company->profile_image) }}" alt="{{ $company->company_name }}" loading="lazy" width="64" height="64" class="w-16 h-16 rounded-xl object-cover ring-2 ring-white/50"/>
+      @endif
+      <div>
+        <h1 class="text-3xl font-extrabold">{{ $company->company_name }}</h1>
+        <p class="opacity-90 mt-1">{{ $company->industry }} · {{ $company->province }}</p>
+      </div>
     </div>
   </section>
 
