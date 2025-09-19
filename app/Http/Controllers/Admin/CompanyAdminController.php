@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
+use App\Models\EmailTemplate;
 use Carbon\Carbon;
 
 class CompanyAdminController extends Controller
@@ -24,7 +26,11 @@ class CompanyAdminController extends Controller
         $company->load(['user','jobs' => function($q){ $q->orderByDesc('id'); }]);
         $jobsOpen = $company->jobs->where('status','open')->count();
         $jobsPending = $company->jobs->where('approved_by_admin', false)->count();
-        return view('admin.companies.show', compact('company','jobsOpen','jobsPending'));
+        $emailTemplates = collect();
+        if (class_exists(EmailTemplate::class) && Schema::hasTable('email_templates')) {
+            $emailTemplates = EmailTemplate::where('scope','company')->where('active',true)->orderBy('name')->get();
+        }
+        return view('admin.companies.show', compact('company','jobsOpen','jobsPending','emailTemplates'));
     }
 
     public function approve(Company $company): RedirectResponse
@@ -82,7 +88,7 @@ class CompanyAdminController extends Controller
         $request->validate([
             'subject' => 'nullable|string|max:200',
             'message' => 'nullable|string|max:5000',
-            'template' => 'nullable|string|in:approval_reminder,subscription_soon,general_notice',
+            'template' => 'nullable|string|max:100',
         ]);
 
         $email = $company->user?->email;
@@ -90,28 +96,17 @@ class CompanyAdminController extends Controller
             return back()->with('status','لا يمكن الإرسال: بريد غير صالح.');
         }
 
-        // Canned templates
-        $templates = [
-            'approval_reminder' => [
-                'subject' => 'تذكير موافقة الحساب',
-                'body' => "مرحبا {{name}}،\n\nتمت مراجعة حساب شركتكم {{company}}. نرجو استكمال البيانات المطلوبة ليتم التفعيل النهائي.\n\nشكرا لكم."
-            ],
-            'subscription_soon' => [
-                'subject' => 'تنبيه: اشتراككم يقترب من الانتهاء',
-                'body' => "السادة {{company}}،\n\nاشتراككم يقترب من الانتهاء. يرجى التجديد لضمان استمرار نشر الوظائف والتقديمات.\n\nفريق Connect Job"
-            ],
-            'general_notice' => [
-                'subject' => 'رسالة إدارية',
-                'body' => "السادة {{company}}،\n\nهذه رسالة إدارية عامة من فريق الدعم.\n\nمع التحية"
-            ],
-        ];
-
-        $tplKey = $request->input('template');
+        $tplParam = (string) ($request->input('template') ?? '');
         $subject = trim((string)($request->input('subject') ?? ''));
         $body = trim((string)($request->input('message') ?? ''));
-        if ($tplKey && isset($templates[$tplKey])) {
-            if ($subject === '') { $subject = $templates[$tplKey]['subject']; }
-            if ($body === '') { $body = $templates[$tplKey]['body']; }
+
+        // If template param is a numeric ID and table exists, load it
+        if ($tplParam !== '' && ctype_digit($tplParam) && class_exists(EmailTemplate::class) && Schema::hasTable('email_templates')) {
+            $tpl = EmailTemplate::where('id', (int)$tplParam)->where('scope','company')->where('active',true)->first();
+            if ($tpl) {
+                if ($subject === '') { $subject = $tpl->subject; }
+                if ($body === '') { $body = $tpl->body; }
+            }
         }
         // Replace placeholders
         $repl = [

@@ -93,6 +93,99 @@
                 </div>
             @endforeach
         </div>
+        <div class="mt-10 bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+            <h3 class="font-bold text-lg mb-4">قوالب البريد الجاهزة</h3>
+            <form method="POST" action="{{ route('admin.email-templates.store') }}" class="grid grid-cols-1 md:grid-cols-6 gap-3 mb-6">
+                @csrf
+                <div>
+                    <x-input-label value="النطاق" />
+                    <select name="scope" class="select select-bordered w-full">
+                        @foreach(['company'=>'الشركات','jobseeker'=>'الباحثون','admin'=>'الإدارة'] as $k=>$v)
+                            <option value="{{ $k }}">{{ $v }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <x-input-label value="الاسم" />
+                    <input type="text" name="name" class="input input-bordered w-full" placeholder="اسم وصفي" />
+                </div>
+                <div class="md:col-span-3">
+                    <x-input-label value="الموضوع" />
+                    <input type="text" name="subject" class="input input-bordered w-full" placeholder="موضوع البريد" />
+                </div>
+                <div class="md:col-span-5">
+                    <x-input-label value="النص" />
+                    <textarea name="body" rows="4" class="textarea textarea-bordered w-full" placeholder="نص الرسالة (يدعم {{name}} و {{company}})"></textarea>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" name="active" value="1" checked class="checkbox" />
+                    <span class="text-sm">نشط</span>
+                </div>
+                <div class="md:col-span-6">
+                    <x-primary-button>إضافة قالب</x-primary-button>
+                </div>
+            </form>
+
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>النطاق</th>
+                            <th>الاسم</th>
+                            <th>الموضوع</th>
+                            <th>نشط</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse(($templates ?? collect()) as $t)
+                            <tr>
+                                <td>{{ $t->scope }}</td>
+                                <td colspan="2">
+                                    <form method="POST" action="{{ route('admin.email-templates.update', $t) }}" class="grid grid-cols-1 md:grid-cols-6 gap-2">
+                                        @csrf
+                                        @method('PUT')
+                                        <div>
+                                            <select name="scope" class="select select-bordered w-full">
+                                                @foreach(['company'=>'الشركات','jobseeker'=>'الباحثون','admin'=>'الإدارة'] as $k=>$v)
+                                                    <option value="{{ $k }}" @selected($t->scope===$k)>{{ $v }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <input type="text" name="name" value="{{ $t->name }}" class="input input-bordered w-full" />
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <input type="text" name="subject" value="{{ $t->subject }}" class="input input-bordered w-full" />
+                                        </div>
+                                        <div class="md:col-span-6">
+                                            <textarea name="body" rows="3" class="textarea textarea-bordered w-full">{{ $t->body }}</textarea>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <input type="checkbox" name="active" value="1" class="checkbox" @checked($t->active) />
+                                            <span class="text-sm">نشط</span>
+                                        </div>
+                                        <div>
+                                            <x-primary-button>حفظ</x-primary-button>
+                                        </div>
+                                    </form>
+                                </td>
+                                <td class="align-top">
+                                    <form method="POST" action="{{ route('admin.email-templates.destroy', $t) }}" onsubmit="return confirm('حذف القالب؟');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-error btn-sm">حذف</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="5" class="text-center text-gray-500">لا توجد قوالب بعد.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 </x-app-layout>
 

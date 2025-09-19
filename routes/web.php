@@ -133,6 +133,11 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
     Route::delete('/settings/{setting}', [\App\Http\Controllers\Admin\MasterSettingController::class, 'destroy'])->name('settings.destroy');
     Route::post('/settings/bulk', [\App\Http\Controllers\Admin\MasterSettingController::class, 'bulkStore'])->name('settings.bulk');
         Route::get('/settings/export', [\App\Http\Controllers\Admin\MasterSettingController::class, 'export'])->name('settings.export');
+    // Email templates CRUD
+    Route::post('/email-templates', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'store'])->name('email-templates.store');
+    Route::put('/email-templates/{template}', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'update'])->name('email-templates.update');
+    Route::delete('/email-templates/{template}', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'destroy'])->name('email-templates.destroy');
+
     // Districts admin
     Route::get('/districts', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'index'])->name('districts.index');
     Route::post('/districts', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'store'])->name('districts.store');

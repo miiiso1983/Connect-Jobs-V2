@@ -31,6 +31,24 @@
                 </div>
             </div>
         </div>
+        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+            @if(!is_null($completedCount))
+            <div class="stats bg-white shadow">
+                <div class="stat">
+                    <div class="stat-title">أكمل الملف</div>
+                    <div class="stat-value text-indigo-600">{{ $completedCount }}</div>
+                </div>
+            </div>
+            @endif
+            @if(!is_null($cvCount))
+            <div class="stats bg-white shadow">
+                <div class="stat">
+                    <div class="stat-title">سيرة ذاتية مرفوعة</div>
+                    <div class="stat-value text-indigo-600">{{ $cvCount }}</div>
+                </div>
+            </div>
+            @endif
+        </div>
 
         <form method="GET" class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow grid grid-cols-1 md:grid-cols-6 gap-3">
             <div class="md:col-span-2">
@@ -109,8 +127,11 @@
                         <th>المحافظة</th>
                         <th>المسمى</th>
                         <th>الحالة</th>
+                        <th>الملف</th>
+                        <th>السيرة الذاتية</th>
                         <th>أُنشئ</th>
                         <th>آخر ظهور</th>
+
                         <th></th>
                     </tr>
                 </thead>
@@ -131,6 +152,22 @@
                                     {{ $s->user->status ?? 'active' }}
                                 </span>
                             </td>
+                            <td>
+                                @php($pc = $s->profile_completed ?? null)
+                                @if($pc===null)
+                                    —
+                                @else
+                                    <span class="badge {{ $pc ? 'badge-success' : 'badge-ghost' }}">{{ $pc ? 'مكتمل' : 'غير مكتمل' }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                @php($cv = $s->cv_file ?? null)
+                                @if($cv===null)
+                                    —
+                                @else
+                                    <span class="badge {{ ($cv !== '') ? 'badge-success' : 'badge-ghost' }}">{{ ($cv !== '') ? 'مرفوعة' : 'لا' }}</span>
+                                @endif
+                            </td>
                             <td>{{ $s->user->created_at ?? '—' }}</td>
                             @php($ts = $lastSeenTs[$s->user_id] ?? null)
                             <td>{{ $ts ? \Carbon\Carbon::createFromTimestamp($ts)->toDateTimeString() : '—' }}</td>
@@ -147,8 +184,25 @@
                                 </form>
                             </td>
                         </tr>
+                            <td>
+                                @php($pc = $s->profile_completed ?? null)
+                                @if($pc===null)
+                                    —
+                                @else
+                                    <span class="badge {{ $pc ? 'badge-success' : 'badge-ghost' }}">{{ $pc ? 'مكتمل' : 'غير مكتمل' }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                @php($cv = $s->cv_file ?? null)
+                                @if($cv===null)
+                                    —
+                                @else
+                                    <span class="badge {{ ($cv !== '') ? 'badge-success' : 'badge-ghost' }}">{{ ($cv !== '') ? 'مرفوعة' : 'لا' }}</span>
+                                @endif
+                            </td>
+
                     @empty
-                        <tr><td colspan="8" class="text-center text-gray-500">لا نتائج.</td></tr>
+                        <tr><td colspan="10" class="text-center text-gray-500">لا نتائج.</td></tr>
                     @endforelse
                 </tbody>
             </table>

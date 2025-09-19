@@ -84,6 +84,17 @@ class JobSeekerAdminController extends Controller
         $activeUsers = User::where('role','jobseeker')->where('status','active')->count();
         $suspendedUsers = User::where('role','jobseeker')->where('status','suspended')->count();
 
+        $completedCount = null;
+        $cvCount = null;
+        if (Schema::hasTable('job_seekers')) {
+            if (Schema::hasColumn('job_seekers','profile_completed')) {
+                $completedCount = JobSeeker::where('profile_completed', true)->count();
+            }
+            if (Schema::hasColumn('job_seekers','cv_file')) {
+                $cvCount = JobSeeker::whereNotNull('cv_file')->where('cv_file','!=','')->count();
+            }
+        }
+
         $provinces = \App\Models\MasterSetting::where('setting_type','province')->pluck('value');
 
         // Last seen map for current page

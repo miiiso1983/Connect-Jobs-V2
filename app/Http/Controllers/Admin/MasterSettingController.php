@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\MasterSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
+use App\Models\EmailTemplate;
 
 class MasterSettingController extends Controller
 {
@@ -14,7 +16,11 @@ class MasterSettingController extends Controller
     {
         $types = MasterSetting::select('setting_type')->distinct()->orderBy('setting_type')->pluck('setting_type');
         $settings = MasterSetting::orderBy('setting_type')->orderBy('value')->get();
-        return view('admin.settings.index', compact('types','settings'));
+        $templates = collect();
+        if (class_exists(EmailTemplate::class) && Schema::hasTable('email_templates')) {
+            $templates = EmailTemplate::orderBy('scope')->orderBy('name')->get();
+        }
+        return view('admin.settings.index', compact('types','settings','templates'));
     }
 
     public function store(Request $request): RedirectResponse

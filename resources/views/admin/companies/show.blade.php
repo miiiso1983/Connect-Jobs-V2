@@ -83,13 +83,17 @@
                 <form method="POST" action="{{ route('admin.companies.user.email', $company) }}" class="space-y-2">
                     @csrf
                     <x-input-label value="قالب جاهز (اختياري)" />
-                    <select name="template" class="select select-bordered w-full">
-                        <option value="">—</option>
-                        <option value="approval_reminder">تذكير موافقة الحساب</option>
-                        <option value="subscription_soon">تنبيه قرب انتهاء الاشتراك</option>
-                        <option value="general_notice">رسالة إدارية عامة</option>
-                    </select>
-                    <p class="text-xs text-gray-500">عند اختيار قالب وترك الحقول فارغة سيُستخدم القالب تلقائياً.</p>
+                    @if(($emailTemplates ?? collect())->count() > 0)
+                        <select name="template" class="select select-bordered w-full">
+                            <option value="">—</option>
+                            @foreach($emailTemplates as $t)
+                                <option value="{{ $t->id }}">{{ $t->name }} — {{ \Illuminate\Support\Str::limit($t->subject, 50) }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500">يدعم القالب المتغيّرات {{name}} و {{company}}. عند ترك الحقول أدناه فارغة سيتم استخدام القالب.</p>
+                    @else
+                        <p class="text-xs text-gray-500">لا توجد قوالب مُنشأة بعد. يمكنك إنشاء القوالب من صفحة الإعدادات.</p>
+                    @endif
 
                     <x-input-label value="الموضوع" />
                     <input type="text" name="subject" class="input input-bordered w-full" placeholder="موضوع الرسالة" />
