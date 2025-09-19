@@ -134,27 +134,6 @@
         </div>
     </div>
 
-    @push('scripts')
-    <script>
-    (function(){
-      const form = document.getElementById('jobs-filter-form');
-      const grid = document.getElementById('jobs-grid');
-      const pag = document.getElementById('jobs-pagination');
-      function showSkeleton(){ if(grid){ grid.classList.add('opacity-30','pointer-events-none'); } }
-      if(form){ form.addEventListener('submit', function(){ showSkeleton(); }); }
-      if(pag){ pag.addEventListener('click', function(e){ const t = e.target.closest('a'); if(t){ showSkeleton(); } }, true); }
-    })();
-    </script>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "الصفحة الرئيسية", "item": "{{ url('/') }}"},
-        {"@type": "ListItem", "position": 2, "name": "الوظائف المتاحة", "item": "{{ url('/jobs') }}"}
-      ]
-    }
-    </script>
-    @endpush
+
 </x-guest-layout>
 
