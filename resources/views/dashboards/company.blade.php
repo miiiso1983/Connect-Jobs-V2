@@ -66,7 +66,11 @@
             </div>
         </div>
     </div>
-            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow" x-data='{ prov: @js($charts["by_province"]), spec: @js($charts["by_speciality"]) }'>
+            <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow"
+                 x-data="{ prov: [], spec: [] }"
+                 x-init="prov = JSON.parse($el.dataset.prov); spec = JSON.parse($el.dataset.spec)"
+                 data-prov='@json($charts["by_province"])'
+                 data-spec='@json($charts["by_speciality"])'>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <div class="text-sm text-gray-500 mb-2">أعلى المحافظات</div>
