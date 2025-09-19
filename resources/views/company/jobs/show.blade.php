@@ -1,3 +1,6 @@
+{{-- Legacy content (accidentally committed) is commented out below. Clean template follows after this block. --}}
+{{--
+
 # إنشاء صفحة ترحيب جديدة وجذابة
 cat > resources/views/welcome.blade.php << 'EOF'
 <!DOCTYPE html>
@@ -6,19 +9,19 @@ cat > resources/views/welcome.blade.php << 'EOF'
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Connect Jobs - منصة الوظائف الرائدة</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- DaisyUI + Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         body { font-family: 'Cairo', sans-serif; }
         .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
@@ -56,12 +59,12 @@ cat > resources/views/welcome.blade.php << 'EOF'
             <p class="text-xl md:text-2xl mb-8 opacity-90">
                 منصة الوظائف الرائدة التي تربط المواهب بأفضل الفرص
             </p>
-            
+
             <!-- Search Box -->
             <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-2xl p-6">
                 <form class="flex flex-col md:flex-row gap-4">
                     <div class="flex-1">
-                        <input type="text" placeholder="ابحث عن وظيفة..." 
+                        <input type="text" placeholder="ابحث عن وظيفة..."
                                class="input input-bordered w-full text-gray-800 text-lg">
                     </div>
                     <div class="flex-1">
@@ -79,7 +82,7 @@ cat > resources/views/welcome.blade.php << 'EOF'
                     </button>
                 </form>
             </div>
-            
+
             <!-- Stats -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
                 <div class="text-center">
@@ -109,7 +112,7 @@ cat > resources/views/welcome.blade.php << 'EOF'
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">لماذا Connect Jobs؟</h2>
                 <p class="text-xl text-gray-600">نحن نقدم أفضل تجربة للباحثين عن عمل والشركات</p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="card bg-base-100 shadow-xl card-hover">
                     <div class="card-body text-center">
@@ -122,7 +125,7 @@ cat > resources/views/welcome.blade.php << 'EOF'
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="card bg-base-100 shadow-xl card-hover">
                     <div class="card-body text-center">
                         <div class="text-5xl text-primary mb-4">
@@ -134,7 +137,7 @@ cat > resources/views/welcome.blade.php << 'EOF'
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="card bg-base-100 shadow-xl card-hover">
                     <div class="card-body text-center">
                         <div class="text-5xl text-primary mb-4">
@@ -157,7 +160,7 @@ cat > resources/views/welcome.blade.php << 'EOF'
                 <h2 class="text-4xl font-bold text-gray-800 mb-4">أحدث الوظائف</h2>
                 <p class="text-xl text-gray-600">اكتشف أحدث الفرص الوظيفية المتاحة</p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Job Card 1 -->
                 <div class="card bg-white shadow-lg card-hover">
@@ -184,7 +187,7 @@ cat > resources/views/welcome.blade.php << 'EOF'
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Job Card 2 -->
                 <div class="card bg-white shadow-lg card-hover">
                     <div class="card-body">
@@ -210,7 +213,7 @@ cat > resources/views/welcome.blade.php << 'EOF'
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Job Card 3 -->
                 <div class="card bg-white shadow-lg card-hover">
                     <div class="card-body">
@@ -237,7 +240,7 @@ cat > resources/views/welcome.blade.php << 'EOF'
                     </div>
                 </div>
             </div>
-            
+
             <div class="text-center mt-12">
                 <a href="/jobs" class="btn btn-primary btn-lg">
                     عرض جميع الوظائف
@@ -309,5 +312,97 @@ cat > resources/views/welcome.blade.php << 'EOF'
         </div>
     </footer>
 </body>
-</html>
-EOF
+--}}
+
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-bold">{{ $job->title }}</h1>
+                <div class="text-sm text-gray-600">{{ $job->province }} · <span class="uppercase">#{{ $job->id }}</span></div>
+            </div>
+            <span class="badge {{ $job->status==='open' ? 'badge-success' : 'badge-ghost' }}">{{ $job->status }}</span>
+        </div>
+    </x-slot>
+
+    <div class="py-8 max-w-6xl mx-auto sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 space-y-3">
+                <h2 class="font-semibold">تفاصيل الوظيفة</h2>
+                <div class="text-gray-700 dark:text-gray-200">
+                    @if($job->requirements)
+                        <div class="mt-2">
+                            <h3 class="font-semibold">المتطلبات</h3>
+                            <p class="whitespace-pre-line">{{ $job->requirements }}</p>
+                        </div>
+                    @endif
+                    <div class="mt-2">
+                        <h3 class="font-semibold">الوصف</h3>
+                        <p class="whitespace-pre-line">{{ $job->description }}</p>
+                    </div>
+                    @if($job->jd_file)
+                        <div class="mt-3">
+                            <a href="{{ Storage::url($job->jd_file) }}" class="link link-primary" target="_blank">تحميل الوصف الوظيفي (PDF/DOC)</a>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                <h2 class="font-semibold mb-3">أحدث المتقدمين</h2>
+                @if($latestApplicants->isEmpty())
+                    <div class="text-gray-500">لا يوجد متقدمون مؤخراً.</div>
+                @else
+                    <div class="divide-y divide-base-200">
+                        @foreach($latestApplicants as $app)
+                            <div class="py-3 flex items-center justify-between">
+                                <div>
+                                    <div class="font-medium">{{ $app->jobSeeker->full_name ?? 'باحث' }}</div>
+                                    <div class="text-xs text-gray-500">تاريخ التقديم: {{ $app->applied_at?->format('Y-m-d H:i') }}</div>
+                                </div>
+                                @if($app->matching_percentage !== null)
+                                    <span class="badge badge-outline">التطابق {{ (int) $app->matching_percentage }}%</span>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <aside class="space-y-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                <h3 class="font-semibold mb-2">ملخص</h3>
+                <ul class="text-sm space-y-1">
+                    <li>الحالة: <span class="badge {{ $job->status==='open' ? 'badge-success' : 'badge-ghost' }}">{{ $job->status }}</span></li>
+                    <li>المحافظة: {{ $job->province }}</li>
+                    <li>آخر تحديث: {{ $job->updated_at?->format('Y-m-d') }}</li>
+                </ul>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                <h3 class="font-semibold mb-2">إحصاءات سريعة</h3>
+                <div class="text-sm space-y-2">
+                    <div>متوسط التطابق: <span class="font-semibold">{{ number_format($stats['avg_match'] ?? 0, 0) }}%</span></div>
+                    <div class="mt-2">
+                        <div class="font-semibold">الأكثر حسب المحافظة</div>
+                        <ul class="list-disc mr-5 mt-1">
+                            @foreach(($stats['by_province'] ?? []) as $row)
+                                <li>{{ $row->province ?: 'غير محدد' }} ({{ $row->c }})</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <div class="mt-2">
+                        <div class="font-semibold">الأكثر حسب التخصص</div>
+                        <ul class="list-disc mr-5 mt-1">
+                            @foreach(($stats['by_speciality'] ?? []) as $row)
+                                <li>{{ $row->speciality ?: 'غير محدد' }} ({{ $row->c }})</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</x-app-layout>
+
