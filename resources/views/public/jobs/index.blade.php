@@ -121,7 +121,9 @@
                                     @else
                                         —
                                     @endif
-                                    @if(optional($job->company)->industry) · {{ optional($job->company)->industry }} @endif
+                                    @if(optional($job->company)->industry)
+                                        <span>&middot; {{ optional($job->company)->industry }}</span>
+                                    @endif
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
