@@ -82,6 +82,15 @@
                 </form>
                 <form method="POST" action="{{ route('admin.companies.user.email', $company) }}" class="space-y-2">
                     @csrf
+                    <x-input-label value="قالب جاهز (اختياري)" />
+                    <select name="template" class="select select-bordered w-full">
+                        <option value="">—</option>
+                        <option value="approval_reminder">تذكير موافقة الحساب</option>
+                        <option value="subscription_soon">تنبيه قرب انتهاء الاشتراك</option>
+                        <option value="general_notice">رسالة إدارية عامة</option>
+                    </select>
+                    <p class="text-xs text-gray-500">عند اختيار قالب وترك الحقول فارغة سيُستخدم القالب تلقائياً.</p>
+
                     <x-input-label value="الموضوع" />
                     <input type="text" name="subject" class="input input-bordered w-full" placeholder="موضوع الرسالة" />
                     <x-input-label value="نص الرسالة" />

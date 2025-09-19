@@ -80,16 +80,50 @@ class CompanyAdminController extends Controller
     public function emailUser(Request $request, Company $company): RedirectResponse
     {
         $request->validate([
-            'subject' => 'required|string|max:200',
-            'message' => 'required|string|max:5000',
+            'subject' => 'nullable|string|max:200',
+            'message' => 'nullable|string|max:5000',
+            'template' => 'nullable|string|in:approval_reminder,subscription_soon,general_notice',
         ]);
+
         $email = $company->user?->email;
         if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return back()->with('status','لا يمكن الإرسال: بريد غير صالح.');
         }
+
+        // Canned templates
+        $templates = [
+            'approval_reminder' => [
+                'subject' => 'تذكير موافقة الحساب',
+                'body' => "مرحبا {{name}}،\n\nتمت مراجعة حساب شركتكم {{company}}. نرجو استكمال البيانات المطلوبة ليتم التفعيل النهائي.\n\nشكرا لكم."
+            ],
+            'subscription_soon' => [
+                'subject' => 'تنبيه: اشتراككم يقترب من الانتهاء',
+                'body' => "السادة {{company}}،\n\nاشتراككم يقترب من الانتهاء. يرجى التجديد لضمان استمرار نشر الوظائف والتقديمات.\n\nفريق Connect Job"
+            ],
+            'general_notice' => [
+                'subject' => 'رسالة إدارية',
+                'body' => "السادة {{company}}،\n\nهذه رسالة إدارية عامة من فريق الدعم.\n\nمع التحية"
+            ],
+        ];
+
+        $tplKey = $request->input('template');
+        $subject = trim((string)($request->input('subject') ?? ''));
+        $body = trim((string)($request->input('message') ?? ''));
+        if ($tplKey && isset($templates[$tplKey])) {
+            if ($subject === '') { $subject = $templates[$tplKey]['subject']; }
+            if ($body === '') { $body = $templates[$tplKey]['body']; }
+        }
+        // Replace placeholders
+        $repl = [
+            '{{name}}' => $company->user->name ?? 'عميلنا',
+            '{{company}}' => $company->company_name ?? 'شركتكم',
+        ];
+        $subject = strtr($subject !== '' ? $subject : 'رسالة من المشرف', $repl);
+        $body = strtr($body !== '' ? $body : '—', $repl);
+
         try {
-            Mail::raw($request->input('message'), function($m) use ($email, $request){
-                $m->to($email)->subject($request->input('subject'));
+            Mail::raw($body, function($m) use ($email, $subject){
+                $m->to($email)->subject($subject);
             });
             return back()->with('status','تم إرسال الرسالة بنجاح.');
         } catch (\Throwable $e) {

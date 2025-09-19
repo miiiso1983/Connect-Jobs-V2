@@ -24,6 +24,8 @@ class JobSeekerAdminController extends Controller
         $createdTo = trim((string) $request->get('created_to', ''));
         $lastSeenFrom = trim((string) $request->get('last_seen_from', ''));
         $lastSeenTo = trim((string) $request->get('last_seen_to', ''));
+        $profileCompleted = trim((string) $request->get('profile_completed', ''));
+        $hasCv = trim((string) $request->get('has_cv', ''));
 
         $seekersQ = JobSeeker::query()->with('user');
         if ($q !== '') {
@@ -45,6 +47,18 @@ class JobSeekerAdminController extends Controller
             $seekersQ->whereHas('user', function($u) use ($status){
                 $u->where('status', $status);
             });
+        }
+        if ($profileCompleted !== '') {
+            $seekersQ->where('profile_completed', $profileCompleted === '1');
+        }
+        if ($hasCv !== '') {
+            if ($hasCv === '1') {
+                $seekersQ->whereNotNull('cv_file')->where('cv_file', '!=', '');
+            } else {
+                $seekersQ->where(function($q){
+                    $q->whereNull('cv_file')->orWhere('cv_file','');
+                });
+            }
         }
         if ($createdFrom !== '' || $createdTo !== '') {
             $seekersQ->whereHas('user', function($u) use ($createdFrom, $createdTo){
@@ -100,6 +114,8 @@ class JobSeekerAdminController extends Controller
             'lastSeenFrom' => $lastSeenFrom,
             'lastSeenTo' => $lastSeenTo,
             'lastSeenTs' => $lastSeenTs,
+            'profileCompleted' => $profileCompleted,
+            'hasCv' => $hasCv,
         ]);
     }
 

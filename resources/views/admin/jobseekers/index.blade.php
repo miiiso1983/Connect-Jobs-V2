@@ -78,6 +78,22 @@
                 <x-input-label for="last_seen_to" value="آخر دخول إلى" />
                 <input type="date" id="last_seen_to" name="last_seen_to" value="{{ $lastSeenTo }}" class="input input-bordered w-full" />
             </div>
+            <div>
+                <x-input-label for="profile_completed" value="أكمل الملف؟" />
+                <select id="profile_completed" name="profile_completed" class="select select-bordered w-full">
+                    <option value="">—</option>
+                    <option value="1" @selected(($profileCompleted ?? '')==='1')>نعم</option>
+                    <option value="0" @selected(($profileCompleted ?? '')==='0')>لا</option>
+                </select>
+            </div>
+            <div>
+                <x-input-label for="has_cv" value="لديه سيرة ذاتية؟" />
+                <select id="has_cv" name="has_cv" class="select select-bordered w-full">
+                    <option value="">—</option>
+                    <option value="1" @selected(($hasCv ?? '')==='1')>نعم</option>
+                    <option value="0" @selected(($hasCv ?? '')==='0')>لا</option>
+                </select>
+            </div>
             <div class="md:col-span-6 flex gap-2">
                 <x-primary-button>تطبيق</x-primary-button>
                 <a href="{{ route('admin.jobseekers.index') }}" class="btn">تفريغ</a>
