@@ -61,9 +61,10 @@
                 @else
                     <div class="text-sm text-gray-600">سجّل دخول كباحث عن عمل للتقديم.</div>
                 @endif
-            @else
-                <a href="{{ route('login') }}" class="btn btn-primary">سجّل للدخول للتقديم</a>
             @endauth
+            @guest
+                <a href="{{ route('login') }}" class="btn btn-primary">سجّل للدخول للتقديم</a>
+            @endguest
         </div>
     </div>
     @auth
@@ -88,11 +89,12 @@
                 </div>
             </div>
         @endif
-    @else
+    @endauth
+    @guest
         <div class="fixed bottom-4 inset-x-0 flex justify-center z-40">
             <a href="{{ route('login') }}" class="btn btn-primary btn-sm rounded-full">سجّل للدخول للتقديم</a>
         </div>
-    @endauth
+    @endguest
 
     {{-- JSON-LD JobPosting Schema --}}
     @php
