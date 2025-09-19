@@ -94,6 +94,12 @@
                                         <input type="text" name="reason" class="input input-bordered input-xs md:col-span-3" placeholder="اكتب سبب الرفض (اختياري)" />
                                         <button class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs">رفض</button>
                                     </form>
+                                    <form method="POST" action="{{ route('admin.jobs.destroy',$j) }}" x-data="{open:false}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" @click="open=true" class="px-3 py-1.5 rounded-lg bg-red-700 hover:bg-red-800 text-white text-xs">حذف نهائياً</button>
+                                        <x-confirm-modal title="تأكيد الحذف" message="سيتم حذف الوظيفة نهائياً. هل أنت متأكد؟" />
+                                    </form>
                                 </div>
                             </td>
                         </tr>

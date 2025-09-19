@@ -149,6 +149,10 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
         Route::post('/settings/import', [\App\Http\Controllers\Admin\MasterSettingController::class, 'import'])->name('settings.import');
 
 
+    // Jobs destructive actions
+    Route::delete('/jobs/{job}', [\App\Http\Controllers\Admin\JobAdminController::class, 'destroy'])->name('jobs.destroy');
+
+
     // Users enable/disable
     Route::put('/users/{user}/toggle', [\App\Http\Controllers\Admin\UserAdminController::class, 'toggleStatus'])->name('users.toggle');
 });

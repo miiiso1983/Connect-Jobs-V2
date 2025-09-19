@@ -83,5 +83,17 @@ class JobAdminController extends Controller
         return back()->with('status','تم رفض الوظيفة وإغلاقها.' . ($reason ? ' (سبب: '.$reason.')' : ''));
     }
 
+
+    public function destroy(Job $job): RedirectResponse
+    {
+        $title = (string) $job->title;
+        try {
+            $job->delete();
+        } catch (\Throwable $e) {
+            return back()->with('status', 'تعذر حذف الوظيفة: '.$e->getMessage());
+        }
+        return back()->with('status', 'تم حذف الوظيفة: '.$title);
+    }
+
 }
 
