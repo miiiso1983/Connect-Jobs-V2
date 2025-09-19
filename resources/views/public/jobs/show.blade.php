@@ -131,8 +131,12 @@
             'identifier' => [
                 '@type' => 'PropertyValue',
                 'name' => $orgName,
-    {{-- JSON-LD Breadcrumbs --}}
-    @php
+                'value' => (string) $job->id,
+            ],
+            'url' => url()->current(),
+        ];
+
+        // Breadcrumbs schema
         $crumbs = [
             ['@type'=>'ListItem','position'=>1,'name'=>'الرئيسية','item'=>url('/')],
             ['@type'=>'ListItem','position'=>2,'name'=>'الوظائف','item'=>route('jobs.index')],
@@ -149,14 +153,8 @@
             'itemListElement'=>$crumbs,
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($breadcrumbSchema, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
-
-                'value' => (string) $job->id,
-            ],
-            'url' => url()->current(),
-        ];
-    @endphp
     <script type="application/ld+json">{!! json_encode(array_filter($schema), JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
+    <script type="application/ld+json">{!! json_encode($breadcrumbSchema, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) !!}</script>
 
 </x-app-layout>
 

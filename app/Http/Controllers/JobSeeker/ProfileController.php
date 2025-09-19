@@ -81,9 +81,9 @@ class ProfileController extends Controller
 
                 $image->toWebp(quality: 82)->save(storage_path('app/public/' . $main));
                 try {
-                    $image->clone()->scaleDown(width: 160, height: 160)->toWebp(quality: 82)->save(storage_path('app/public/' . $sm));
-                    $image->clone()->scaleDown(width: 320, height: 320)->toWebp(quality: 82)->save(storage_path('app/public/' . $md));
-                    $image->clone()->scaleDown(width: 640, height: 640)->toWebp(quality: 82)->save(storage_path('app/public/' . $lg));
+                    $manager->read($request->file('profile_image')->getPathname())->scaleDown(width: 160, height: 160)->toWebp(quality: 82)->save(storage_path('app/public/' . $sm));
+                    $manager->read($request->file('profile_image')->getPathname())->scaleDown(width: 320, height: 320)->toWebp(quality: 82)->save(storage_path('app/public/' . $md));
+                    $manager->read($request->file('profile_image')->getPathname())->scaleDown(width: 640, height: 640)->toWebp(quality: 82)->save(storage_path('app/public/' . $lg));
                 } catch (\Throwable $e) {}
 
                 $imagePath = $main;
