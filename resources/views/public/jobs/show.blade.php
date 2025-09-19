@@ -1,6 +1,8 @@
 <x-app-layout>
     @section('meta_title', $job->title . ' - ' . (optional($job->company)->company_name ?? 'Connect Jobs'))
-    @php($__desc = \Illuminate\Support\Str::limit(strip_tags((string)($job->description ?? '')), 150))
+    @php
+        $__desc = \Illuminate\Support\Str::limit(strip_tags((string)($job->description ?? '')), 150);
+    @endphp
     @section('meta_description', $__desc)
     @if($job->company && !empty($job->company->profile_image))
         @section('meta_image', Storage::url($job->company->profile_image))
