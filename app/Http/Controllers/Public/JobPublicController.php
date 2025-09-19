@@ -106,7 +106,7 @@ class JobPublicController extends Controller
             $savedIds = DB::table('saved_jobs')->where('user_id', Auth::id())->pluck('job_id')->all();
         }
 
-        return view('public.jobs.index', compact('jobs','q','province','sort','provinces','industries','jobTitles','industry','jobTitleFilter','savedIds','companies','companyId','companyName'));
+        return view('public.jobs.index2', compact('jobs','q','province','sort','provinces','industries','jobTitles','industry','jobTitleFilter','savedIds','companies','companyId','companyName'));
     }
 
     public function show(Job $job): View
