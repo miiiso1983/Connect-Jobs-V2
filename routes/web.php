@@ -189,3 +189,5 @@ Route::middleware(['setlocale','auth','role:jobseeker'])->prefix('jobseeker')->n
     Route::delete('/alerts/{id}', [\App\Http\Controllers\JobSeeker\JobAlertController::class,'destroy'])->name('alerts.destroy');
 });
 
+
+

@@ -45,6 +45,12 @@ return [
     'ignore_transactions' => [
         // Ignore Laravel's default health URL
         '/up',
+        // Common bot/probe noise
+        '/wp-admin',
+        '/wp-login.php',
+        '/.env',
+        '/phpinfo.php',
+        '/.git',
     ],
 
     // Breadcrumb specific configuration

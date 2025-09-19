@@ -27,6 +27,10 @@ use App\Models\Job;
 use Illuminate\Support\Facades\Mail as MailFacade;
 use App\Mail\JobAlertMail;
 
+use App\Models\Company;
+use App\Models\JobSeeker;
+use App\Mail\AdminWeeklyDigestMail;
+
 Artisan::command('alerts:send-weekly', function(){
     $this->info('Sending weekly job alerts...');
     $count = 0;
@@ -75,6 +79,32 @@ Artisan::command('alerts:send-weekly', function(){
         } catch (\Throwable $e) {
             $this->error('Failed to send to '.$email.': '.$e->getMessage());
         }
+
+    // Admin weekly digest
+    try {
+        $since = now()->subDays(7);
+        $jobsNew = Job::where('created_at','>=',$since)->count();
+        $companiesNew = Company::where('created_at','>=',$since)->count();
+        $seekersNew = JobSeeker::where('created_at','>=',$since)->count();
+        $topJobs = Job::with('company')
+            ->where('created_at','>=',$since)
+            ->orderByDesc('id')->limit(5)->get();
+
+        $adminEmail = trim((string) env('ADMIN_DIGEST_EMAIL', config('mail.from.address') ?? 'info.skylimitx@gmail.com'));
+        if ($adminEmail !== '' && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+            MailFacade::to($adminEmail)->send(new AdminWeeklyDigestMail([
+                'alerts_sent' => $count,
+                'jobs_new' => $jobsNew,
+                'companies_new' => $companiesNew,
+                'seekers_new' => $seekersNew,
+                'since' => $since,
+            ], $topJobs));
+            $this->info('Admin weekly digest sent to '.$adminEmail);
+        }
+    } catch (\Throwable $e) {
+        $this->error('Failed to send admin digest: '.$e->getMessage());
+    }
+
     }
 
     $this->info('Weekly alerts sent: '.$count);

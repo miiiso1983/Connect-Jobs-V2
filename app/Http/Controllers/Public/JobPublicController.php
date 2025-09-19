@@ -15,6 +15,19 @@ class JobPublicController extends Controller
 {
     public function index(Request $request): View
     {
+        // Restore last used filters if no query provided (and not clearing)
+        if (!$request->boolean('clear') && count($request->query()) === 0) {
+            $saved = $request->session()->get('jobs.filters', []);
+            if (!empty($saved)) {
+                return redirect()->route('jobs.index', $saved);
+            }
+        }
+        // Clear saved filters
+        if ($request->boolean('clear')) {
+            $request->session()->forget('jobs.filters');
+        }
+
+        // Read current query params
         $q = trim((string)$request->query('q', ''));
         $province = trim((string)$request->query('province', ''));
         $sort = $request->query('sort', 'latest');
@@ -55,6 +68,21 @@ class JobPublicController extends Controller
             'oldest' => $jobsQ->orderBy('id','asc'),
             default => $jobsQ->orderBy('id','desc'),
         };
+
+        // Persist filters if provided
+        $toSave = [
+            'q' => $q,
+            'province' => $province,
+            'industry' => $industry,
+            'job_title' => $jobTitleFilter,
+            'company_id' => $companyId,
+            'company' => $companyName,
+            'sort' => $sort,
+        ];
+        $nonEmpty = array_filter($toSave, function($v){ return !(is_null($v) || $v === '' || $v === 0); });
+        if (!empty($nonEmpty) || ($sort !== 'latest')) {
+            $request->session()->put('jobs.filters', $toSave);
+        }
 
         $jobs = $jobsQ->paginate(12)->withQueryString();
 

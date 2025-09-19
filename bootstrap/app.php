@@ -13,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Global HTTP middleware
+        $middleware->append(App\Http\Middleware\SentryUserContext::class);
+
+        // Route middleware aliases
         $middleware->alias([
             'role' => App\Http\Middleware\RoleMiddleware::class,
             'company.approved' => App\Http\Middleware\EnsureCompanyIsApproved::class,
