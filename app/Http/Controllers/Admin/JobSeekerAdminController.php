@@ -127,6 +127,8 @@ class JobSeekerAdminController extends Controller
             'lastSeenTs' => $lastSeenTs,
             'profileCompleted' => $profileCompleted,
             'hasCv' => $hasCv,
+            'completedCount' => $completedCount,
+            'cvCount' => $cvCount,
         ]);
     }
 

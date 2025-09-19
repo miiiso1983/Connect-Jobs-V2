@@ -184,22 +184,7 @@
                                 </form>
                             </td>
                         </tr>
-                            <td>
-                                @php($pc = $s->profile_completed ?? null)
-                                @if($pc===null)
-                                    —
-                                @else
-                                    <span class="badge {{ $pc ? 'badge-success' : 'badge-ghost' }}">{{ $pc ? 'مكتمل' : 'غير مكتمل' }}</span>
-                                @endif
-                            </td>
-                            <td>
-                                @php($cv = $s->cv_file ?? null)
-                                @if($cv===null)
-                                    —
-                                @else
-                                    <span class="badge {{ ($cv !== '') ? 'badge-success' : 'badge-ghost' }}">{{ ($cv !== '') ? 'مرفوعة' : 'لا' }}</span>
-                                @endif
-                            </td>
+
 
                     @empty
                         <tr><td colspan="10" class="text-center text-gray-500">لا نتائج.</td></tr>
