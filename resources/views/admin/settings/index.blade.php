@@ -115,7 +115,7 @@
                 </div>
                 <div class="md:col-span-5">
                     <x-input-label value="النص" />
-                    <textarea name="body" rows="4" class="textarea textarea-bordered w-full" placeholder="نص الرسالة (يدعم {{name}} و {{company}})"></textarea>
+                    <textarea name="body" rows="4" class="textarea textarea-bordered w-full" placeholder="نص الرسالة (يدعم @{{name}} و @{{company}})"></textarea>
                 </div>
                 <div class="flex items-center gap-2">
                     <input type="checkbox" name="active" value="1" checked class="checkbox" />

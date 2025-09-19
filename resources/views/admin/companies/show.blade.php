@@ -90,7 +90,7 @@
                                 <option value="{{ $t->id }}">{{ $t->name }} — {{ \Illuminate\Support\Str::limit($t->subject, 50) }}</option>
                             @endforeach
                         </select>
-                        <p class="text-xs text-gray-500">يدعم القالب المتغيّرات {{name}} و {{company}}. عند ترك الحقول أدناه فارغة سيتم استخدام القالب.</p>
+                        <p class="text-xs text-gray-500">يدعم القالب المتغيّرات @{{name}} و @{{company}}. عند ترك الحقول أدناه فارغة سيتم استخدام القالب.</p>
                     @else
                         <p class="text-xs text-gray-500">لا توجد قوالب مُنشأة بعد. يمكنك إنشاء القوالب من صفحة الإعدادات.</p>
                     @endif
