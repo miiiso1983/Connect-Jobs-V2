@@ -93,3 +93,12 @@ Artisan::command('alerts:backfill-unsubscribe-tokens', function(){
     $this->info('Backfilled unsubscribe_token for '.$count.' alerts.');
 })->purpose('Generate unsubscribe_token for old job alerts');
 
+
+
+use Illuminate\Support\Facades\Schedule;
+
+// Schedule weekly job alerts every Saturday 08:00 Baghdad time
+Schedule::command('alerts:send-weekly')
+    ->timezone('Asia/Baghdad')
+    ->weeklyOn(6, '8:00')
+    ->description('Weekly job alerts every Saturday 08:00 Asia/Baghdad');

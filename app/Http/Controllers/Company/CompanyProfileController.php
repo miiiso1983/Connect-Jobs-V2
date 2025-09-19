@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\Storage;
+
 class CompanyProfileController extends Controller
 {
     public function edit()
@@ -50,7 +52,19 @@ class CompanyProfileController extends Controller
 
         $imagePath = $company->profile_image;
         if ($request->hasFile('profile_image')) {
-            $imagePath = $request->file('profile_image')->store('profile-images','public');
+            try {
+                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $image = $manager->read($request->file('profile_image')->getPathname())
+                    ->scaleDown(width: 800, height: 800);
+                Storage::disk('public')->makeDirectory('profile-images');
+                $filename = 'profile-images/' . uniqid('img_') . '.webp';
+                $fullPath = storage_path('app/public/' . $filename);
+                $image->toWebp(quality: 82)->save($fullPath);
+                $imagePath = $filename;
+            } catch (\Throwable $e) {
+                // Fallback to original storage if image processing fails
+                $imagePath = $request->file('profile_image')->store('profile-images', 'public');
+            }
         }
 
         $company->update([

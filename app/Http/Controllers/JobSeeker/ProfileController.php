@@ -9,6 +9,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
+
 
 class ProfileController extends Controller
 {
@@ -65,7 +67,18 @@ class ProfileController extends Controller
         }
         $imagePath = $js->profile_image;
         if ($request->hasFile('profile_image')) {
-            $imagePath = $request->file('profile_image')->store('profile-images','public');
+            try {
+                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $image = $manager->read($request->file('profile_image')->getPathname())
+                    ->scaleDown(width: 800, height: 800);
+                Storage::disk('public')->makeDirectory('profile-images');
+                $filename = 'profile-images/' . uniqid('img_') . '.webp';
+                $fullPath = storage_path('app/public/' . $filename);
+                $image->toWebp(quality: 82)->save($fullPath);
+                $imagePath = $filename;
+            } catch (\Throwable $e) {
+                $imagePath = $request->file('profile_image')->store('profile-images', 'public');
+            }
         }
 
         $js->update([
