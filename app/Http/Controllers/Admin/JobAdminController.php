@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\JobRejectedMail;
+use App\Mail\JobApprovedMail;
 
 class JobAdminController extends Controller
 {
@@ -49,6 +50,18 @@ class JobAdminController extends Controller
     public function approve(Job $job): RedirectResponse
     {
         $job->update(['approved_by_admin' => true, 'status' => 'open', 'admin_reject_reason' => null]);
+
+        // Notify company owner about approval
+        $user = optional($job->company)->user;
+        $email = $user?->email ? trim((string)$user->email) : '';
+        if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            try {
+                Mail::to($email)->send(new JobApprovedMail($job));
+            } catch (\Throwable $e) {
+                // Ignore email failure silently
+            }
+        }
+
         return back()->with('status','تمت الموافقة على الوظيفة.');
     }
     public function reject(Job $job, \Illuminate\Http\Request $request): RedirectResponse
