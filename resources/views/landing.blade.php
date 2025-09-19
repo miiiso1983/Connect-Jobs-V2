@@ -99,21 +99,17 @@
         </div>
     </section>
 
-    @push('scripts')
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
-        <script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          "name": "Connect Jobs",
-          "url": "{{ url('/') }}",
-          "logo": "{{ asset('favicon.ico') }}"
-        }
-        </script>
-
-        <style>
-            .card-hover{transition:transform .3s ease,box-shadow .3s ease}
-            .card-hover:hover{transform:translateY(-6px);box-shadow:0 24px 48px rgba(0,0,0,.12)}
-        </style>
-    @endpush
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+    @php($orgJson = json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'Organization',
+        'name' => 'Connect Jobs',
+        'url' => url('/'),
+        'logo' => asset('favicon.ico'),
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
+    <script type="application/ld+json">{!! $orgJson !!}</script>
+    <style>
+        .card-hover{transition:transform .3s ease,box-shadow .3s ease}
+        .card-hover:hover{transform:translateY(-6px);box-shadow:0 24px 48px rgba(0,0,0,.12)}
+    </style>
 </x-guest-layout>
