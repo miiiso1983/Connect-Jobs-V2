@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Job;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\JobRejectedMail;
 
 class JobAdminController extends Controller
 {
@@ -53,6 +55,18 @@ class JobAdminController extends Controller
     {
         $reason = trim((string)$request->input('reason',''));
         $job->update(['approved_by_admin' => false, 'status' => 'closed', 'admin_reject_reason' => ($reason ?: null)]);
+
+        // Send email notification to company owner
+        $user = optional($job->company)->user;
+        $email = $user?->email ? trim((string)$user->email) : '';
+        if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            try {
+                Mail::to($email)->send(new JobRejectedMail($job, $reason ?: null));
+            } catch (\Throwable $e) {
+                // Silently ignore email failure in admin flow
+            }
+        }
+
         return back()->with('status','تم رفض الوظيفة وإغلاقها.' . ($reason ? ' (سبب: '.$reason.')' : ''));
     }
 

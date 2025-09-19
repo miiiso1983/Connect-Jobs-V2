@@ -12,7 +12,7 @@ class Job extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'company_id','title','speciality','specialities','description','requirements','province','districts','status','approved_by_admin','jd_file'
+        'company_id','title','speciality','specialities','description','requirements','province','districts','status','approved_by_admin','jd_file','admin_reject_reason'
     ];
 
     protected $casts = [
