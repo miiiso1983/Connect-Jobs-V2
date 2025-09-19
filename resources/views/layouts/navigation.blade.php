@@ -19,6 +19,12 @@
                         {{ __('nav.jobs') }}
                     </x-nav-link>
                     @if(auth()->check() && (auth()->user()->role ?? null)==='admin')
+                        <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+                            الشركات
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.jobseekers.index')" :active="request()->routeIs('admin.jobseekers.*')">
+                            الباحثون
+                        </x-nav-link>
                         <x-nav-link :href="route('admin.settings.index')" :active="request()->routeIs('admin.settings.*')">
                             القوائم المنسدلة
                         </x-nav-link>

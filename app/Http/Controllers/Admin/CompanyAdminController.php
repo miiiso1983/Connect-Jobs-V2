@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 class CompanyAdminController extends Controller
@@ -63,6 +64,37 @@ class CompanyAdminController extends Controller
         ], fn($v) => !is_null($v)));
 
         return back()->with('status','تم تحديث خطة الاشتراك.');
+    }
+
+    public function toggleUser(Company $company): RedirectResponse
+    {
+        $user = $company->user;
+        if (!$user) {
+            return back()->with('status','لا يوجد مستخدم مرتبط بالشركة.');
+        }
+        $new = ($user->status === 'active') ? 'suspended' : 'active';
+        $user->update(['status' => $new]);
+        return back()->with('status', 'تم تحديث حالة مستخدم الشركة إلى: '.$new);
+    }
+
+    public function emailUser(Request $request, Company $company): RedirectResponse
+    {
+        $request->validate([
+            'subject' => 'required|string|max:200',
+            'message' => 'required|string|max:5000',
+        ]);
+        $email = $company->user?->email;
+        if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return back()->with('status','لا يمكن الإرسال: بريد غير صالح.');
+        }
+        try {
+            Mail::raw($request->input('message'), function($m) use ($email, $request){
+                $m->to($email)->subject($request->input('subject'));
+            });
+            return back()->with('status','تم إرسال الرسالة بنجاح.');
+        } catch (\Throwable $e) {
+            return back()->with('status','تعذر الإرسال: '.$e->getMessage());
+        }
     }
 }
 

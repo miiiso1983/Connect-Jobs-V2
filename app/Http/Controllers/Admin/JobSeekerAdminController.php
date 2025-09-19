@@ -7,6 +7,8 @@ use App\Models\JobSeeker;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class JobSeekerAdminController extends Controller
@@ -18,6 +20,10 @@ class JobSeekerAdminController extends Controller
         $status = trim((string) $request->get('status', ''));
         $perPage = (int) $request->get('per_page', 20);
         if ($perPage < 5) $perPage = 5; if ($perPage > 200) $perPage = 200;
+        $createdFrom = trim((string) $request->get('created_from', ''));
+        $createdTo = trim((string) $request->get('created_to', ''));
+        $lastSeenFrom = trim((string) $request->get('last_seen_from', ''));
+        $lastSeenTo = trim((string) $request->get('last_seen_to', ''));
 
         $seekersQ = JobSeeker::query()->with('user');
         if ($q !== '') {
@@ -40,6 +46,24 @@ class JobSeekerAdminController extends Controller
                 $u->where('status', $status);
             });
         }
+        if ($createdFrom !== '' || $createdTo !== '') {
+            $seekersQ->whereHas('user', function($u) use ($createdFrom, $createdTo){
+                if ($createdFrom !== '') { $u->whereDate('created_at', '>=', $createdFrom); }
+                if ($createdTo !== '') { $u->whereDate('created_at', '<=', $createdTo); }
+            });
+        }
+        if (Schema::hasTable('sessions') && ($lastSeenFrom !== '' || $lastSeenTo !== '')) {
+            $fromEpoch = $lastSeenFrom !== '' ? strtotime($lastSeenFrom.' 00:00:00') : null;
+            $toEpoch = $lastSeenTo !== '' ? strtotime($lastSeenTo.' 23:59:59') : null;
+            $seekersQ->whereHas('user', function($u) use ($fromEpoch, $toEpoch){
+                $sub = DB::table('sessions')->select('user_id');
+                if (!is_null($fromEpoch)) { $sub->where('last_activity', '>=', $fromEpoch); }
+                if (!is_null($toEpoch)) { $sub->where('last_activity', '<=', $toEpoch); }
+                $sub->groupBy('user_id');
+                $u->whereIn('id', $sub);
+            });
+        }
+
         $seekers = $seekersQ->orderByDesc('id')->paginate($perPage)->withQueryString();
 
         $totalSeekers = JobSeeker::count();
@@ -48,7 +72,35 @@ class JobSeekerAdminController extends Controller
 
         $provinces = \App\Models\MasterSetting::where('setting_type','province')->pluck('value');
 
-        return view('admin.jobseekers.index', compact('seekers','q','province','status','perPage','totalSeekers','activeUsers','suspendedUsers','provinces'));
+        // Last seen map for current page
+        $lastSeenTs = collect();
+        if (Schema::hasTable('sessions')) {
+            $userIds = $seekers->pluck('user_id')->filter()->unique()->values();
+            if ($userIds->isNotEmpty()) {
+                $lastSeenTs = DB::table('sessions')
+                    ->whereIn('user_id', $userIds)
+                    ->select('user_id', DB::raw('MAX(last_activity) as ts'))
+                    ->groupBy('user_id')
+                    ->pluck('ts','user_id');
+            }
+        }
+
+        return view('admin.jobseekers.index', [
+            'seekers' => $seekers,
+            'q' => $q,
+            'province' => $province,
+            'status' => $status,
+            'perPage' => $perPage,
+            'totalSeekers' => $totalSeekers,
+            'activeUsers' => $activeUsers,
+            'suspendedUsers' => $suspendedUsers,
+            'provinces' => $provinces,
+            'createdFrom' => $createdFrom,
+            'createdTo' => $createdTo,
+            'lastSeenFrom' => $lastSeenFrom,
+            'lastSeenTo' => $lastSeenTo,
+            'lastSeenTs' => $lastSeenTs,
+        ]);
     }
 
     public function toggle(User $user): RedirectResponse

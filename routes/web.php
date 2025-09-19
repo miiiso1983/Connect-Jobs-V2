@@ -113,6 +113,8 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
     Route::get('/companies/{company}', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'show'])->name('companies.show');
     Route::post('/companies/{company}/approve', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'approve'])->name('companies.approve');
     Route::put('/companies/{company}/subscription', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'updateSubscription'])->name('companies.subscription');
+    Route::put('/companies/{company}/user/toggle', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'toggleUser'])->name('companies.user.toggle');
+    Route::post('/companies/{company}/email', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'emailUser'])->name('companies.user.email');
 
     // Jobseekers management
     Route::get('/jobseekers', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'index'])->name('jobseekers.index');

@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <form method="GET" class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow grid grid-cols-1 md:grid-cols-5 gap-3">
+        <form method="GET" class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow grid grid-cols-1 md:grid-cols-6 gap-3">
             <div class="md:col-span-2">
                 <x-input-label for="q" value="بحث (اسم، بريد، مسمى، تخصص)" />
                 <input type="text" id="q" name="q" value="{{ $q }}" class="input input-bordered w-full" />
@@ -62,7 +62,23 @@
                     @endforeach
                 </select>
             </div>
-            <div class="md:col-span-5 flex gap-2">
+            <div>
+                <x-input-label for="created_from" value="إنشاء من" />
+                <input type="date" id="created_from" name="created_from" value="{{ $createdFrom }}" class="input input-bordered w-full" />
+            </div>
+            <div>
+                <x-input-label for="created_to" value="إنشاء إلى" />
+                <input type="date" id="created_to" name="created_to" value="{{ $createdTo }}" class="input input-bordered w-full" />
+            </div>
+            <div>
+                <x-input-label for="last_seen_from" value="آخر دخول من" />
+                <input type="date" id="last_seen_from" name="last_seen_from" value="{{ $lastSeenFrom }}" class="input input-bordered w-full" />
+            </div>
+            <div>
+                <x-input-label for="last_seen_to" value="آخر دخول إلى" />
+                <input type="date" id="last_seen_to" name="last_seen_to" value="{{ $lastSeenTo }}" class="input input-bordered w-full" />
+            </div>
+            <div class="md:col-span-6 flex gap-2">
                 <x-primary-button>تطبيق</x-primary-button>
                 <a href="{{ route('admin.jobseekers.index') }}" class="btn">تفريغ</a>
             </div>
@@ -77,6 +93,8 @@
                         <th>المحافظة</th>
                         <th>المسمى</th>
                         <th>الحالة</th>
+                        <th>أُنشئ</th>
+                        <th>آخر ظهور</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -97,6 +115,9 @@
                                     {{ $s->user->status ?? 'active' }}
                                 </span>
                             </td>
+                            <td>{{ $s->user->created_at ?? '—' }}</td>
+                            @php($ts = $lastSeenTs[$s->user_id] ?? null)
+                            <td>{{ $ts ? \Carbon\Carbon::createFromTimestamp($ts)->toDateTimeString() : '—' }}</td>
                             <td class="whitespace-nowrap">
                                 <form method="POST" action="{{ route('admin.jobseekers.toggle', $s->user) }}" class="inline">
                                     @csrf
@@ -111,7 +132,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="text-center text-gray-500">لا نتائج.</td></tr>
+                        <tr><td colspan="8" class="text-center text-gray-500">لا نتائج.</td></tr>
                     @endforelse
                 </tbody>
             </table>

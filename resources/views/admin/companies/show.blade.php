@@ -73,6 +73,22 @@
                     <x-primary-button class="w-full">تحديث الاشتراك</x-primary-button>
                 </form>
             </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                <h3 class="font-semibold mb-3">إجراءات الحساب</h3>
+                <form method="POST" action="{{ route('admin.companies.user.toggle', $company) }}" class="mb-3">
+                    @csrf
+                    @method('PUT')
+                    <button class="btn w-full">{{ ($company->user->status ?? 'active')==='active' ? 'إيقاف المستخدم' : 'تنشيط المستخدم' }}</button>
+                </form>
+                <form method="POST" action="{{ route('admin.companies.user.email', $company) }}" class="space-y-2">
+                    @csrf
+                    <x-input-label value="الموضوع" />
+                    <input type="text" name="subject" class="input input-bordered w-full" placeholder="موضوع الرسالة" />
+                    <x-input-label value="نص الرسالة" />
+                    <textarea name="message" rows="4" class="textarea textarea-bordered w-full" placeholder="اكتب رسالتك هنا..."></textarea>
+                    <x-primary-button class="w-full">إرسال بريد</x-primary-button>
+                </form>
+            </div>
         </aside>
     </div>
 </x-app-layout>
