@@ -17,7 +17,19 @@
                         <div class="avatar">
                             <div class="w-20 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden">
                                 @if(!empty($company->profile_image))
-                                    <img src="{{ Storage::url($company->profile_image) }}" alt="Logo" />
+                                    @php
+                                        $imgPath = $company->profile_image;
+                                        $base = \Illuminate\Support\Str::of($imgPath)->beforeLast('.');
+                                        $sm = (string)$base . '_sm.webp';
+                                        $md = (string)$base . '_md.webp';
+                                        $lg = (string)$base . '_lg.webp';
+                                        $srcsetArr = [];
+                                        if (Storage::disk('public')->exists($sm)) { $srcsetArr[] = Storage::url($sm).' 160w'; }
+                                        if (Storage::disk('public')->exists($md)) { $srcsetArr[] = Storage::url($md).' 320w'; }
+                                        if (Storage::disk('public')->exists($lg)) { $srcsetArr[] = Storage::url($lg).' 640w'; }
+                                        $srcset = implode(', ', $srcsetArr);
+                                    @endphp
+                                    <img src="{{ Storage::url($company->profile_image) }}" @if($srcset) srcset="{{ $srcset }}" sizes="80px" @endif alt="Logo" />
                                 @else
                                     <img src="https://api.dicebear.com/7.x/initials/svg?seed={{ urlencode($company->company_name ?? auth()->user()->name) }}" alt="Logo" />
                                 @endif

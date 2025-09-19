@@ -1,10 +1,35 @@
 <x-app-layout>
+    @section('meta_title', $job->title . ' - ' . (optional($job->company)->company_name ?? 'Connect Jobs'))
+    @php($__desc = \Illuminate\Support\Str::limit(strip_tags((string)($job->description ?? '')), 150))
+    @section('meta_description', $__desc)
+    @if($job->company && !empty($job->company->profile_image))
+        @section('meta_image', Storage::url($job->company->profile_image))
+    @endif
+
     <x-slot name="header">
         <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
             <h1 class="text-2xl font-bold">{{ $job->title }}</h1>
             <div class="mt-1 text-[#E7C66A] text-sm">{{ $job->province }}</div>
             @if($job->company)
-                <div class="mt-1 text-sm">
+                <div class="mt-2 flex items-center gap-2 text-sm">
+                    @php
+                        $imgPath = $job->company->profile_image ?? null;
+                        $srcset = '';
+                        if ($imgPath) {
+                            $base = \Illuminate\Support\Str::of($imgPath)->beforeLast('.');
+                            $sm = (string)$base . '_sm.webp';
+                            $md = (string)$base . '_md.webp';
+                            $lg = (string)$base . '_lg.webp';
+                            $arr = [];
+                            if (Storage::disk('public')->exists($sm)) { $arr[] = Storage::url($sm).' 160w'; }
+                            if (Storage::disk('public')->exists($md)) { $arr[] = Storage::url($md).' 320w'; }
+                            if (Storage::disk('public')->exists($lg)) { $arr[] = Storage::url($lg).' 640w'; }
+                            $srcset = implode(', ', $arr);
+                        }
+                    @endphp
+                    @if(!empty($job->company->profile_image))
+                        <img src="{{ Storage::url($job->company->profile_image) }}" @if($srcset) srcset="{{ $srcset }}" sizes="32px" @endif alt="{{ $job->company->company_name }}" class="w-8 h-8 rounded object-cover ring-1 ring-white/40" />
+                    @endif
                     <a class="underline text-white/90 hover:text-white" href="{{ route('public.company.show', $job->company) }}">{{ $job->company->company_name }}</a>
                 </div>
             @endif

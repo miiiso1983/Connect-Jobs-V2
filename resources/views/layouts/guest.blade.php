@@ -12,7 +12,11 @@
         <link rel="canonical" href="{{ url()->current() }}" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="@yield('meta_title', config('app.name','Connect Jobs'))" />
-        <meta property="og:description" content="@yield('meta_description','
+        @php($metaDescription = trim($__env->yieldContent('meta_description','')))
+        @php($metaDescription = $metaDescription !== '' ? $metaDescription : 'منصة وظائف تربط الشركات بالكوادر الموهوبة في العراق والشرق الأوسط')
+        <meta property="og:description" content="{{ $metaDescription }}" />
+
+        {{-- <meta property="og:description" content="@yield('meta_description','
 
 
 
@@ -29,14 +33,13 @@
 
 
 
-منصة وظائف تربط الشركات بالكوادر الموهوبة في العراق والشرق الأوسط')" />
+منصة وظائف تربط الشركات بالكوادر الموهوبة في العراق والشرق الأوسط')" /> --}}
         <meta property="og:url" content="{{ request()->fullUrl() }}" />
         <meta property="og:site_name" content="{{ config('app.name','Connect Jobs') }}" />
         @php($metaImage = trim($__env->yieldContent('meta_image','')))
-        @if($metaImage !== '')
-            <meta property="og:image" content="{{ $metaImage }}" />
-            <meta name="twitter:image" content="{{ $metaImage }}" />
-        @endif
+        @php($metaImage = $metaImage !== '' ? $metaImage : asset('favicon.ico'))
+        <meta property="og:image" content="{{ $metaImage }}" />
+        <meta name="twitter:image" content="{{ $metaImage }}" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="@yield('meta_title', config('app.name','Connect Jobs'))" />
         <meta name="twitter:description" content="@yield('meta_description','منصة وظائف تربط الشركات بالكوادر الموهوبة في العراق والشرق الأوسط')" />

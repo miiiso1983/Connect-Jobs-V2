@@ -1,4 +1,6 @@
 <x-guest-layout>
+
+
     <!-- Hero -->
     <section class="relative overflow-hidden bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white py-20 w-full">
         <div class="absolute -top-20 -left-20 h-72 w-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
@@ -91,12 +93,24 @@
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
                 <a href="/register?type=jobseeker" class="btn btn-secondary">سجل كباحث عن عمل</a>
                 <a href="/register?type=company" class="btn btn-outline text-white border-white hover:bg-white hover:text-[#0D2660]">سجل كشركة</a>
+
+
             </div>
         </div>
     </section>
 
     @push('scripts')
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Connect Jobs",
+          "url": "{{ url('/') }}",
+          "logo": "{{ asset('favicon.ico') }}"
+        }
+        </script>
+
         <style>
             .card-hover{transition:transform .3s ease,box-shadow .3s ease}
             .card-hover:hover{transform:translateY(-6px);box-shadow:0 24px 48px rgba(0,0,0,.12)}

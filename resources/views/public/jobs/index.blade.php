@@ -1,4 +1,15 @@
 <x-guest-layout>
+    @php
+        $titleParts = [];
+        if (!empty($province)) $titleParts[] = "المحافظة: $province";
+        if (!empty($industry)) $titleParts[] = "القطاع: $industry";
+        if (!empty($jobTitleFilter)) $titleParts[] = "المسمى الوظيفي: $jobTitleFilter";
+        $pageTitle = 'الوظائف المتاحة' . (count($titleParts) ? ' - '.implode('، ',$titleParts) : '');
+        $pageDesc = 'استكشف أحدث الوظائف المتاحة' . (count($titleParts) ? ' مع فلاتر: '.implode('، ',$titleParts) : '');
+    @endphp
+    @section('meta_title', $pageTitle.' - Connect Jobs')
+    @section('meta_description', $pageDesc)
+
     <div class="py-10">
         <div class="max-w-7xl mx-auto px-4">
             <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6">الوظائف المتاحة</h1>
@@ -162,6 +173,16 @@
       if(form){ form.addEventListener('submit', function(){ showSkeleton(); }); }
       if(pag){ pag.addEventListener('click', function(e){ const t = e.target.closest('a'); if(t){ showSkeleton(); } }, true); }
     })();
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "الصفحة الرئيسية", "item": "{{ url('/') }}"},
+        {"@type": "ListItem", "position": 2, "name": "الوظائف المتاحة", "item": "{{ url('/jobs') }}"}
+      ]
+    }
     </script>
     @endpush
 </x-guest-layout>

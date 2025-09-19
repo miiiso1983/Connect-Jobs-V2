@@ -57,10 +57,27 @@ class CompanyProfileController extends Controller
                 $image = $manager->read($request->file('profile_image')->getPathname())
                     ->scaleDown(width: 800, height: 800);
                 Storage::disk('public')->makeDirectory('profile-images');
-                $filename = 'profile-images/' . uniqid('img_') . '.webp';
-                $fullPath = storage_path('app/public/' . $filename);
-                $image->toWebp(quality: 82)->save($fullPath);
-                $imagePath = $filename;
+
+                // Base filename without extension
+                $base = 'profile-images/' . uniqid('img_');
+                $main = $base . '.webp';
+                $sm = $base . '_sm.webp';
+                $md = $base . '_md.webp';
+                $lg = $base . '_lg.webp';
+
+                // Save main
+                $image->toWebp(quality: 82)->save(storage_path('app/public/' . $main));
+
+                // Save responsive variants
+                try {
+                    $image->clone()->scaleDown(width: 160, height: 160)->toWebp(quality: 82)->save(storage_path('app/public/' . $sm));
+                    $image->clone()->scaleDown(width: 320, height: 320)->toWebp(quality: 82)->save(storage_path('app/public/' . $md));
+                    $image->clone()->scaleDown(width: 640, height: 640)->toWebp(quality: 82)->save(storage_path('app/public/' . $lg));
+                } catch (\Throwable $e) {
+                    // Non-fatal if variant generation fails
+                }
+
+                $imagePath = $main;
             } catch (\Throwable $e) {
                 // Fallback to original storage if image processing fails
                 $imagePath = $request->file('profile_image')->store('profile-images', 'public');

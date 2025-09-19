@@ -9,7 +9,19 @@
   <section class="bg-gradient-to-r from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white py-10">
     <div class="max-w-6xl mx-auto px-4 flex items-center gap-4">
       @if(!empty($company->profile_image))
-        <img src="{{ Storage::url($company->profile_image) }}" alt="{{ $company->company_name }}" loading="lazy" width="64" height="64" class="w-16 h-16 rounded-xl object-cover ring-2 ring-white/50"/>
+        @php
+          $imgPath = $company->profile_image;
+          $base = \Illuminate\Support\Str::of($imgPath)->beforeLast('.');
+          $sm = (string)$base . '_sm.webp';
+          $md = (string)$base . '_md.webp';
+          $lg = (string)$base . '_lg.webp';
+          $srcsetArr = [];
+          if (Storage::disk('public')->exists($sm)) { $srcsetArr[] = Storage::url($sm).' 160w'; }
+          if (Storage::disk('public')->exists($md)) { $srcsetArr[] = Storage::url($md).' 320w'; }
+          if (Storage::disk('public')->exists($lg)) { $srcsetArr[] = Storage::url($lg).' 640w'; }
+          $srcset = implode(', ', $srcsetArr);
+        @endphp
+        <img src="{{ Storage::url($company->profile_image) }}" @if($srcset) srcset="{{ $srcset }}" sizes="64px" @endif alt="{{ $company->company_name }}" loading="lazy" width="64" height="64" class="w-16 h-16 rounded-xl object-cover ring-2 ring-white/50"/>
       @endif
       <div>
         <h1 class="text-3xl font-extrabold">{{ $company->company_name }}</h1>
