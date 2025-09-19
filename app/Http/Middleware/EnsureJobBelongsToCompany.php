@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Models\Job;
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class EnsureJobBelongsToCompany
 {
@@ -15,7 +14,10 @@ class EnsureJobBelongsToCompany
         if ($job instanceof Job) {
             $companyId = $request->user()?->company?->id;
             if (!$companyId || $job->company_id !== $companyId) {
-                throw new AccessDeniedHttpException('Unauthorized');
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => __('غير مسموح بالوصول إلى هذه الوظيفة.')], 403);
+                }
+                return redirect()->route('company.jobs.index')->with('status', __('لا تملك صلاحية لعرض هذه الوظيفة.'));
             }
         }
         return $next($request);
