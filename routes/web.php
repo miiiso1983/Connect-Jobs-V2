@@ -110,8 +110,14 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
 
     // Companies management
     Route::get('/companies', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'index'])->name('companies.index');
+    Route::get('/companies/{company}', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'show'])->name('companies.show');
     Route::post('/companies/{company}/approve', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'approve'])->name('companies.approve');
     Route::put('/companies/{company}/subscription', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'updateSubscription'])->name('companies.subscription');
+
+    // Jobseekers management
+    Route::get('/jobseekers', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'index'])->name('jobseekers.index');
+    Route::put('/jobseekers/{user}/toggle', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'toggle'])->name('jobseekers.toggle');
+    Route::delete('/jobseekers/{user}', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'destroy'])->name('jobseekers.destroy');
 
     // Jobs approvals
     Route::get('/jobs/pending', [\App\Http\Controllers\Admin\JobAdminController::class, 'pending'])->name('jobs.pending');

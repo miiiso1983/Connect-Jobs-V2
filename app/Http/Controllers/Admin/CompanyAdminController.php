@@ -18,6 +18,14 @@ class CompanyAdminController extends Controller
         return view('admin.companies.index', compact('companies'));
     }
 
+    public function show(Company $company): View
+    {
+        $company->load(['user','jobs' => function($q){ $q->orderByDesc('id'); }]);
+        $jobsOpen = $company->jobs->where('status','open')->count();
+        $jobsPending = $company->jobs->where('approved_by_admin', false)->count();
+        return view('admin.companies.show', compact('company','jobsOpen','jobsPending'));
+    }
+
     public function approve(Company $company): RedirectResponse
     {
         // Activate both user and company
