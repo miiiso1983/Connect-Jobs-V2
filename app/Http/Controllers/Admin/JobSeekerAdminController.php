@@ -48,10 +48,10 @@ class JobSeekerAdminController extends Controller
                 $u->where('status', $status);
             });
         }
-        if ($profileCompleted !== '') {
+        if ($profileCompleted !== '' && Schema::hasColumn('job_seekers', 'profile_completed')) {
             $seekersQ->where('profile_completed', $profileCompleted === '1');
         }
-        if ($hasCv !== '') {
+        if ($hasCv !== '' && Schema::hasColumn('job_seekers', 'cv_file')) {
             if ($hasCv === '1') {
                 $seekersQ->whereNotNull('cv_file')->where('cv_file', '!=', '');
             } else {
