@@ -102,6 +102,16 @@
                     <x-primary-button class="w-full">إرسال بريد</x-primary-button>
                 </form>
             </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                <h3 class="font-semibold mb-3">حذف الشركة</h3>
+                <form method="POST" action="{{ route('admin.companies.destroy', $company) }}" x-data="{open:false}">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" @click="open=true" class="btn btn-error w-full">حذف نهائياً</button>
+                    <x-confirm-modal title="تأكيد الحذف" message="سيتم حذف الشركة وجميع وظائفها والحساب المرتبط بها. هل أنت متأكد؟" />
+                </form>
+            </div>
+
         </aside>
     </div>
 </x-app-layout>

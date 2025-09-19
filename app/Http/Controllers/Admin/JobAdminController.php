@@ -88,6 +88,8 @@ class JobAdminController extends Controller
     {
         $title = (string) $job->title;
         try {
+            // Delete related applications first (avoid orphans)
+            try { $job->applications()->delete(); } catch (\Throwable $e) { /* ignore */ }
             $job->delete();
         } catch (\Throwable $e) {
             return back()->with('status', 'تعذر حذف الوظيفة: '.$e->getMessage());

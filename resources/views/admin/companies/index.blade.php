@@ -96,7 +96,20 @@
                                     <input type="datetime-local" name="subscription_expires_at" value="{{ $c->subscription_expires_at ? $c->subscription_expires_at->format('Y-m-d\\TH:i') : '' }}" class="rounded-lg text-xs border-gray-300 dark:bg-gray-800 dark:border-gray-700" title="تاريخ ووقت الانتهاء">
                                     <button class="px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-800 text-white text-xs">تحديث</button>
                                 </form>
+                                <form method="POST" action="{{ route('admin.companies.destroy',$c) }}" x-data="{open:false}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" @click="open=true" class="px-3 py-1.5 rounded-lg bg-red-700 hover:bg-red-800 text-white text-xs">حذف الشركة</button>
+                                    <x-confirm-modal title="تأكيد الحذف" message="سيتم حذف الشركة وجميع وظائفها. هل أنت متأكد؟" />
+                                </form>
                             </td>
+                                    <form method="POST" action="{{ route('admin.companies.destroy',$c) }}" x-data="{open:false}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" @click="open=true" class="px-3 py-1.5 rounded-lg bg-red-700 hover:bg-red-800 text-white text-xs">حذف الشركة</button>
+                                        <x-confirm-modal title="تأكيد الحذف" message="سيتم حذف الشركة وجميع وظائفها. هل أنت متأكد؟" />
+                                    </form>
+
                         </tr>
                     @endforeach
                 </tbody>

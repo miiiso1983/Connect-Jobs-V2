@@ -125,5 +125,31 @@ class CompanyAdminController extends Controller
             return back()->with('status','تعذر الإرسال: '.$e->getMessage());
         }
     }
+
+    public function destroy(Company $company): RedirectResponse
+    {
+        // Delete company, its jobs (and their applications), and the linked user
+        try {
+            \DB::transaction(function() use ($company){
+                // Delete applications of each job
+                foreach ($company->jobs as $job) {
+                    try { $job->applications()->delete(); } catch (\Throwable $e) { /* ignore */ }
+                }
+                // Delete jobs
+                try { $company->jobs()->delete(); } catch (\Throwable $e) { /* ignore */ }
+                // Delete company
+                $company->delete();
+                // Delete linked user (if role company)
+                $user = $company->user;
+                if ($user && ($user->role === 'company')) {
+                    $user->delete();
+                }
+            });
+            return redirect()->route('admin.companies.index')->with('status','تم حذف الشركة وجميع وظائفها.');
+        } catch (\Throwable $e) {
+            return back()->with('status','تعذر حذف الشركة: '.$e->getMessage());
+        }
+    }
+
 }
 

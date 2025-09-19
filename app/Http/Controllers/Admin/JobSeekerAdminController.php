@@ -143,9 +143,12 @@ class JobSeekerAdminController extends Controller
     public function destroy(User $user): RedirectResponse
     {
         abort_unless($user->role === 'jobseeker', 404);
-        // حذف ملفاته الأساسية فقط بدون لمس حسابات أخرى
+        // حذف الطلبات والملفات المرتبطة قبل حذف الحساب
         $js = JobSeeker::firstWhere('user_id', $user->id);
-        if ($js) { $js->delete(); }
+        if ($js) {
+            try { \App\Models\Application::where('job_seeker_id', $js->id)->delete(); } catch (\Throwable $e) { /* ignore */ }
+            $js->delete();
+        }
         $user->delete();
         return back()->with('status', 'تم حذف الباحث عن عمل.');
     }

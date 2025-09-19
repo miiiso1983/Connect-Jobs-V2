@@ -115,6 +115,10 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
     Route::put('/companies/{company}/user/toggle', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'toggleUser'])->name('companies.user.toggle');
     Route::post('/companies/{company}/email', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'emailUser'])->name('companies.user.email');
 
+    // Delete company (destructive)
+    Route::delete('/companies/{company}', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'destroy'])->name('companies.destroy');
+
+
     // Jobseekers management
     Route::get('/jobseekers', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'index'])->name('jobseekers.index');
     Route::put('/jobseekers/{user}/toggle', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'toggle'])->name('jobseekers.toggle');
