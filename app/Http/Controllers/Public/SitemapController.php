@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Job;
+use App\Models\Company;
 use Illuminate\Http\Response;
 
 class SitemapController extends Controller
@@ -30,6 +31,24 @@ class SitemapController extends Controller
                 // 'lastmod' omitted if timestamps not available
                 'changefreq' => 'daily',
                 'priority' => '0.8',
+            ];
+        }
+
+        // Companies that have at least one open approved job
+        $companies = Company::query()
+            ->whereHas('jobs', function($q){
+                $q->where('approved_by_admin', true)->where('status','open');
+            })
+            ->select(['id'])
+            ->orderByDesc('id')
+            ->limit(5000)
+            ->get();
+
+        foreach ($companies as $company) {
+            $urls[] = [
+                'loc' => route('public.company.show', $company),
+                'changefreq' => 'daily',
+                'priority' => '0.6',
             ];
         }
 

@@ -3,6 +3,11 @@
         <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
             <h1 class="text-2xl font-bold">{{ $job->title }}</h1>
             <div class="mt-1 text-[#E7C66A] text-sm">{{ $job->province }}</div>
+            @if($job->company)
+                <div class="mt-1 text-sm">
+                    <a class="underline text-white/90 hover:text-white" href="{{ route('public.company.show', $job->company) }}">{{ $job->company->company_name }}</a>
+                </div>
+            @endif
         </div>
     </x-slot>
 
@@ -83,6 +88,7 @@
             'hiringOrganization' => [
                 '@type' => 'Organization',
                 'name' => $orgName,
+                'url' => $job->company ? route('public.company.show', $job->company) : null,
             ],
             'jobLocation' => [
                 '@type' => 'Place',
