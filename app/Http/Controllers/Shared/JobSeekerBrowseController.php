@@ -109,6 +109,9 @@ class JobSeekerBrowseController extends Controller
 
         // Pagination or export
         if ($request->get('export') === 'csv') {
+            if ($this->context() !== 'admin') {
+                abort(403, 'CSV export is only available to admin.');
+            }
             $filename = 'jobseekers_'.date('Ymd_His').'.csv';
             $headers = [
                 'Content-Type' => 'text/csv; charset=UTF-8',

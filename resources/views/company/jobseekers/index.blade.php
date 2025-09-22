@@ -124,7 +124,9 @@
             <div class="md:col-span-6 flex flex-wrap gap-2 items-end">
                 <x-primary-button>تطبيق</x-primary-button>
                 <a href="{{ $context==='admin' ? route('admin.seekers.browse') : route('company.seekers.browse') }}" class="btn">تفريغ</a>
-                <a href="{{ request()->fullUrlWithQuery(['export'=>'csv']) }}" class="btn btn-ghost text-primary">تصدير CSV</a>
+                @if($context==='admin')
+                    <a href="{{ request()->fullUrlWithQuery(['export'=>'csv']) }}" class="btn btn-ghost text-primary">تصدير CSV</a>
+                @endif
             </div>
         </form>
 
