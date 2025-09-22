@@ -50,7 +50,7 @@
                 <td>{{ $s->user->created_at ?? '—' }}</td>
                 <td class="whitespace-nowrap">
                     @if($context==='company')
-                        <a href="{{ route('company.applicants.show', $s) }}" class="btn btn-xs">عرض الملف</a>
+                        <a href="{{ route('company.seekers.show', $s) }}" class="btn btn-xs">عرض الملف</a>
                     @else
                         <a href="{{ route('admin.jobseekers.show', $s) }}" class="btn btn-xs">عرض</a>
                     @endif
