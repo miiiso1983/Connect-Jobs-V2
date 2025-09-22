@@ -187,6 +187,8 @@ Route::middleware(['setlocale','auth','role:company','company.approved'])->prefi
     // Route::delete('/jobs/{job}', [\App\Http\Controllers\Company\CompanyJobController::class, 'destroy'])->middleware('job.owner')->name('jobs.destroy');
 
     Route::get('/applicants/{jobSeeker}', \App\Http\Controllers\Company\ApplicantShowController::class)->name('applicants.show');
+    // Limited profile view for seekers even if not applicants
+    Route::get('/seekers/{jobSeeker}', \App\Http\Controllers\Company\SeekerShowController::class)->name('seekers.show');
 
     // Company profile (logo/avatar)
     Route::get('/profile', [\App\Http\Controllers\Company\CompanyProfileController::class, 'edit'])->name('profile.edit');
