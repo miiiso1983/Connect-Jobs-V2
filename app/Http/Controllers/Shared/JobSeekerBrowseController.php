@@ -146,14 +146,25 @@ class JobSeekerBrowseController extends Controller
 
         $provinces = \App\Models\MasterSetting::where('setting_type','province')->pluck('value');
         $specialities = \App\Models\MasterSetting::where('setting_type','speciality')->pluck('value');
+        $educationLevels = \App\Models\MasterSetting::where('setting_type','education_level')->pluck('value');
+        $experienceLevels = \App\Models\MasterSetting::where('setting_type','experience_level')->pluck('value');
 
         $context = $this->context(); // 'company' or 'admin'
+
+        if ($request->ajax()) {
+            return view('company.jobseekers._results', [
+                'seekers' => $seekers,
+                'context' => $context,
+            ]);
+        }
 
         return view('company.jobseekers.index', [
             'seekers' => $seekers,
             'filters' => $filters,
             'provinces' => $provinces,
             'specialities' => $specialities,
+            'educationLevels' => $educationLevels,
+            'experienceLevels' => $experienceLevels,
             'hasEducation' => $hasEducation,
             'hasExperience' => $hasExperience,
             'perPage' => $perPage,

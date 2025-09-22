@@ -7,7 +7,16 @@
     </x-slot>
 
     <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-        <form method="GET" class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow grid grid-cols-1 md:grid-cols-6 gap-3">
+        <form method="GET" class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow grid grid-cols-1 md:grid-cols-6 gap-3" x-data x-on:change.debounce.400ms="
+            const f = $el.closest('form');
+            const url = new URL(f.action || window.location.href);
+            const fd = new FormData(f);
+            const params = new URLSearchParams(fd);
+            fetch(url.pathname + '?' + params.toString(), { headers: { 'X-Requested-With':'XMLHttpRequest' } })
+              .then(r => r.text())
+              .then(html => { document.getElementById('results').innerHTML = html; window.history.replaceState({}, '', url.pathname + '?' + params.toString()); })
+              .catch(console.error);
+        ">
             <div class="md:col-span-2">
                 <x-input-label for="q" value="بحث (اسم، بريد، مسمى، تخصص، مهارة)" />
                 <input type="text" id="q" name="q" value="{{ $filters['q'] ?? '' }}" class="input input-bordered w-full" />
@@ -77,13 +86,23 @@
             @if($hasEducation)
                 <div>
                     <x-input-label for="education_level" value="المؤهل العلمي" />
-                    <input type="text" id="education_level" name="education_level" value="{{ $filters['education_level'] ?? '' }}" class="input input-bordered w-full" />
+                    <select id="education_level" name="education_level" class="select select-bordered w-full">
+                        <option value="">الكل</option>
+                        @foreach(($educationLevels ?? collect()) as $e)
+                            <option value="{{ $e }}" @selected(($filters['education_level'] ?? '')===$e)>{{ $e }}</option>
+                        @endforeach
+                    </select>
                 </div>
             @endif
             @if($hasExperience)
                 <div>
                     <x-input-label for="experience_level" value="سنوات الخبرة/المستوى" />
-                    <input type="text" id="experience_level" name="experience_level" value="{{ $filters['experience_level'] ?? '' }}" class="input input-bordered w-full" />
+                    <select id="experience_level" name="experience_level" class="select select-bordered w-full">
+                        <option value="">الكل</option>
+                        @foreach(($experienceLevels ?? collect()) as $e)
+                            <option value="{{ $e }}" @selected(($filters['experience_level'] ?? '')===$e)>{{ $e }}</option>
+                        @endforeach
+                    </select>
                 </div>
             @endif
             <div>
@@ -109,74 +128,8 @@
             </div>
         </form>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-x-auto">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>المستخدم</th>
-                        <th>الاسم الكامل</th>
-                        <th>المسمى</th>
-                        <th>المحافظة</th>
-                        <th>التخصصات</th>
-                        <th>المناطق</th>
-                        <th>الجنس</th>
-                        <th>سيارة</th>
-                        <th>أُنشئ</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($seekers as $s)
-                        <tr>
-                            <td class="whitespace-nowrap">
-                                <div class="text-sm">
-                                    <div class="font-semibold">{{ $s->user->name ?? '—' }}</div>
-                                    <div class="text-gray-500">{{ $s->user->email ?? '—' }}</div>
-                                </div>
-                            </td>
-                            <td>{{ $s->full_name ?? '—' }}</td>
-                            <td>{{ $s->job_title ?? '—' }}</td>
-                            <td>{{ $s->province ?? '—' }}</td>
-                            <td>
-                                <div class="flex flex-wrap gap-1">
-                                    @forelse((array)($s->specialities ?? []) as $sp)
-                                        <span class="badge badge-outline badge-sm">{{ $sp }}</span>
-                                    @empty
-                                        <span class="text-gray-400">-</span>
-                                    @endforelse
-                                </div>
-                            </td>
-                            <td>
-                                <div class="flex flex-wrap gap-1">
-                                    @forelse((array)($s->districts ?? []) as $d)
-                                        <span class="badge badge-ghost badge-sm">{{ $d }}</span>
-                                    @empty
-                                        <span class="text-gray-400">-</span>
-                                    @endforelse
-                                </div>
-                            </td>
-                            <td>{{ $s->gender ?? '—' }}</td>
-                            <td>
-                                <span class="badge {{ $s->own_car ? 'badge-success' : 'badge-ghost' }} badge-sm">{{ $s->own_car ? 'نعم' : 'لا' }}</span>
-                            </td>
-                            <td>{{ $s->user->created_at ?? '—' }}</td>
-                            <td class="whitespace-nowrap">
-                                @if($context==='company')
-                                    <a href="{{ route('company.applicants.show', $s) }}" class="btn btn-xs">عرض الملف</a>
-                                @else
-                                    {{-- للإدمن يمكن لاحقاً إضافة صفحة عرض تفصيلية --}}
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="10" class="text-center text-gray-500">لا نتائج.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <div>
-            {{ $seekers->links() }}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-x-auto" id="results">
+            @include('company.jobseekers._results', ['seekers'=>$seekers,'context'=>$context])
         </div>
     </div>
 

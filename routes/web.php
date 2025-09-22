@@ -121,6 +121,7 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
 
     // Jobseekers management
     Route::get('/jobseekers', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'index'])->name('jobseekers.index');
+    Route::get('/jobseekers/{jobSeeker}', [\App\Http\Controllers\Admin\JobSeekerDetailController::class, 'show'])->name('jobseekers.show');
     Route::put('/jobseekers/{user}/toggle', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'toggle'])->name('jobseekers.toggle');
     Route::delete('/jobseekers/{user}', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'destroy'])->name('jobseekers.destroy');
 

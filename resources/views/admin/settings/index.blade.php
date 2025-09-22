@@ -13,7 +13,7 @@
             <div>
                 <x-input-label for="setting_type" value="نوع القائمة" />
                 <select name="setting_type" id="setting_type" class="mt-1 rounded-lg border-gray-300 dark:bg-gray-800 dark:border-gray-700">
-                    @foreach (['job_title','province','speciality','gender'] as $t)
+                    @foreach (['job_title','province','speciality','gender','education_level','experience_level'] as $t)
                         <option value="{{ $t }}">{{ $t }}</option>
                     @endforeach
                 </select>
@@ -26,7 +26,7 @@
                 <div class="flex items-center gap-2">
                     <label class="text-sm text-gray-600">النوع:</label>
                     <select class="rounded-lg border-gray-300 dark:bg-gray-800 dark:border-gray-700" onchange="document.getElementById('bulk_setting_type').value=this.value">
-                        @foreach (['job_title','province','speciality','gender'] as $t)
+                        @foreach (['job_title','province','speciality','gender','education_level','experience_level'] as $t)
                             <option value="{{ $t }}">{{ $t }}</option>
                         @endforeach
                     </select>
