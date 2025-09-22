@@ -124,6 +124,9 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
     Route::put('/jobseekers/{user}/toggle', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'toggle'])->name('jobseekers.toggle');
     Route::delete('/jobseekers/{user}', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'destroy'])->name('jobseekers.destroy');
 
+    // Admin browse all job seekers (shared)
+    Route::get('/seekers', [\App\Http\Controllers\Shared\JobSeekerBrowseController::class, 'index'])->name('seekers.browse');
+
     // Jobs approvals
     Route::get('/jobs/pending', [\App\Http\Controllers\Admin\JobAdminController::class, 'pending'])->name('jobs.pending');
     Route::post('/jobs/{job}/approve', [\App\Http\Controllers\Admin\JobAdminController::class, 'approve'])->name('jobs.approve');
@@ -190,6 +193,9 @@ Route::middleware(['setlocale','auth','role:company','company.approved'])->prefi
 
     Route::get('/applicants', [\App\Http\Controllers\Company\ApplicantFilterController::class, 'index'])->name('applicants.index');
     Route::put('/applications/{application}', [\App\Http\Controllers\Company\ApplicantActionController::class, 'update'])->name('applications.update');
+
+    // Browse all job seekers (shared)
+    Route::get('/seekers', [\App\Http\Controllers\Shared\JobSeekerBrowseController::class, 'index'])->name('seekers.browse');
 
 });
 

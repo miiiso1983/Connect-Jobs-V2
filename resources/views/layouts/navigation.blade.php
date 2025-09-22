@@ -18,12 +18,22 @@
                     <x-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.*')">
                         {{ __('nav.jobs') }}
                     </x-nav-link>
+
+                    @if(auth()->check() && (auth()->user()->role ?? null)==='company')
+                        <x-nav-link :href="route('company.seekers.browse')" :active="request()->routeIs('company.seekers.browse')">
+                            قاعدة الباحثين
+                        </x-nav-link>
+                    @endif
+
                     @if(auth()->check() && (auth()->user()->role ?? null)==='admin')
                         <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
                             الشركات
                         </x-nav-link>
                         <x-nav-link :href="route('admin.jobseekers.index')" :active="request()->routeIs('admin.jobseekers.*')">
                             الباحثون
+                        </x-nav-link>
+                        <x-nav-link :href="route('admin.seekers.browse')" :active="request()->routeIs('admin.seekers.browse')">
+                            قاعدة الباحثين
                         </x-nav-link>
                         <x-nav-link :href="route('admin.settings.index')" :active="request()->routeIs('admin.settings.*')">
                             القوائم المنسدلة

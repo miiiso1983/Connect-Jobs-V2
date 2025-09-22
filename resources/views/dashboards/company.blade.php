@@ -34,6 +34,11 @@
                     <div class="mt-1 text-2xl font-bold">إدارة الوظائف</div>
                     <div class="mt-2 text-xs opacity-90">أضف/عدّل/انشر وظائفك</div>
                 </a>
+                <a href="{{ route('company.seekers.browse') }}" class="group p-6 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 text-white shadow hover:shadow-lg">
+                    <div class="text-sm opacity-90">قاعدة البيانات</div>
+                    <div class="mt-1 text-2xl font-bold">كل الباحثين عن عمل</div>
+                    <div class="mt-2 text-xs opacity-90">استعرض وفلتر جميع الباحثين</div>
+                </a>
                 <a href="{{ route('company.jobs.create') }}" class="group p-6 rounded-xl bg-gradient-to-br from-[#D2A85A] to-[#B7792A] text-[#0D2660] shadow hover:shadow-lg">
                     <div class="text-sm opacity-90">وظيفة جديدة</div>
                     <div class="mt-1 text-2xl font-bold">إنشاء وظيفة</div>
