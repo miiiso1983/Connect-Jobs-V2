@@ -12,7 +12,7 @@ class Application extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'job_id','job_seeker_id','cv_file','matching_percentage','applied_at','status'
+        'job_id','job_seeker_id','cv_file','matching_percentage','applied_at','status','notes','reviewed_at'
     ];
 
     public function job(){ return $this->belongsTo(Job::class); }

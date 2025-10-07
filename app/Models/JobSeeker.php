@@ -12,7 +12,7 @@ class JobSeeker extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'user_id','full_name','province','districts','job_title','speciality','specialities','education_level','experience_level','gender','own_car','profile_completed','cv_file','profile_image'
+        'user_id','full_name','province','districts','job_title','speciality','specialities','education_level','experience_level','gender','own_car','profile_completed','cv_file','profile_image','summary','qualifications','experiences','languages','skills'
     ];
 
     protected $casts = [
