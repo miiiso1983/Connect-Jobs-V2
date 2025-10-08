@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/auth/auth_event.dart';
 import '../../bloc/auth/auth_state.dart';
+import '../../../core/constants/app_constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -50,16 +51,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   // Logo
                   Container(
-                    width: 100,
-                    height: 100,
+                    width: 120,
+                    height: 120,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Icon(
-                      Icons.work,
-                      size: 50,
-                      color: Colors.blue[700],
+                    padding: const EdgeInsets.all(12),
+                    child: Image.network(
+                      AppConstants.baseUrl.replaceFirst('/api/v1', '') + '/images/brand/logo.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(height: 24),

@@ -262,7 +262,7 @@ class JobCard extends StatelessWidget {
       final weeks = (difference.inDays / 7).floor();
       return 'منذ $weeks ${weeks == 1 ? 'أسبوع' : 'أسابيع'}';
     } else {
-      return DateFormat('dd/MM/yyyy').format(date);
+      return DateFormat('dd/MM/yyyy', 'ar').format(date);
     }
   }
 }

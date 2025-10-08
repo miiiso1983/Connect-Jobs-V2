@@ -13,6 +13,10 @@
             </div>
         </div>
         <div>
+        <div class="md:hidden flex justify-center mb-6">
+            <x-application-logo class="h-12 w-auto" />
+        </div>
+
 
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />

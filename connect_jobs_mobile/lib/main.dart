@@ -113,8 +113,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   backgroundColor: scheme.primary,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Image.asset(
-                      'web/icons/Icon-192.png',
+                    child: Image.network(
+                      AppConfig.baseUrl.replaceFirst('api/v1/', '') + 'images/brand/logo.png',
                       width: 96,
                       height: 96,
                       fit: BoxFit.contain,
