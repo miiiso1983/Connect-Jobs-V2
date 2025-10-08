@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/models/job_model.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../bloc/jobs/jobs_bloc.dart';
 import '../../bloc/jobs/jobs_event.dart';
 import '../../bloc/jobs/jobs_state.dart';

@@ -1,0 +1,23 @@
+name: connect_jobs_root
+description: Root Flutter project for Connect Jobs
+version: 1.0.0
+
+environment:
+  sdk: ^3.8.1
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  json_annotation: ^4.9.0
+  http: ^1.5.0
+  flutter_bloc: ^8.1.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  json_serializable: ^6.11.1
+  build_runner: ^2.9.0
+
+flutter:
+  uses-material-design: true

@@ -13,6 +13,7 @@ class JobsService {
     String? speciality,
     String sortBy = 'id',
     String sortOrder = 'desc',
+    int? page,
   }) async {
     final query = <String, String>{
       'sort_by': sortBy,
@@ -20,6 +21,7 @@ class JobsService {
       if (search != null && search.isNotEmpty) 'search': search,
       if (province != null) 'province': province,
       if (speciality != null) 'speciality': speciality,
+      if (page != null) 'page': page.toString(),
     };
 
     final uri = Uri.parse('${AppConfig.baseUrl}jobs').replace(queryParameters: query);

@@ -1,21 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../utils/runtime_config.dart';
+import '../utils/app_config.dart';
 
 class AuthService {
   final http.Client _client;
   AuthService({http.Client? client}) : _client = client ?? http.Client();
 
-  List<Uri> _loginCandidates() {
-    final baseUri = Uri.parse(RuntimeConfig.baseUrl);
-    final domain = '${baseUri.scheme}://${baseUri.host}${baseUri.hasPort ? ':${baseUri.port}' : ''}/';
-    return [
-      Uri.parse('${RuntimeConfig.baseUrl}${RuntimeConfig.authLoginPath}'),
-      Uri.parse('${domain}api/v1/${RuntimeConfig.authLoginPath}'),
-      Uri.parse('${domain}api/${RuntimeConfig.authLoginPath}'),
-      Uri.parse(domain + RuntimeConfig.authLoginPath),
-    ];
-  }
+  Uri _loginUri() => Uri.parse('${AppConfig.baseUrl}${AppConfig.authLoginPath}');
 
   Future<http.Response> _post(Uri uri, Map<String, dynamic> payload) {
     return _client.post(
@@ -30,19 +21,11 @@ class AuthService {
 
   Future<http.Response> loginRaw({required String email, required String password}) async {
     final payload = {'email': email, 'password': password};
-    http.Response? last;
-    for (final uri in _loginCandidates()) {
-      try {
-        final resp = await _post(uri, payload);
-        if (resp.statusCode == 200 || resp.statusCode == 401 || resp.statusCode == 422) {
-          return resp;
-        }
-        last = resp;
-      } catch (_) {
-        // ignore and try next
-      }
+    try {
+      return await _post(_loginUri(), payload);
+    } catch (_) {
+      return http.Response('{"success":false}', 500);
     }
-    return last ?? http.Response('{"success":false}', 500);
   }
 
   Future<Map<String, dynamic>> login({required String email, required String password}) async {
@@ -72,58 +55,55 @@ class AuthService {
     return <String, dynamic>{'success': false, 'message': msg};
   }
 
+  Uri _path(String path) => Uri.parse('${AppConfig.baseUrl}$path');
 
-  List<Uri> _candidatesForPath(String path) {
-    final baseUri = Uri.parse(RuntimeConfig.baseUrl);
-    final domain = '${baseUri.scheme}://${baseUri.host}${baseUri.hasPort ? ':${baseUri.port}' : ''}/';
-    return [
-      Uri.parse('${RuntimeConfig.baseUrl}$path'),
-      Uri.parse('${domain}api/v1/$path'),
-      Uri.parse('${domain}api/$path'),
-      Uri.parse(domain + path),
-    ];
-  }
-
-  Future<Map<String, dynamic>> _postJsonToCandidates(String path, Map<String, dynamic> payload) async {
-    http.Response? last;
-    for (final uri in _candidatesForPath(path)) {
+  Future<Map<String, dynamic>> _postJson(String path, Map<String, dynamic> payload) async {
+    try {
+      final resp = await _post(_path(path), payload);
+      Map<String, dynamic> data;
       try {
-        final resp = await _post(uri, payload);
-        last = resp;
-        Map<String, dynamic> data;
-        try {
-          data = jsonDecode(resp.body) is Map<String, dynamic> ? (jsonDecode(resp.body) as Map<String, dynamic>) : <String, dynamic>{};
-        } catch (_) {
-          data = <String, dynamic>{};
-        }
-        if (resp.statusCode == 200 || resp.statusCode == 201) {
-          return data.isNotEmpty ? data : <String, dynamic>{'success': true, 'data': {}};
-        }
-        if (resp.statusCode == 422) {
-          // Validation errors; bubble up to UI
-          return data.isNotEmpty ? data : <String, dynamic>{'success': false, 'message': 'بيانات غير صحيحة'};
-        }
+        data = jsonDecode(resp.body) is Map<String, dynamic>
+            ? (jsonDecode(resp.body) as Map<String, dynamic>)
+            : <String, dynamic>{};
       } catch (_) {
-        // try next candidate
+        data = <String, dynamic>{};
       }
+      if (resp.statusCode == 200 || resp.statusCode == 201) {
+        return data.isNotEmpty ? data : <String, dynamic>{'success': true, 'data': {}};
+      }
+      if (resp.statusCode == 422) {
+        return data.isNotEmpty ? data : <String, dynamic>{'success': false, 'message': 'بيانات غير صحيحة'};
+      }
+      return <String, dynamic>{'success': false, 'message': data['message'] ?? 'فشل الطلب', 'status': resp.statusCode};
+    } catch (_) {
+      return <String, dynamic>{'success': false, 'message': 'تعذّر الاتصال بالخادم'};
     }
-    return <String, dynamic>{'success': false, 'message': 'تعذّر الاتصال بالخادم', 'status': last?.statusCode ?? 0};
   }
 
   Future<Map<String, dynamic>> registerJobSeeker({
     required String name,
+    String? fullName,
     required String email,
     required String password,
     required String passwordConfirmation,
+    String? province,
+    String? jobTitle,
+    String? speciality,
+    String? gender,
   }) async {
     final payload = {
       'name': name,
+      'full_name': fullName ?? name,
       'email': email,
       'password': password,
       'password_confirmation': passwordConfirmation,
       'role': 'jobseeker',
+      if (province != null && province.isNotEmpty) 'province': province,
+      if (jobTitle != null && jobTitle.isNotEmpty) 'job_title': jobTitle,
+      if (speciality != null && speciality.isNotEmpty) 'speciality': speciality,
+      if (gender != null && gender.isNotEmpty) 'gender': gender,
     };
-    final res = await _postJsonToCandidates(RuntimeConfig.registerJobSeekerPath, payload);
+    final res = await _postJson(AppConfig.registerJobSeekerPath, payload);
     return _normalizeAuthResponse(res);
   }
 
@@ -135,6 +115,8 @@ class AuthService {
     String? officeName,
     String? jobTitle,
     String? phone,
+    String? industry,
+    String? province,
   }) async {
     final payload = {
       'name': name,
@@ -145,8 +127,10 @@ class AuthService {
       if (officeName != null && officeName.isNotEmpty) 'office_name': officeName,
       if (jobTitle != null && jobTitle.isNotEmpty) 'job_title': jobTitle,
       if (phone != null && phone.isNotEmpty) 'phone': phone,
+      if (industry != null && industry.isNotEmpty) 'industry': industry,
+      if (province != null && province.isNotEmpty) 'province': province,
     };
-    final res = await _postJsonToCandidates(RuntimeConfig.registerCompanyPath, payload);
+    final res = await _postJson(AppConfig.registerCompanyPath, payload);
     return _normalizeAuthResponse(res);
   }
 

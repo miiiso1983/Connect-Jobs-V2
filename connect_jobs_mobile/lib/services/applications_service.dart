@@ -39,6 +39,30 @@ class ApplicationsService {
     };
   }
 
+  Future<Map<String, dynamic>> applyToJob({
+    required String token,
+    required int jobId,
+  }) async {
+    final uri = Uri.parse('${AppConfig.baseUrl}applications/apply/$jobId');
+    final resp = await _client.post(
+      uri,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({}),
+    );
+    final body = _safeDecode(resp.body);
+    return {
+      'statusCode': resp.statusCode,
+      'success': body['success'] == true || resp.statusCode == 201,
+      'data': body['data'],
+      'message': body['message'] ?? (resp.statusCode == 201 ? null : 'Failed to apply'),
+    };
+  }
+
+
   Map<String, dynamic> _safeDecode(String src) {
     try {
       final d = jsonDecode(src);

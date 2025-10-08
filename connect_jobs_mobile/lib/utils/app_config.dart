@@ -11,7 +11,7 @@ class AppConfig {
 
   /// API paths (keep here so we can adjust quickly if backend differs)
   static const String authLoginPath = 'auth/login';
-  static const String registerJobSeekerPath = 'auth/register/jobseeker';
-  static const String registerCompanyPath = 'auth/register/company';
+  static const String registerJobSeekerPath = 'auth/register';
+  static const String registerCompanyPath = 'auth/register';
 }
 

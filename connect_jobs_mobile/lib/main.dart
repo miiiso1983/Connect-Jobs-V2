@@ -9,7 +9,6 @@ import 'services/company_service.dart';
 import 'services/applications_service.dart';
 import 'theme/app_theme.dart';
 import 'services/profile_service.dart';
-import 'screens/api_settings_screen.dart';
 
 
 import 'dart:io';
@@ -101,21 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: 'إعدادات API',
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ApiSettingsScreen()),
-            ),
-          ),
-        ],
-      ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
@@ -304,8 +288,46 @@ class _RegisterJobSeekerScreenState extends State<RegisterJobSeekerScreen> {
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _confirmCtrl = TextEditingController();
+  final _provinceCtrl = TextEditingController();
+  final _jobTitleCtrl = TextEditingController();
+  final _specialityCtrl = TextEditingController();
+  String _gender = 'male';
+  final List<String> _specialitiesOptions = [
+    'General Practitioner','Pediatrics','Cardiologist','Nurses','Pharmacist','General Surgery','Radiology','Obstetrics and Gynecology','Medical Laboratory','Dentistry'
+  ];
+  final List<String> _provinces = [
+    'بغداد', 'البصرة', 'أربيل', 'الموصل', 'النجف', 'كربلاء', 'الأنبار', 'ديالى', 'صلاح الدين', 'واسط', 'ميسان', 'ذي قار', 'المثنى', 'القادسية', 'بابل', 'كركوك', 'السليمانية', 'دهوك'
+  ];
   bool _loading = false;
   String _error = '';
+  String _specialityName(String speciality) {
+    switch (speciality) {
+      case 'General Practitioner':
+        return 'طبيب عام';
+      case 'Pediatrics':
+        return 'طبيب أطفال';
+      case 'Cardiologist':
+        return 'طبيب قلب';
+      case 'Nurses':
+        return 'ممرض/ممرضة';
+      case 'Pharmacist':
+        return 'صيدلي';
+      case 'General Surgery':
+        return 'طبيب جراحة عامة';
+      case 'Radiology':
+        return 'أخصائي أشعة';
+      case 'Obstetrics and Gynecology':
+        return 'طبيب نساء وولادة';
+      case 'Medical Laboratory':
+        return 'فني مختبر طبي';
+      case 'Dentistry':
+        return 'طبيب أسنان';
+      default:
+        return speciality;
+    }
+  }
+
+
 
   @override
   void dispose() {
@@ -313,6 +335,9 @@ class _RegisterJobSeekerScreenState extends State<RegisterJobSeekerScreen> {
     _emailCtrl.dispose();
     _passCtrl.dispose();
     _confirmCtrl.dispose();
+    _provinceCtrl.dispose();
+    _jobTitleCtrl.dispose();
+    _specialityCtrl.dispose();
     super.dispose();
   }
 
@@ -322,8 +347,15 @@ class _RegisterJobSeekerScreenState extends State<RegisterJobSeekerScreen> {
     if (_nameCtrl.text.trim().isEmpty ||
         _emailCtrl.text.trim().isEmpty ||
         _passCtrl.text.isEmpty ||
-        _confirmCtrl.text.isEmpty) {
+        _confirmCtrl.text.isEmpty ||
+        _provinceCtrl.text.trim().isEmpty ||
+        _jobTitleCtrl.text.trim().isEmpty ||
+        _specialityCtrl.text.trim().isEmpty) {
       setState(() => _error = 'يرجى تعبئة جميع الحقول');
+      return;
+    }
+    if (_passCtrl.text.length < 8) {
+      setState(() => _error = 'الحد الأدنى 8 أحرف');
       return;
     }
     if (_passCtrl.text != _confirmCtrl.text) {
@@ -334,9 +366,14 @@ class _RegisterJobSeekerScreenState extends State<RegisterJobSeekerScreen> {
     final auth = AuthService();
     final res = await auth.registerJobSeeker(
       name: _nameCtrl.text.trim(),
+      fullName: _nameCtrl.text.trim(),
       email: _emailCtrl.text.trim(),
       password: _passCtrl.text,
       passwordConfirmation: _confirmCtrl.text,
+      province: _provinceCtrl.text.trim(),
+      jobTitle: _jobTitleCtrl.text.trim(),
+      speciality: _specialityCtrl.text.trim(),
+      gender: _gender,
     );
     auth.close();
     if (!mounted) return;
@@ -373,6 +410,32 @@ class _RegisterJobSeekerScreenState extends State<RegisterJobSeekerScreen> {
               TextField(controller: _passCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'كلمة المرور', border: OutlineInputBorder())),
               const SizedBox(height: 12),
               TextField(controller: _confirmCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'تأكيد كلمة المرور', border: OutlineInputBorder())),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: _provinceCtrl.text.isNotEmpty ? _provinceCtrl.text : null,
+                decoration: const InputDecoration(labelText: 'المحافظة', border: OutlineInputBorder()),
+                items: _provinces.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
+                onChanged: (val) { setState(() { _provinceCtrl.text = val ?? ''; }); },
+              ),
+              const SizedBox(height: 12),
+              TextField(controller: _jobTitleCtrl, decoration: const InputDecoration(labelText: 'المسمى الوظيفي', border: OutlineInputBorder())),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: _specialityCtrl.text.isNotEmpty ? _specialityCtrl.text : null,
+                decoration: const InputDecoration(labelText: 'التخصص', border: OutlineInputBorder()),
+                items: _specialitiesOptions.map((s) => DropdownMenuItem(value: s, child: Text(_specialityName(s)))).toList(),
+                onChanged: (val) { setState(() { _specialityCtrl.text = val ?? ''; }); },
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: _gender,
+                decoration: const InputDecoration(labelText: 'الجنس', border: OutlineInputBorder()),
+                items: const [
+                  DropdownMenuItem(value: 'male', child: Text('ذكر')),
+                  DropdownMenuItem(value: 'female', child: Text('أنثى')),
+                ],
+                onChanged: (val) { setState(() { _gender = val ?? 'male'; }); },
+              ),
               const SizedBox(height: 16),
               if (_error.isNotEmpty)
                 Container(
@@ -411,6 +474,15 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
   final _officeCtrl = TextEditingController();
   final _jobTitleCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
+  // Dropdown data for company registration
+  final List<String> _provinces = [
+    'بغداد','البصرة','أربيل','الموصل','النجف','كربلاء','الأنبار','ديالى','صلاح الدين','واسط','ميسان','ذي قار','المثنى','القادسية','بابل','كركوك','السليمانية','دهوك'
+  ];
+  final List<String> _industries = [
+    'الصيدلة','المستلزمات الطبية','مستشفيات','عيادات','شركات توزيع','مختبرات','أخرى'
+  ];
+  String? _selectedProvince;
+  String? _selectedIndustry;
   bool _loading = false;
   String _error = '';
 
@@ -429,8 +501,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
   Future<void> _submit() async {
     FocusScope.of(context).unfocus();
     setState(() => _error = '');
-    if (_nameCtrl.text.trim().isEmpty || _emailCtrl.text.trim().isEmpty || _passCtrl.text.isEmpty || _confirmCtrl.text.isEmpty) {
-      setState(() => _error = 'يرجى تعبئة جميع الحقول الأساسية');
+    if (!_formKey.currentState!.validate()) {
       return;
     }
     if (_passCtrl.text != _confirmCtrl.text) {
@@ -447,6 +518,8 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
       officeName: _officeCtrl.text.trim(),
       jobTitle: _jobTitleCtrl.text.trim(),
       phone: _phoneCtrl.text.trim(),
+      industry: _selectedIndustry,
+      province: _selectedProvince,
     );
     auth.close();
     if (!mounted) return;
@@ -476,21 +549,76 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
           key: _formKey,
           child: ListView(
             children: [
-              TextField(controller: _nameCtrl, decoration: const InputDecoration(labelText: 'اسم الشركة', border: OutlineInputBorder())),
+              TextFormField(
+                controller: _nameCtrl,
+                decoration: const InputDecoration(labelText: 'اسم الشركة *', border: OutlineInputBorder()),
+                validator: (v) => (v==null || v.trim().isEmpty) ? 'اسم الشركة مطلوب' : null,
+              ),
               const SizedBox(height: 12),
-              TextField(controller: _emailCtrl, decoration: const InputDecoration(labelText: 'البريد الإلكتروني', border: OutlineInputBorder()), keyboardType: TextInputType.emailAddress),
+              TextFormField(
+                controller: _emailCtrl,
+                decoration: const InputDecoration(labelText: 'البريد الإلكتروني *', border: OutlineInputBorder()),
+                keyboardType: TextInputType.emailAddress,
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return 'البريد الإلكتروني مطلوب';
+                  if (!v.contains('@')) return 'بريد إلكتروني غير صالح';
+                  return null;
+                },
+              ),
               const SizedBox(height: 12),
-              TextField(controller: _passCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'كلمة المرور', border: OutlineInputBorder())),
+              TextFormField(
+                controller: _passCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'كلمة المرور (8 أحرف على الأقل) *', border: OutlineInputBorder()),
+                validator: (v) => (v==null || v.length < 8) ? 'الحد الأدنى 8 أحرف' : null,
+              ),
               const SizedBox(height: 12),
-              TextField(controller: _confirmCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'تأكيد كلمة المرور', border: OutlineInputBorder())),
+              TextFormField(
+                controller: _confirmCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'تأكيد كلمة المرور *', border: OutlineInputBorder()),
+                validator: (v) => (v==null || v.isEmpty) ? 'تأكيد كلمة المرور مطلوب' : null,
+              ),
               const SizedBox(height: 16),
               const Divider(),
               const SizedBox(height: 16),
-              TextField(controller: _officeCtrl, decoration: const InputDecoration(labelText: 'اسم المكتب العلمي', border: OutlineInputBorder())),
+              TextFormField(
+                controller: _officeCtrl,
+                decoration: const InputDecoration(labelText: 'اسم المكتب العلمي *', border: OutlineInputBorder()),
+                validator: (v) => (v==null || v.trim().isEmpty) ? 'اسم المكتب العلمي مطلوب' : null,
+              ),
               const SizedBox(height: 12),
-              TextField(controller: _jobTitleCtrl, decoration: const InputDecoration(labelText: 'المسمى الوظيفي', border: OutlineInputBorder())),
+              TextFormField(
+                controller: _jobTitleCtrl,
+                decoration: const InputDecoration(labelText: 'المسمى الوظيفي *', border: OutlineInputBorder()),
+                validator: (v) => (v==null || v.trim().isEmpty) ? 'المسمى الوظيفي مطلوب' : null,
+              ),
               const SizedBox(height: 12),
-              TextField(controller: _phoneCtrl, decoration: const InputDecoration(labelText: 'رقم الموبايل', border: OutlineInputBorder()), keyboardType: TextInputType.phone),
+              DropdownButtonFormField<String>(
+                value: _selectedIndustry,
+                decoration: const InputDecoration(labelText: 'القطاع/الصناعة', border: OutlineInputBorder()),
+                items: _industries.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
+                onChanged: (v) => setState(() { _selectedIndustry = v; }),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: _selectedProvince,
+                decoration: const InputDecoration(labelText: 'المحافظة', border: OutlineInputBorder()),
+                items: _provinces.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
+                onChanged: (v) => setState(() { _selectedProvince = v; }),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _phoneCtrl,
+                decoration: const InputDecoration(labelText: 'رقم الموبايل *', border: OutlineInputBorder()),
+                keyboardType: TextInputType.phone,
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return 'رقم الموبايل مطلوب';
+                  final digits = v.replaceAll(RegExp(r'[^0-9]'), '');
+                  if (digits.length < 7) return 'رقم غير صالح';
+                  return null;
+                },
+              ),
               const SizedBox(height: 16),
               if (_error.isNotEmpty)
                 Container(
@@ -536,6 +664,12 @@ class _JobsScreenState extends State<JobsScreen> {
   String? _selectedSpeciality;
   String _sortBy = 'id';
   String _sortOrder = 'desc';
+  int _currentPage = 1;
+  int _lastPage = 1;
+  bool _isLoadingMore = false;
+  final Set<int> _favoriteIds = <int>{};
+
+
 
   // Available options for filters
   final List<String> _provinces = [
@@ -549,6 +683,11 @@ class _JobsScreenState extends State<JobsScreen> {
   @override
   void initState() {
     super.initState();
+    // Preload favorites for jobseekers (optional best-effort)
+    if (widget.user['role'] == 'jobseeker') {
+      _loadFavorites();
+    }
+
     _loadJobs();
   }
 
@@ -590,6 +729,8 @@ class _JobsScreenState extends State<JobsScreen> {
         final data = res['data'] as Map<String, dynamic>?;
         setState(() {
           jobs = (data?['data'] as List?) ?? [];
+          _currentPage = (data?['current_page'] as int?) ?? 1;
+          _lastPage = (data?['last_page'] as int?) ?? 1;
           isLoading = false;
         });
       } else {
@@ -606,6 +747,105 @@ class _JobsScreenState extends State<JobsScreen> {
     }
   }
 
+  Future<void> _loadMoreJobs() async {
+    if (_isLoadingMore || _currentPage >= _lastPage) return;
+    setState(() {
+      _isLoadingMore = true;
+    });
+    try {
+      final res = await JobsService().listJobs(
+        token: widget.token,
+        search: _searchController.text.isNotEmpty ? _searchController.text : null,
+        province: _selectedProvince,
+        speciality: _selectedSpeciality,
+        sortBy: _sortBy,
+        sortOrder: _sortOrder,
+        page: _currentPage + 1,
+      );
+      if (res['success'] == true) {
+        final data = res['data'] as Map<String, dynamic>?;
+        final List<dynamic> more = (data?['data'] as List?) ?? [];
+        setState(() {
+          jobs = [...jobs, ...more];
+          _currentPage = (data?['current_page'] as int?) ?? _currentPage;
+          _lastPage = (data?['last_page'] as int?) ?? _lastPage;
+        });
+      }
+    } catch (_) {
+      // ignore errors for load more; keep current list
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingMore = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadFavorites() async {
+    if (widget.user['role'] != 'jobseeker') return;
+    try {
+      final res = await FavoritesService().listFavorites(token: widget.token, page: 1);
+      final data = res['data'];
+      final Set<int> ids = <int>{};
+      if (data is Map<String, dynamic>) {
+        final list = (data['data'] as List?) ?? const [];
+        for (final item in list) {
+          if (item is Map<String, dynamic>) {
+            final job = item['job'];
+            if (job is Map<String, dynamic>) {
+              final id = job['id'];
+              if (id is num) {
+                ids.add(id.toInt());
+              } else if (id != null) {
+                final p = int.tryParse('$id');
+                if (p != null) ids.add(p);
+              }
+            } else {
+              final id = item['id'];
+              if (id is num) {
+                ids.add(id.toInt());
+              } else if (id != null) {
+                final p = int.tryParse('$id');
+                if (p != null) ids.add(p);
+              }
+            }
+          }
+        }
+      } else if (data is List) {
+        for (final item in data) {
+          if (item is Map<String, dynamic>) {
+            final job = item['job'];
+            if (job is Map<String, dynamic>) {
+              final id = job['id'];
+              if (id is num) {
+                ids.add(id.toInt());
+              } else if (id != null) {
+                final p = int.tryParse('$id');
+                if (p != null) ids.add(p);
+              }
+            } else {
+              final id = item['id'];
+              if (id is num) {
+                ids.add(id.toInt());
+              } else if (id != null) {
+                final p = int.tryParse('$id');
+                if (p != null) ids.add(p);
+              }
+            }
+          }
+        }
+      }
+      if (!mounted) return;
+      setState(() {
+        _favoriteIds
+          ..clear()
+          ..addAll(ids);
+      });
+    } catch (_) {
+      // ignore failures silently; keep icons default
+    }
+  }
 
   void _logout() {
     Navigator.pushReplacement(
@@ -637,7 +877,7 @@ class _JobsScreenState extends State<JobsScreen> {
 
               // Province filter
               DropdownButtonFormField<String>(
-                initialValue: _selectedProvince,
+                value: _selectedProvince,
                 decoration: const InputDecoration(
                   labelText: 'المحافظة',
                   border: OutlineInputBorder(),
@@ -662,7 +902,7 @@ class _JobsScreenState extends State<JobsScreen> {
 
               // Speciality filter
               DropdownButtonFormField<String>(
-                initialValue: _selectedSpeciality,
+                value: _selectedSpeciality,
                 decoration: const InputDecoration(
                   labelText: 'التخصص',
                   border: OutlineInputBorder(),
@@ -687,7 +927,7 @@ class _JobsScreenState extends State<JobsScreen> {
 
               // Sort options
               DropdownButtonFormField<String>(
-                initialValue: '$_sortBy-$_sortOrder',
+                value: '$_sortBy-$_sortOrder',
                 decoration: const InputDecoration(
                   labelText: 'ترتيب النتائج',
                   border: OutlineInputBorder(),
@@ -892,6 +1132,7 @@ class _JobsScreenState extends State<JobsScreen> {
                       setState(() {
                         _searchController.clear();
                         _selectedProvince = null;
+
                         _selectedSpeciality = null;
                         _sortBy = 'id';
                         _sortOrder = 'desc';
@@ -927,11 +1168,52 @@ class _JobsScreenState extends State<JobsScreen> {
                         ),
                       )
                     : jobs.isEmpty
-                        ? const Center(child: Text('لا توجد وظائف متاحة'))
-                        : ListView.builder(
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text('لا توجد نتائج مطابقة'),
+                                const SizedBox(height: 8),
+                                const Text('جرّب تعديل الفلاتر أو استخدام كلمة بحث أكثر عمومية', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                const SizedBox(height: 8),
+                                if (_searchController.text.isNotEmpty || _selectedProvince != null || _selectedSpeciality != null)
+                                  OutlinedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _searchController.clear();
+                                        _selectedProvince = null;
+                                        _selectedSpeciality = null;
+                                        _sortBy = 'id';
+                                        _sortOrder = 'desc';
+                                      });
+                                      _loadJobs();
+                                    },
+                                    child: const Text('مسح الفلاتر'),
+                                  ),
+                              ],
+                            ),
+                          )
+                        : RefreshIndicator(
+                          onRefresh: _loadJobs,
+                          child: ListView.builder(
                       padding: const EdgeInsets.all(16),
-                      itemCount: jobs.length,
+                      itemCount: jobs.length + ((_currentPage < _lastPage) ? 1 : 0),
                       itemBuilder: (context, index) {
+                        if (index >= jobs.length) {
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton(
+                                onPressed: _isLoadingMore ? null : _loadMoreJobs,
+                                child: _isLoadingMore
+                                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                                    : const Text('\u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0645\u0632\u064a\u062f'),
+                              ),
+                            ),
+                          );
+                        }
+
                         final job = jobs[index];
                         return Card(
                           margin: const EdgeInsets.only(bottom: 16),
@@ -946,6 +1228,7 @@ class _JobsScreenState extends State<JobsScreen> {
                                   children: [
                                     Expanded(
                                       child: Text(
+
                                         job['title'] ?? '',
                                         style: const TextStyle(
                                           fontSize: 18,
@@ -956,11 +1239,13 @@ class _JobsScreenState extends State<JobsScreen> {
                                     if (widget.user['role'] == 'jobseeker')
                                       IconButton(
                                         icon: Icon(
-                                          Icons.favorite_border,
-                                          color: Colors.red[300],
+                                          _favoriteIds.contains((job['id'] is num) ? (job['id'] as num).toInt() : (int.tryParse('${job['id']}') ?? -1))
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color: Colors.red[400],
                                           size: 20,
                                         ),
-                                        onPressed: () => _toggleFavorite(job['id']),
+                                        onPressed: () => _toggleFavorite((job['id'] is num) ? (job['id'] as num).toInt() : (int.tryParse('${job['id']}') ?? -1)),
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),
                                       ),
@@ -971,7 +1256,7 @@ class _JobsScreenState extends State<JobsScreen> {
                                   job['company']?['company_name'] ?? 'شركة غير محددة',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Colors.blue[700],
+                                    color: Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -1011,6 +1296,7 @@ class _JobsScreenState extends State<JobsScreen> {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
+
                                         color: job['status'] == 'open' ? Colors.green[50] : Colors.red[50],
                                         borderRadius: BorderRadius.circular(12),
                                       ),
@@ -1037,8 +1323,8 @@ class _JobsScreenState extends State<JobsScreen> {
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue,
-                                        foregroundColor: Colors.white,
+                                        backgroundColor: Theme.of(context).colorScheme.primary,
+                                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                                       ),
                                       child: const Text('عرض التفاصيل'),
                                     ),
@@ -1049,7 +1335,7 @@ class _JobsScreenState extends State<JobsScreen> {
                           ),
                         );
                       },
-                    ),
+                    )),
           ),
         ],
       ),
@@ -1089,27 +1375,39 @@ class _JobsScreenState extends State<JobsScreen> {
   }
 
   Future<void> _toggleFavorite(int jobId) async {
+    if (jobId <= 0) return;
     final favs = FavoritesService();
+    final bool isFav = _favoriteIds.contains(jobId);
     try {
-      final res = await favs.addFavorite(token: widget.token, jobId: jobId);
-      if (res['success'] == true && (res['statusCode'] == 201 || res['statusCode'] == 200)) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم إضافة الوظيفة للمفضلة')),
-        );
-      } else if (res['statusCode'] == 409) {
+      if (isFav) {
         final rem = await favs.removeFavorite(token: widget.token, jobId: jobId);
         if (rem['success'] == true) {
           if (!mounted) return;
+          setState(() { _favoriteIds.remove(jobId); });
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('تم إزالة الوظيفة من المفضلة')),
           );
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text((rem['message'] as String?) ?? 'تعذر إزالة المفضلة')),
+          );
         }
       } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text((res['message'] as String?) ?? 'حدث خطأ')),
-        );
+        final add = await favs.addFavorite(token: widget.token, jobId: jobId);
+        if (add['success'] == true || add['statusCode'] == 409) {
+          // 409 = موجودة مسبقًا
+          if (!mounted) return;
+          setState(() { _favoriteIds.add(jobId); });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('تم إضافة الوظيفة للمفضلة')),
+          );
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text((add['message'] as String?) ?? 'تعذر إضافة إلى المفضلة')),
+          );
+        }
       }
     } catch (e) {
       if (!mounted) return;
@@ -1145,22 +1443,16 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
     });
 
     try {
-      final response = await http.post(
-        Uri.parse('${AppConfig.baseUrl}applications/apply/${widget.job['id']}'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer ${widget.token}',
-        },
-        body: jsonEncode({}),
+      final jobId = (widget.job['id'] is num) ? (widget.job['id'] as num).toInt() : int.tryParse('${widget.job['id']}') ?? 0;
+      final res = await ApplicationsService().applyToJob(
+        token: widget.token,
+        jobId: jobId,
       );
 
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 201 && data['success'] == true) {
+      if (res['success'] == true && (res['statusCode'] == 201 || res['statusCode'] == 200)) {
         _showMessage('تم التقديم على الوظيفة بنجاح!', isError: false);
       } else {
-        _showMessage(data['message'] ?? 'فشل في التقديم على الوظيفة', isError: true);
+        _showMessage((res['message'] as String?) ?? 'فشل في التقديم على الوظيفة', isError: true);
       }
     } catch (e) {
       _showMessage('خطأ في الاتصال: $e', isError: true);
@@ -1225,13 +1517,14 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.job['title'] ?? ''),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -1248,6 +1541,54 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
             ),
             const SizedBox(height: 16),
 
+            // Quick tags
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if ((widget.job['province'] ?? '').toString().isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      '\u0627\u0644\u0645\u062d\u0627\u0641\u0638\u0629: ${widget.job['province']}',
+                      style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ),
+                if ((widget.job['speciality'] ?? '').toString().isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      '\u0627\u0644\u062a\u062e\u0635\u0635: ${widget.job['speciality']}',
+                      style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                    ),
+                  ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: (widget.job['status'] == 'open' ? Colors.green[50] : Colors.red[50]),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    widget.job['status'] == 'open' ? '\u0645\u062a\u0627\u062d\u0629' : '\u0645\u063a\u0644\u0642\u0629',
+                    style: TextStyle(
+                      color: widget.job['status'] == 'open' ? Colors.green[700] : Colors.red[700],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+
             // Company Info
             Card(
               child: Padding(
@@ -1255,11 +1596,12 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'معلومات الشركة',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -1290,11 +1632,12 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'تفاصيل الوظيفة',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -1353,11 +1696,12 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'وصف الوظيفة',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -1378,11 +1722,12 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'متطلبات الوظيفة',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -1402,8 +1747,10 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
               child: ElevatedButton(
                 onPressed: (widget.job['status'] == 'open' && !_isApplying) ? _showApplicationDialog : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: widget.job['status'] == 'open' ? Colors.green : Colors.grey,
-                  foregroundColor: Colors.white,
+                  backgroundColor: widget.job['status'] == 'open'
+                      ? Theme.of(context).colorScheme.secondary
+                      : Colors.grey,
+                  foregroundColor: Theme.of(context).colorScheme.onSecondary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: _isApplying
@@ -2653,7 +3000,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        initialValue: _selectedProvince,
+                        value: _selectedProvince,
                         decoration: const InputDecoration(
                           labelText: 'المحافظة',
                           border: OutlineInputBorder(),
@@ -2670,7 +3017,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        initialValue: _selectedGender,
+                        value: _selectedGender,
                         decoration: const InputDecoration(
                           labelText: 'الجنس',
                           border: OutlineInputBorder(),
@@ -2727,7 +3074,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        initialValue: _selectedSpeciality,
+                        value: _selectedSpeciality,
                         decoration: const InputDecoration(
                           labelText: 'التخصص',
                           border: OutlineInputBorder(),
@@ -2744,7 +3091,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        initialValue: _selectedEducationLevel,
+                        value: _selectedEducationLevel,
                         decoration: const InputDecoration(
                           labelText: 'مستوى التعليم',
                           border: OutlineInputBorder(),
@@ -2761,7 +3108,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        initialValue: _selectedExperienceLevel,
+                        value: _selectedExperienceLevel,
                         decoration: const InputDecoration(
                           labelText: 'مستوى الخبرة',
                           border: OutlineInputBorder(),
@@ -3150,7 +3497,7 @@ class _ApplicantsScreenState extends State<ApplicantsScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
-                initialValue: _selectedStatus,
+                value: _selectedStatus,
                 decoration: const InputDecoration(labelText: 'الحالة', border: OutlineInputBorder()),
                 items: [
                   const DropdownMenuItem<String>(value: null, child: Text('كل الحالات')),
@@ -3166,7 +3513,7 @@ class _ApplicantsScreenState extends State<ApplicantsScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: _selectedSpeciality,
+                value: _selectedSpeciality,
                 decoration: const InputDecoration(labelText: 'التخصص', border: OutlineInputBorder()),
                 items: [
                   const DropdownMenuItem<String>(value: null, child: Text('كل التخصصات')),
@@ -3176,7 +3523,7 @@ class _ApplicantsScreenState extends State<ApplicantsScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: _selectedProvince,
+                value: _selectedProvince,
                 decoration: const InputDecoration(labelText: 'المحافظة', border: OutlineInputBorder()),
                 items: [
                   const DropdownMenuItem<String>(value: null, child: Text('كل المحافظات')),
@@ -3186,7 +3533,7 @@ class _ApplicantsScreenState extends State<ApplicantsScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: _sortBy,
+                value: _sortBy,
                 decoration: const InputDecoration(labelText: 'ترتيب حسب', border: OutlineInputBorder()),
                 items: const [
                   DropdownMenuItem<String>(value: 'matching_percentage', child: Text('نسبة التطابق')),
@@ -3196,7 +3543,7 @@ class _ApplicantsScreenState extends State<ApplicantsScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                initialValue: _sortOrder,
+                value: _sortOrder,
                 decoration: const InputDecoration(labelText: 'اتجاه الترتيب', border: OutlineInputBorder()),
                 items: const [
                   DropdownMenuItem<String>(value: 'desc', child: Text('تنازلي')),
@@ -3391,7 +3738,7 @@ class _ApplicantDetailScreenState extends State<ApplicantDetailScreen> {
                     const Text('تحديث الحالة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      initialValue: _status,
+                      value: _status,
                       decoration: const InputDecoration(labelText: 'الحالة', border: OutlineInputBorder()),
                       items: _statuses.map((s) => DropdownMenuItem<String>(value: s, child: Text(_statusText(s)))).toList(),
                       onChanged: (v) => setState(() { _status = v; }),
