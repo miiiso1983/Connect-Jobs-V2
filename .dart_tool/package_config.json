@@ -141,9 +141,9 @@
     },
     {
       "name": "flutter",
-      "rootUri": "file:///opt/homebrew/share/flutter/packages/flutter",
+      "rootUri": "file:///Users/mustafaaljaf/Documents/augment-projects/POS/flutter/packages/flutter",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.7"
     },
     {
       "name": "flutter_bloc",
@@ -153,9 +153,9 @@
     },
     {
       "name": "flutter_test",
-      "rootUri": "file:///opt/homebrew/share/flutter/packages/flutter_test",
+      "rootUri": "file:///Users/mustafaaljaf/Documents/augment-projects/POS/flutter/packages/flutter_test",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.7"
     },
     {
       "name": "glob",
@@ -213,19 +213,19 @@
     },
     {
       "name": "leak_tracker",
-      "rootUri": "file:///Users/mustafaaljaf/.pub-cache/hosted/pub.dev/leak_tracker-11.0.2",
+      "rootUri": "file:///Users/mustafaaljaf/.pub-cache/hosted/pub.dev/leak_tracker-10.0.9",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
     {
       "name": "leak_tracker_flutter_testing",
-      "rootUri": "file:///Users/mustafaaljaf/.pub-cache/hosted/pub.dev/leak_tracker_flutter_testing-3.0.10",
+      "rootUri": "file:///Users/mustafaaljaf/.pub-cache/hosted/pub.dev/leak_tracker_flutter_testing-3.0.9",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
     {
       "name": "leak_tracker_testing",
-      "rootUri": "file:///Users/mustafaaljaf/.pub-cache/hosted/pub.dev/leak_tracker_testing-3.0.2",
+      "rootUri": "file:///Users/mustafaaljaf/.pub-cache/hosted/pub.dev/leak_tracker_testing-3.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -315,9 +315,9 @@
     },
     {
       "name": "sky_engine",
-      "rootUri": "file:///opt/homebrew/share/flutter/bin/cache/pkg/sky_engine",
+      "rootUri": "file:///Users/mustafaaljaf/Documents/augment-projects/POS/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.7"
     },
     {
       "name": "source_gen",
@@ -369,7 +369,7 @@
     },
     {
       "name": "test_api",
-      "rootUri": "file:///Users/mustafaaljaf/.pub-cache/hosted/pub.dev/test_api-0.7.6",
+      "rootUri": "file:///Users/mustafaaljaf/.pub-cache/hosted/pub.dev/test_api-0.7.4",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
@@ -381,9 +381,9 @@
     },
     {
       "name": "vector_math",
-      "rootUri": "file:///Users/mustafaaljaf/.pub-cache/hosted/pub.dev/vector_math-2.2.0",
+      "rootUri": "file:///Users/mustafaaljaf/.pub-cache/hosted/pub.dev/vector_math-2.1.4",
       "packageUri": "lib/",
-      "languageVersion": "3.1"
+      "languageVersion": "2.14"
     },
     {
       "name": "vm_service",
@@ -429,8 +429,8 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.9.2",
-  "flutterRoot": "file:///opt/homebrew/share/flutter",
-  "flutterVersion": "3.35.5",
+  "generatorVersion": "3.8.1",
+  "flutterRoot": "file:///Users/mustafaaljaf/Documents/augment-projects/POS/flutter",
+  "flutterVersion": "3.32.4",
   "pubCache": "file:///Users/mustafaaljaf/.pub-cache"
 }

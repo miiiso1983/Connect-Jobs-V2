@@ -10,6 +10,8 @@ import 'services/applications_service.dart';
 import 'theme/app_theme.dart';
 import 'services/profile_service.dart';
 
+import 'screens/admin_webview_screen.dart';
+
 
 import 'dart:io';
 
@@ -64,14 +66,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (data['success'] == true) {
         if (!mounted) return;
+        final String token = (data['data']?['token'] as String?) ?? '';
+        final Map<String, dynamic> user = (data['data']?['user'] as Map<String, dynamic>?) ?? {};
+        final String role = (user['role'] as String?) ?? '';
+        Widget home;
+        if (role == 'admin') {
+          home = AdminDashboardScreen(token: token, user: user);
+        } else if (role == 'company') {
+          home = CompanyDashboardScreen(token: token, user: user);
+        } else {
+          home = JobsScreen(token: token, user: user);
+        }
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => JobsScreen(
-              token: data['data']['token'],
-              user: data['data']['user'],
-            ),
-          ),
+          MaterialPageRoute(builder: (context) => home),
         );
       } else {
         setState(() {
@@ -114,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Image.network(
-                      AppConfig.baseUrl.replaceFirst('api/v1/', '') + 'images/brand/logo.png',
+                      '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}images/brand/logo.png',
                       width: 96,
                       height: 96,
                       fit: BoxFit.contain,
@@ -3338,6 +3346,45 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
       ),
     );
   }
+  Widget _actionCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required LinearGradient gradient,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: gradient,
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(icon, size: 48, color: Colors.white),
+            Text(
+              title,
+              textAlign: TextAlign.right,
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openCompany(BuildContext context, String title, String url) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: url)),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -3350,6 +3397,7 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
           IconButton(icon: const Icon(Icons.refresh), onPressed: _loadDashboard),
         ],
       ),
+
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : errorMessage.isNotEmpty
@@ -3374,6 +3422,71 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                         ],
                       ),
                     ),
+                    // روابط الشركة كما في الموقع داخل WebView
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 1.6,
+                        children: [
+                          _actionCard(
+                            context,
+                            title: 'إدارة الوظائف',
+                            icon: Icons.work_outline,
+                            gradient: const LinearGradient(colors: [Color(0xFF0D2660), Color(0xFF102E66)]),
+                            onTap: () {
+                              final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+                              _openCompany(context, 'إدارة الوظائف', '${site}company/jobs');
+                            },
+                          ),
+                          _actionCard(
+                            context,
+                            title: 'وظيفة جديدة',
+                            icon: Icons.add_box_outlined,
+                            gradient: const LinearGradient(colors: [Color(0xFFE7C66A), Color(0xFFC5A74F)]),
+                            onTap: () {
+                              final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+                              _openCompany(context, 'وظيفة جديدة', '${site}company/jobs/create');
+                            },
+                          ),
+                          _actionCard(
+                            context,
+                            title: 'الطلبات',
+                            icon: Icons.inbox_outlined,
+                            gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
+                            onTap: () {
+                              final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+                              _openCompany(context, 'طلبات التقديم', '${site}company/applicants');
+                            },
+                          ),
+                          _actionCard(
+                            context,
+                            title: 'قاعدة الباحثين',
+                            icon: Icons.manage_search,
+                            gradient: const LinearGradient(colors: [Color(0xFF0EA5E9), Color(0xFF0369A1)]),
+                            onTap: () {
+                              final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+                              _openCompany(context, 'قاعدة الباحثين', '${site}company/seekers');
+                            },
+                          ),
+                          _actionCard(
+                            context,
+                            title: 'ملف الشركة',
+                            icon: Icons.account_circle_outlined,
+                            gradient: const LinearGradient(colors: [Color(0xFF9333EA), Color(0xFF7E22CE)]),
+                            onTap: () {
+                              final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+                              _openCompany(context, 'ملف الشركة', '${site}company/profile');
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
                     const Padding(
                       padding: EdgeInsets.fromLTRB(12, 12, 12, 0),
                       child: Align(
@@ -3382,9 +3495,12 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                       ),
                     ),
                     Expanded(
+
                       child: jobs.isEmpty
                           ? const Center(child: Text('لا توجد وظائف'))
                           : ListView.builder(
+                    // Gradient header like website
+
                               padding: const EdgeInsets.all(12),
                               itemCount: jobs.length,
                               itemBuilder: (context, i) {
@@ -3763,6 +3879,165 @@ class _ApplicantDetailScreenState extends State<ApplicantDetailScreen> {
               ),
             ),
           ],
+
+
+        ),
+      ),
+    );
+  }
+}
+
+
+// ========================= Admin Dashboard (Mobile) =========================
+class AdminDashboardScreen extends StatelessWidget {
+  final String token;
+  final Map<String, dynamic> user;
+  const AdminDashboardScreen({super.key, required this.token, required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('لوحة تحكم الأدمن'),
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          children: [
+            // Use website routes inside WebView for full parity
+            _adminCard(
+              context,
+              title: 'الشركات',
+              icon: Icons.apartment,
+              gradient: const LinearGradient(colors: [Color(0xFF4F46E5), Color(0xFF3730A3)]),
+              onTap: () {
+                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+                _open(context, 'إدارة الشركات', '${site}admin/companies');
+              },
+            ),
+            _adminCard(
+              context,
+              title: 'وظائف قيد المراجعة',
+              icon: Icons.fact_check,
+              gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
+              onTap: () {
+                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+                _open(context, 'الوظائف قيد المراجعة', '${site}admin/jobs/pending');
+              },
+            ),
+            _adminCard(
+              context,
+              title: 'الباحثون عن عمل',
+              icon: Icons.people_alt,
+              gradient: const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFD97706)]),
+              onTap: () {
+                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+                _open(context, 'إدارة الباحثين', '${site}admin/jobseekers');
+              },
+            ),
+            _adminCard(
+              context,
+              title: 'قاعدة بيانات الباحثين',
+              icon: Icons.manage_search,
+              gradient: const LinearGradient(colors: [Color(0xFF0EA5E9), Color(0xFF0369A1)]),
+              onTap: () {
+                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+                _open(context, 'قاعدة بيانات الباحثين', '${site}admin/seekers');
+              },
+            ),
+            _adminCard(
+              context,
+              title: 'الإعدادات',
+              icon: Icons.settings,
+              gradient: const LinearGradient(colors: [Color(0xFF9333EA), Color(0xFF7E22CE)]),
+              onTap: () {
+                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+                _open(context, 'الإعدادات', '${site}admin/settings');
+              },
+            ),
+            _adminCard(
+              context,
+              title: 'الأقضية والمناطق',
+              icon: Icons.map,
+              gradient: const LinearGradient(colors: [Color(0xFF14B8A6), Color(0xFF0F766E)]),
+              onTap: () {
+                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+                _open(context, 'الأقضية والمناطق', '${site}admin/districts');
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _adminCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required LinearGradient gradient,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: gradient,
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(icon, size: 48, color: Colors.white.withOpacity(0.95)),
+            Text(
+              title,
+              textAlign: TextAlign.right,
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _open(BuildContext context, String title, String url) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: url)),
+    );
+  }
+}
+
+class AdminPlaceholderScreen extends StatelessWidget {
+  final String title;
+  const AdminPlaceholderScreen({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Text(
+            'هذه الشاشة ستتوفر قريبا في التطبيق مع واجهات برمجية للادمن يمكنني ربطها فور توفرها.\nضمن API /api/v1 للادمن حاليا لا توجد نقاط توفرها.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8), fontSize: 16),
+          ),
         ),
       ),
     );
