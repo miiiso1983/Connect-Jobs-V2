@@ -3415,10 +3415,23 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
     );
   }
 
+  String _wrapSessionUrl(String absoluteUrl) {
+    final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+    String redirect = absoluteUrl;
+    if (absoluteUrl.startsWith(site)) {
+      redirect = absoluteUrl.substring(site.length);
+      if (!redirect.startsWith('/')) redirect = '/$redirect';
+    }
+    final token = Uri.encodeComponent(widget.token);
+    final dest = Uri.encodeComponent(redirect);
+    return '${site}mobile/session-login?token=$token&redirect=$dest';
+  }
+
   void _openCompany(BuildContext context, String title, String url) {
+    final bridged = _wrapSessionUrl(url);
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: url)),
+      MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: bridged)),
     );
   }
 
@@ -4049,10 +4062,23 @@ class AdminDashboardScreen extends StatelessWidget {
     );
   }
 
+  String _wrapSessionUrl(String absoluteUrl) {
+    final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+    String redirect = absoluteUrl;
+    if (absoluteUrl.startsWith(site)) {
+      redirect = absoluteUrl.substring(site.length);
+      if (!redirect.startsWith('/')) redirect = '/$redirect';
+    }
+    final encodedToken = Uri.encodeComponent(this.token);
+    final dest = Uri.encodeComponent(redirect);
+    return '${site}mobile/session-login?token=$encodedToken&redirect=$dest';
+  }
+
   void _open(BuildContext context, String title, String url) {
+    final bridged = _wrapSessionUrl(url);
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: url)),
+      MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: bridged)),
     );
   }
 }

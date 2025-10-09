@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 
 
 // Locale switcher
@@ -99,6 +101,42 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
+// Mobile WebView session bridge: accept JWT token, create web session, then redirect
+Route::get('/mobile/session-login', function (Request $request) {
+    $token = $request->query('token');
+    $redirect = $request->query('redirect', '/');
+
+    if (!$token) {
+        return redirect()->route('login');
+    }
+
+    try {
+        $user = JWTAuth::setToken($token)->authenticate();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+        // Log into web guard and regenerate session/cookie
+        Auth::login($user, true);
+        $request->session()->regenerate();
+
+        // Allow only internal redirects
+        if (str_starts_with($redirect, 'http')) {
+            $parts = parse_url($redirect);
+            $path = $parts['path'] ?? '/';
+            $q = isset($parts['query']) ? ('?'.$parts['query']) : '';
+            $redirect = $path.$q;
+        }
+        if (!str_starts_with($redirect, '/')) {
+            $redirect = '/'.$redirect;
+        }
+
+        return redirect($redirect);
+    } catch (\Throwable $e) {
+        return redirect()->route('login');
+    }
+})->name('mobile.session_login');
 
 // Auth routes (login/register/...) provided by Breeze
 require __DIR__.'/auth.php';
