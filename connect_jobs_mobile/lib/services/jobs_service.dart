@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../utils/app_config.dart';
+import 'cache/jobs_cache.dart';
 
 class JobsService {
   final http.Client _client;
@@ -24,17 +25,63 @@ class JobsService {
       if (page != null) 'page': page.toString(),
     };
 
-    final uri = Uri.parse('${AppConfig.baseUrl}jobs').replace(queryParameters: query);
-    final resp = await _client.get(uri, headers: {
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    });
-    final body = _safeDecode(resp.body);
+    // Try network first
+    try {
+      final uri = Uri.parse('${AppConfig.baseUrl}jobs').replace(queryParameters: query);
+      final resp = await _client.get(uri, headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      });
+      final body = _safeDecode(resp.body);
+      final success = body['success'] == true || resp.statusCode == 200;
+      final result = {
+        'statusCode': resp.statusCode,
+        'success': success,
+        'data': body['data'],
+        'message': body['message'] ?? (resp.statusCode == 200 ? null : 'Failed to load jobs'),
+      };
+      // Save to cache on success
+      if (success && body['data'] != null) {
+        await JobsCache.instance.saveList(
+          payload: result,
+          search: search,
+          province: province,
+          speciality: speciality,
+          sortBy: sortBy,
+          sortOrder: sortOrder,
+          page: page,
+        );
+      }
+      return result;
+    } catch (_) {
+      // ignore and try cache
+    }
+
+    // Fallback to cache
+    final cached = JobsCache.instance.getList(
+      search: search,
+      province: province,
+      speciality: speciality,
+      sortBy: sortBy,
+      sortOrder: sortOrder,
+      page: page,
+    );
+    if (cached != null) {
+      return {
+        'statusCode': 200,
+        'success': true,
+        'data': cached['data'],
+        'message': null,
+        'cached': true,
+      };
+    }
+
+    // Final fallback
     return {
-      'statusCode': resp.statusCode,
-      'success': body['success'] == true || resp.statusCode == 200,
-      'data': body['data'],
-      'message': body['message'] ?? (resp.statusCode == 200 ? null : 'Failed to load jobs'),
+      'statusCode': 503,
+      'success': false,
+      'data': null,
+      'message': 'تعذّر تحميل الوظائف (لا يوجد اتصال ولا بيانات مخزنة)'
     };
   }
 
@@ -49,4 +96,3 @@ class JobsService {
 
   void close() => _client.close();
 }
-

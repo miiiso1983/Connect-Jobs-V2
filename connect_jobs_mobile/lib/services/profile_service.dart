@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 
 import 'package:http/http.dart' as http;
 
@@ -88,29 +89,84 @@ class ProfileService {
     required String token,
     required Map<String, String> fields,
     Map<String, File> files = const {},
+    void Function(double progress)? onProgress,
+    int retries = 2,
+    Duration initialBackoff = const Duration(seconds: 1),
   }) async {
-    try {
+    // Prepare request
+    Future<http.Response> sendOnce() async {
       final request = http.MultipartRequest('POST', _path('profile/'));
       request.headers.addAll(_authHeaders(token));
       request.fields['_method'] = 'PUT';
       request.fields.addAll(fields);
+
+      // Compute total bytes across all files (best-effort)
+      int totalBytes = 0;
+      for (final f in files.values) {
+        try { totalBytes += await f.length(); } catch (_) {}
+      }
+      int sentBytes = 0;
+
       for (final entry in files.entries) {
-        final file = await http.MultipartFile.fromPath(entry.key, entry.value.path);
-        request.files.add(file);
+        final file = entry.value;
+        final length = await file.length();
+        final Stream<List<int>> stream = file.openRead().transform<List<int>>(
+          StreamTransformer<List<int>, List<int>>.fromHandlers(
+            handleData: (List<int> chunk, EventSink<List<int>> sink) {
+              sentBytes += chunk.length;
+              if (onProgress != null && totalBytes > 0) {
+                final double p = sentBytes / totalBytes;
+                // Clamp 0..1
+                onProgress(p < 0 ? 0 : (p > 1 ? 1 : p));
+              }
+              sink.add(chunk);
+            },
+          ),
+        );
+        final multipart = http.MultipartFile(
+          entry.key,
+          stream,
+          length,
+          filename: file.path.split('/').last,
+        );
+        request.files.add(multipart);
       }
+
       final streamed = await request.send();
-      final resp = await http.Response.fromStream(streamed);
-      Map<String, dynamic> data;
+      return http.Response.fromStream(streamed);
+    }
+
+    int attempt = 0;
+    while (true) {
       try {
-        data = jsonDecode(resp.body) is Map<String, dynamic>
-            ? (jsonDecode(resp.body) as Map<String, dynamic>)
-            : <String, dynamic>{};
+        final resp = await sendOnce();
+        Map<String, dynamic> data;
+        try {
+          data = jsonDecode(resp.body) is Map<String, dynamic>
+              ? (jsonDecode(resp.body) as Map<String, dynamic>)
+              : <String, dynamic>{};
+        } catch (_) {
+          data = <String, dynamic>{};
+        }
+        final normalized = _normalize(data, resp.statusCode);
+        // Consider 5xx/connection issues for retry; 4xx shouldn't retry
+        final shouldRetry = resp.statusCode >= 500 && attempt < retries;
+        if (!shouldRetry) {
+          // Ensure final progress emits 1.0 if success
+          if (normalized['success'] == true && onProgress != null) {
+            onProgress(1.0);
+          }
+          return normalized;
+        }
       } catch (_) {
-        data = <String, dynamic>{};
+        if (attempt >= retries) {
+          return {'success': false, 'message': 'تعذّر الاتصال بالخادم'};
+        }
       }
-      return _normalize(data, resp.statusCode);
-    } catch (_) {
-      return {'success': false, 'message': 'تعذّر الاتصال بالخادم'};
+      // Backoff
+      final delay = initialBackoff * (1 << attempt);
+      await Future.delayed(delay);
+      attempt += 1;
     }
   }
 

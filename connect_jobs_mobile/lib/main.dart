@@ -22,6 +22,25 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'services/cache/jobs_cache.dart';
+
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // Ensure Firebase is initialized for background isolates
+  try { await Firebase.initializeApp(); } catch (_) {}
+}
+
+final FlutterLocalNotificationsPlugin _fln = FlutterLocalNotificationsPlugin();
+const AndroidNotificationChannel _defaultAndroidChannel = AndroidNotificationChannel(
+  'default_channel',
+  'General',
+  description: 'General notifications',
+  importance: Importance.defaultImportance,
+);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize Firebase using explicit options for both platforms
@@ -55,6 +74,55 @@ void main() async {
     // TODO: send this token to your backend and associate with the logged-in user
     debugPrint('FCM token: $token');
   } catch (_) {}
+  // Local notifications + FCM handlers
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true, badge: true, sound: true,
+  );
+
+  const InitializationSettings initSettings = InitializationSettings(
+    android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+    iOS: DarwinInitializationSettings(),
+  );
+  await _fln.initialize(initSettings);
+
+  await _fln
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(_defaultAndroidChannel);
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    final notif = message.notification;
+    if (notif != null) {
+      await _fln.show(
+        notif.hashCode,
+        notif.title,
+        notif.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _defaultAndroidChannel.id,
+            _defaultAndroidChannel.name,
+            channelDescription: _defaultAndroidChannel.description,
+            importance: Importance.defaultImportance,
+            priority: Priority.defaultPriority,
+          ),
+          iOS: DarwinNotificationDetails(),
+        ),
+      );
+    }
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    debugPrint('Notification clicked: \\${message.messageId}');
+  });
+
+
+  // Initialize local cache (Hive)
+  try {
+    await Hive.initFlutter();
+    await JobsCache.instance.init();
+  } catch (_) {}
+
 
   runApp(const ConnectJobsApp());
 }
@@ -83,10 +151,22 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController(text: 'test@example.com');
-  final _passwordController = TextEditingController(text: '123456');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _isLoading = false;
   String _errorMessage = '';
+
+  bool _obscure = true;
+  bool _animateIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Simple fade-in animation for a modern feel
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _animateIn = true);
+    });
+  }
 
   Future<void> _login() async {
     setState(() {
@@ -112,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
         } else if (role == 'company') {
           home = CompanyDashboardScreen(token: token, user: user);
         } else {
-          home = JobsScreen(token: token, user: user);
+          home = JobSeekerDashboardScreen(token: token, user: user);
         }
         Navigator.pushReplacement(
           context,
@@ -134,189 +214,195 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  void _setQuickLogin(String email, String password) {
-    setState(() {
-      _emailController.text = email;
-      _passwordController.text = password;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Logo
-                CircleAvatar(
-                  radius: 60,
-                  backgroundColor: scheme.primary,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Image.network(
-                      '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}images/brand/logo.png',
-                      width: 96,
-                      height: 96,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Title
-                Text(
-                  'Connect Jobs',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: scheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'منصة التوظيف الطبي',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: scheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-              // Quick Login Buttons
-              Text(
-                'تسجيل دخول سريع:',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: scheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: () => _setQuickLogin('test@example.com', '123456'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: scheme.secondary,
-                        foregroundColor: scheme.onSecondary,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: const Text('باحث عمل'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: () => _setQuickLogin('mazi@n.com', '123456'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: scheme.tertiary,
-                        foregroundColor: scheme.onTertiary,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: const Text('شركة'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Login Form
-              TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'البريد الإلكتروني',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
-                ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'كلمة المرور',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 24),
-
-              // Error Message
-              if (_errorMessage.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.red[50],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.red[300]!),
-                  ),
-                  child: Text(
-                    _errorMessage,
-                    style: TextStyle(color: Colors.red[700]),
-                  ),
-                ),
-
-              // Login Button
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _isLoading ? null : _login,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: scheme.primary,
-                    foregroundColor: scheme.onPrimary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          'تسجيل الدخول',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const RegisterJobSeekerScreen()),
-                      ),
-                      child: const Text('إنشاء حساب كباحث عن عمل'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const RegisterCompanyScreen()),
-                      ),
-                      child: const Text('إنشاء حساب كشركة'),
-                    ),
-                  ),
-                ],
-              ),
-
-            ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [Color(0xFFF8FAFF), Color(0xFFEFF3FF)],
           ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 500),
+                opacity: _animateIn ? 1.0 : 0.0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Logo
+                    CircleAvatar(
+                      radius: 56,
+                      backgroundColor: scheme.primary,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.network(
+                          '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}images/brand/logo.png',
+                          width: 88,
+                          height: 88,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Title
+                    Text(
+                      'Connect Jobs',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: scheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'منصة التوظيف الطبي',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: scheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Form Card
+                    Card(
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            TextField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: InputDecoration(
+                                labelText: 'البريد الإلكتروني',
+                                prefixIcon: const Icon(Icons.email_outlined),
+                                filled: true,
+                                fillColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.95),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            TextField(
+                              controller: _passwordController,
+                              obscureText: _obscure,
+                              decoration: InputDecoration(
+                                labelText: 'كلمة المرور',
+                                prefixIcon: const Icon(Icons.lock_outline),
+                                suffixIcon: IconButton(
+                                  icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
+                                  onPressed: () => setState(() => _obscure = !_obscure),
+                                ),
+                                filled: true,
+                                fillColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.95),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Error Message
+                            if (_errorMessage.isNotEmpty)
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                margin: const EdgeInsets.only(bottom: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.red[50],
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.red[200]!),
+                                ),
+                                child: Text(
+                                  _errorMessage,
+                                  textAlign: TextAlign.right,
+                                  style: TextStyle(color: Colors.red[700]),
+                                ),
+                              ),
+
+                            // Login Button
+                            SizedBox(
+                              width: double.infinity,
+                              child: FilledButton.icon(
+                                onPressed: _isLoading ? null : _login,
+                                icon: _isLoading
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                      )
+                                    : const Icon(Icons.login),
+                                label: const Text('تسجيل الدخول'),
+                                style: FilledButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(child: Divider(color: Colors.grey[300])),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Text('أو'),
+                                ),
+                                Expanded(child: Divider(color: Colors.grey[300])),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => const RegisterJobSeekerScreen()),
+                                    ),
+                                    icon: const Icon(Icons.person_add_alt_1),
+                                    label: const Text('إنشاء حساب كباحث عن عمل'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => const RegisterCompanyScreen()),
+                                    ),
+                                    icon: const Icon(Icons.apartment),
+                                    label: const Text('إنشاء حساب كشركة'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
-
-    ),
-
     );
   }
 }
@@ -328,178 +414,14 @@ class RegisterJobSeekerScreen extends StatefulWidget {
 }
 
 class _RegisterJobSeekerScreenState extends State<RegisterJobSeekerScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameCtrl = TextEditingController();
-  final _emailCtrl = TextEditingController();
-  final _passCtrl = TextEditingController();
-  final _confirmCtrl = TextEditingController();
-  final _provinceCtrl = TextEditingController();
-  final _jobTitleCtrl = TextEditingController();
-  final _specialityCtrl = TextEditingController();
-  String _gender = 'male';
-  final List<String> _specialitiesOptions = [
-    'General Practitioner','Pediatrics','Cardiologist','Nurses','Pharmacist','General Surgery','Radiology','Obstetrics and Gynecology','Medical Laboratory','Dentistry'
-  ];
-  final List<String> _provinces = [
-    'بغداد', 'البصرة', 'أربيل', 'الموصل', 'النجف', 'كربلاء', 'الأنبار', 'ديالى', 'صلاح الدين', 'واسط', 'ميسان', 'ذي قار', 'المثنى', 'القادسية', 'بابل', 'كركوك', 'السليمانية', 'دهوك'
-  ];
-  bool _loading = false;
-  String _error = '';
-  String _specialityName(String speciality) {
-    switch (speciality) {
-      case 'General Practitioner':
-        return 'طبيب عام';
-      case 'Pediatrics':
-        return 'طبيب أطفال';
-      case 'Cardiologist':
-        return 'طبيب قلب';
-      case 'Nurses':
-        return 'ممرض/ممرضة';
-      case 'Pharmacist':
-        return 'صيدلي';
-      case 'General Surgery':
-        return 'طبيب جراحة عامة';
-      case 'Radiology':
-        return 'أخصائي أشعة';
-      case 'Obstetrics and Gynecology':
-        return 'طبيب نساء وولادة';
-      case 'Medical Laboratory':
-        return 'فني مختبر طبي';
-      case 'Dentistry':
-        return 'طبيب أسنان';
-      default:
-        return speciality;
-    }
-  }
-
-
-
-  @override
-  void dispose() {
-    _nameCtrl.dispose();
-    _emailCtrl.dispose();
-    _passCtrl.dispose();
-    _confirmCtrl.dispose();
-    _provinceCtrl.dispose();
-    _jobTitleCtrl.dispose();
-    _specialityCtrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submit() async {
-    FocusScope.of(context).unfocus();
-    setState(() => _error = '');
-    if (_nameCtrl.text.trim().isEmpty ||
-        _emailCtrl.text.trim().isEmpty ||
-        _passCtrl.text.isEmpty ||
-        _confirmCtrl.text.isEmpty ||
-        _provinceCtrl.text.trim().isEmpty ||
-        _jobTitleCtrl.text.trim().isEmpty ||
-        _specialityCtrl.text.trim().isEmpty) {
-      setState(() => _error = 'يرجى تعبئة جميع الحقول');
-      return;
-    }
-    if (_passCtrl.text.length < 8) {
-      setState(() => _error = 'الحد الأدنى 8 أحرف');
-      return;
-    }
-    if (_passCtrl.text != _confirmCtrl.text) {
-      setState(() => _error = 'كلمتا المرور غير متطابقتين');
-      return;
-    }
-    setState(() => _loading = true);
-    final auth = AuthService();
-    final res = await auth.registerJobSeeker(
-      name: _nameCtrl.text.trim(),
-      fullName: _nameCtrl.text.trim(),
-      email: _emailCtrl.text.trim(),
-      password: _passCtrl.text,
-      passwordConfirmation: _confirmCtrl.text,
-      province: _provinceCtrl.text.trim(),
-      jobTitle: _jobTitleCtrl.text.trim(),
-      speciality: _specialityCtrl.text.trim(),
-      gender: _gender,
-    );
-    auth.close();
-    if (!mounted) return;
-    setState(() => _loading = false);
-    if (res['success'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إنشاء الحساب بنجاح. يرجى تسجيل الدخول.')),
-      );
-      Navigator.pop(context);
-    } else {
-      setState(() => _error = (res['message'] as String?) ?? 'تعذر إنشاء الحساب');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('إنشاء حساب - باحث عن عمل'),
-        backgroundColor: scheme.primary,
-        foregroundColor: scheme.onPrimary,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextField(controller: _nameCtrl, decoration: const InputDecoration(labelText: 'الاسم الكامل', border: OutlineInputBorder())),
-              const SizedBox(height: 12),
-              TextField(controller: _emailCtrl, decoration: const InputDecoration(labelText: 'البريد الإلكتروني', border: OutlineInputBorder()), keyboardType: TextInputType.emailAddress),
-              const SizedBox(height: 12),
-              TextField(controller: _passCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'كلمة المرور', border: OutlineInputBorder())),
-              const SizedBox(height: 12),
-              TextField(controller: _confirmCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'تأكيد كلمة المرور', border: OutlineInputBorder())),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: _provinceCtrl.text.isNotEmpty ? _provinceCtrl.text : null,
-                decoration: const InputDecoration(labelText: 'المحافظة', border: OutlineInputBorder()),
-                items: _provinces.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
-                onChanged: (val) { setState(() { _provinceCtrl.text = val ?? ''; }); },
-              ),
-              const SizedBox(height: 12),
-              TextField(controller: _jobTitleCtrl, decoration: const InputDecoration(labelText: 'المسمى الوظيفي', border: OutlineInputBorder())),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: _specialityCtrl.text.isNotEmpty ? _specialityCtrl.text : null,
-                decoration: const InputDecoration(labelText: 'التخصص', border: OutlineInputBorder()),
-                items: _specialitiesOptions.map((s) => DropdownMenuItem(value: s, child: Text(_specialityName(s)))).toList(),
-                onChanged: (val) { setState(() { _specialityCtrl.text = val ?? ''; }); },
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: _gender,
-                decoration: const InputDecoration(labelText: 'الجنس', border: OutlineInputBorder()),
-                items: const [
-                  DropdownMenuItem(value: 'male', child: Text('ذكر')),
-                  DropdownMenuItem(value: 'female', child: Text('أنثى')),
-                ],
-                onChanged: (val) { setState(() { _gender = val ?? 'male'; }); },
-              ),
-              const SizedBox(height: 16),
-              if (_error.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  margin: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(color: Colors.red[50], borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.red[300]!)),
-                  child: Text(_error, style: TextStyle(color: Colors.red[700])),
-                ),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _loading ? null : _submit,
-                  child: _loading ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('إنشاء حساب'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+    final url = '${site}register/jobseeker';
+    return AdminWebViewScreen(
+      title: 'إنشاء حساب - باحث عن عمل',
+      url: url,
     );
   }
 }
@@ -511,178 +433,14 @@ class RegisterCompanyScreen extends StatefulWidget {
 }
 
 class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameCtrl = TextEditingController();
-  final _emailCtrl = TextEditingController();
-  final _passCtrl = TextEditingController();
-  final _confirmCtrl = TextEditingController();
-  final _officeCtrl = TextEditingController();
-  final _jobTitleCtrl = TextEditingController();
-  final _phoneCtrl = TextEditingController();
-  // Dropdown data for company registration
-  final List<String> _provinces = [
-    'بغداد','البصرة','أربيل','الموصل','النجف','كربلاء','الأنبار','ديالى','صلاح الدين','واسط','ميسان','ذي قار','المثنى','القادسية','بابل','كركوك','السليمانية','دهوك'
-  ];
-  final List<String> _industries = [
-    'الصيدلة','المستلزمات الطبية','مستشفيات','عيادات','شركات توزيع','مختبرات','أخرى'
-  ];
-  String? _selectedProvince;
-  String? _selectedIndustry;
-  bool _loading = false;
-  String _error = '';
-
-  @override
-  void dispose() {
-    _nameCtrl.dispose();
-    _emailCtrl.dispose();
-    _passCtrl.dispose();
-    _confirmCtrl.dispose();
-    _officeCtrl.dispose();
-    _jobTitleCtrl.dispose();
-    _phoneCtrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submit() async {
-    FocusScope.of(context).unfocus();
-    setState(() => _error = '');
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-    if (_passCtrl.text != _confirmCtrl.text) {
-      setState(() => _error = 'كلمتا المرور غير متطابقتين');
-      return;
-    }
-    setState(() => _loading = true);
-    final auth = AuthService();
-    final res = await auth.registerCompany(
-      name: _nameCtrl.text.trim(),
-      email: _emailCtrl.text.trim(),
-      password: _passCtrl.text,
-      passwordConfirmation: _confirmCtrl.text,
-      officeName: _officeCtrl.text.trim(),
-      jobTitle: _jobTitleCtrl.text.trim(),
-      phone: _phoneCtrl.text.trim(),
-      industry: _selectedIndustry,
-      province: _selectedProvince,
-    );
-    auth.close();
-    if (!mounted) return;
-    setState(() => _loading = false);
-    if (res['success'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إنشاء حساب الشركة بنجاح. سيتم تفعيل الحساب بعد موافقة الإدارة.')),
-      );
-      Navigator.pop(context);
-    } else {
-      setState(() => _error = (res['message'] as String?) ?? 'تعذر إنشاء الحساب');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('إنشاء حساب - شركة'),
-        backgroundColor: scheme.primary,
-        foregroundColor: scheme.onPrimary,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _nameCtrl,
-                decoration: const InputDecoration(labelText: 'اسم الشركة *', border: OutlineInputBorder()),
-                validator: (v) => (v==null || v.trim().isEmpty) ? 'اسم الشركة مطلوب' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _emailCtrl,
-                decoration: const InputDecoration(labelText: 'البريد الإلكتروني *', border: OutlineInputBorder()),
-                keyboardType: TextInputType.emailAddress,
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'البريد الإلكتروني مطلوب';
-                  if (!v.contains('@')) return 'بريد إلكتروني غير صالح';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _passCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'كلمة المرور (8 أحرف على الأقل) *', border: OutlineInputBorder()),
-                validator: (v) => (v==null || v.length < 8) ? 'الحد الأدنى 8 أحرف' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _confirmCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'تأكيد كلمة المرور *', border: OutlineInputBorder()),
-                validator: (v) => (v==null || v.isEmpty) ? 'تأكيد كلمة المرور مطلوب' : null,
-              ),
-              const SizedBox(height: 16),
-              const Divider(),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _officeCtrl,
-                decoration: const InputDecoration(labelText: 'اسم المكتب العلمي *', border: OutlineInputBorder()),
-                validator: (v) => (v==null || v.trim().isEmpty) ? 'اسم المكتب العلمي مطلوب' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _jobTitleCtrl,
-                decoration: const InputDecoration(labelText: 'المسمى الوظيفي *', border: OutlineInputBorder()),
-                validator: (v) => (v==null || v.trim().isEmpty) ? 'المسمى الوظيفي مطلوب' : null,
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: _selectedIndustry,
-                decoration: const InputDecoration(labelText: 'القطاع/الصناعة', border: OutlineInputBorder()),
-                items: _industries.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
-                onChanged: (v) => setState(() { _selectedIndustry = v; }),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: _selectedProvince,
-                decoration: const InputDecoration(labelText: 'المحافظة', border: OutlineInputBorder()),
-                items: _provinces.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
-                onChanged: (v) => setState(() { _selectedProvince = v; }),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _phoneCtrl,
-                decoration: const InputDecoration(labelText: 'رقم الموبايل *', border: OutlineInputBorder()),
-                keyboardType: TextInputType.phone,
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'رقم الموبايل مطلوب';
-                  final digits = v.replaceAll(RegExp(r'[^0-9]'), '');
-                  if (digits.length < 7) return 'رقم غير صالح';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              if (_error.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  margin: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(color: Colors.red[50], borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.red[300]!)),
-                  child: Text(_error, style: TextStyle(color: Colors.red[700])),
-                ),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _loading ? null : _submit,
-                  child: _loading ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('إنشاء حساب'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+    final url = '${site}register/company';
+    return AdminWebViewScreen(
+      title: 'إنشاء حساب - شركة',
+      url: url,
     );
   }
 }
@@ -734,6 +492,21 @@ class _JobsScreenState extends State<JobsScreen> {
     }
 
     _loadJobs();
+  }
+
+  Future<void> _refreshJobs() async {
+    // Clear cache for current filters then reload
+    try {
+      await JobsCache.instance.clearForParams(
+        search: _searchController.text.isNotEmpty ? _searchController.text : null,
+        province: _selectedProvince,
+        speciality: _selectedSpeciality,
+        sortBy: _sortBy,
+        sortOrder: _sortOrder,
+        page: null,
+      );
+    } catch (_) {}
+    await _loadJobs();
   }
 
   Future<void> _loadJobs() async {
@@ -1145,7 +918,7 @@ class _JobsScreenState extends State<JobsScreen> {
           // 5) Refresh
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _loadJobs,
+            onPressed: _refreshJobs,
           ),
           // 6) Logout
           IconButton(
@@ -2836,11 +2609,56 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (_selectedProfileImage != null) files['profile_image'] = _selectedProfileImage!;
       if (_selectedCVFile != null) files['cv_file'] = _selectedCVFile!;
 
+      // Show progress dialog
+      double dlgProgress = 0.0;
+      if (!mounted) return;
+      StateSetter? dialogSet;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) {
+          return StatefulBuilder(
+            builder: (ctx, setDlg) {
+              dialogSet = setDlg;
+              return AlertDialog(
+                title: const Text('جاري رفع الملفات'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    LinearProgressIndicator(value: dlgProgress > 0 && dlgProgress < 1 ? dlgProgress : null),
+                    const SizedBox(height: 12),
+                    Text(
+                      dlgProgress > 0 ? '${(dlgProgress * 100).toStringAsFixed(0)}%' : 'يتم التحضير...'
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      );
+
+      // Start upload while updating the dialog's state
       final res = await service.updateProfileMultipart(
         token: widget.token,
         fields: fields,
         files: files,
+        onProgress: (p) {
+          dlgProgress = p;
+          // Update dialog UI
+          if (mounted && dialogSet != null) {
+            dialogSet!(() {});
+          }
+        },
       );
+
+      // Close dialog if still mounted and open
+      if (mounted) {
+        final nav = Navigator.of(context, rootNavigator: true);
+        if (nav.canPop()) nav.pop();
+      }
+
       if (!mounted) return;
       if (res['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -2852,6 +2670,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     } catch (e) {
       if (!mounted) return;
+      // Ensure dialog closed on error
+      if (Navigator.of(context, rootNavigator: true).canPop()) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
       setState(() { errorMessage = 'خطأ في الاتصال: $e'; });
     } finally {
       service.close();
@@ -4050,7 +3872,7 @@ class AdminDashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, size: 48, color: Colors.white.withOpacity(0.95)),
+            Icon(icon, size: 48, color: Colors.white.withValues(alpha: 0.95)),
             Text(
               title,
               textAlign: TextAlign.right,
@@ -4069,7 +3891,7 @@ class AdminDashboardScreen extends StatelessWidget {
       redirect = absoluteUrl.substring(site.length);
       if (!redirect.startsWith('/')) redirect = '/$redirect';
     }
-    final encodedToken = Uri.encodeComponent(this.token);
+    final encodedToken = Uri.encodeComponent(token);
     final dest = Uri.encodeComponent(redirect);
     return '${site}mobile/session-login?token=$encodedToken&redirect=$dest';
   }
@@ -4104,6 +3926,120 @@ class AdminPlaceholderScreen extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8), fontSize: 16),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+
+// ========================= Job Seeker Dashboard (Mobile) =========================
+class JobSeekerDashboardScreen extends StatelessWidget {
+  final String token;
+  final Map<String, dynamic> user;
+  const JobSeekerDashboardScreen({super.key, required this.token, required this.user});
+
+  String _wrapSessionUrl(String absoluteUrl) {
+    final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+    String redirect = absoluteUrl;
+    if (absoluteUrl.startsWith(site)) {
+      redirect = absoluteUrl.substring(site.length);
+      if (!redirect.startsWith('/')) redirect = '/$redirect';
+    }
+    final encodedToken = Uri.encodeComponent(token);
+    final dest = Uri.encodeComponent(redirect);
+    return '${site}mobile/session-login?token=$encodedToken&redirect=$dest';
+  }
+
+  void _open(BuildContext context, String title, String url) {
+    final bridged = _wrapSessionUrl(url);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: bridged)),
+    );
+  }
+
+  Widget _jsCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required LinearGradient gradient,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(icon, size: 48, color: Colors.white.withValues(alpha: 0.95)),
+            Text(
+              title,
+              textAlign: TextAlign.right,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('لوحة الباحث'),
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          children: [
+            _jsCard(
+              context,
+              title: 'لوحتي',
+              icon: Icons.dashboard,
+              gradient: const LinearGradient(colors: [Color(0xFF4F46E5), Color(0xFF3730A3)]),
+              onTap: () => _open(context, 'لوحة الباحث', '${site}jobseeker'),
+            ),
+            _jsCard(
+              context,
+              title: 'الملف الشخصي',
+              icon: Icons.account_circle_outlined,
+              gradient: const LinearGradient(colors: [Color(0xFF9333EA), Color(0xFF7E22CE)]),
+              onTap: () => _open(context, 'الملف الشخصي', '${site}jobseeker/profile'),
+            ),
+            _jsCard(
+              context,
+              title: 'الإشعارات',
+              icon: Icons.notifications_active_outlined,
+              gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
+              onTap: () => _open(context, 'الإشعارات', '${site}notifications'),
+            ),
+            _jsCard(
+              context,
+              title: 'تصفح الوظائف',
+              icon: Icons.search,
+              gradient: const LinearGradient(colors: [Color(0xFF0EA5E9), Color(0xFF0369A1)]),
+              onTap: () => _open(context, 'الوظائف', '${site}jobs'),
+            ),
+          ],
         ),
       ),
     );
