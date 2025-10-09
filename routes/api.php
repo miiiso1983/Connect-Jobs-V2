@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\JobController;
 use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\CvController;
+use App\Http\Controllers\Api\NotificationTestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +46,11 @@ Route::prefix('v1')->middleware(['auth:api'])->group(function () {
     Route::prefix('auth')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('logout', [AuthController::class, 'logout']);
+
+        // FCM token management
+        Route::post('register-fcm-token', [AuthController::class, 'registerFcmToken']);
+        Route::delete('unregister-fcm-token', [AuthController::class, 'unregisterFcmToken']);
+        Route::get('fcm-tokens', [AuthController::class, 'getFcmTokens']);
     });
 
     // Profile management
@@ -80,6 +87,33 @@ Route::prefix('v1')->middleware(['auth:api'])->group(function () {
         Route::middleware('role:company')->group(function () {
             Route::put('{applicationId}/status', [ApplicationController::class, 'updateStatus']);
         });
+    });
+
+    // CV access routes
+    Route::prefix('cv')->group(function () {
+        // Company routes - for accessing job seeker CVs
+        Route::middleware('role:company')->group(function () {
+            Route::get('download/{jobSeekerId}/{jobId?}', [CvController::class, 'download']);
+            Route::get('view/{jobSeekerId}/{jobId?}', [CvController::class, 'view']);
+        });
+
+        // Job seeker routes - for viewing access logs
+        Route::middleware('role:jobseeker')->group(function () {
+            Route::get('access-logs', [CvController::class, 'getAccessLogs']);
+        });
+    });
+
+    // Notification testing routes (for development/testing)
+    Route::prefix('notifications/test')->middleware('auth:api')->group(function () {
+        Route::get('connection', [NotificationTestController::class, 'testConnection']);
+        Route::post('send-test', [NotificationTestController::class, 'sendTestNotification']);
+        Route::post('admin-notification', [NotificationTestController::class, 'testAdminNotification']);
+        Route::post('company-notification', [NotificationTestController::class, 'testCompanyNotification']);
+        Route::post('jobseeker-notification', [NotificationTestController::class, 'testJobSeekerNotification']);
+        Route::get('stats', [NotificationTestController::class, 'getStats']);
+        Route::get('fcm-tokens', [NotificationTestController::class, 'getFcmTokenInfo']);
+        Route::get('recent', [NotificationTestController::class, 'getRecentNotifications']);
+        Route::delete('clear', [NotificationTestController::class, 'clearNotifications']);
     });
 
     // Favorites routes

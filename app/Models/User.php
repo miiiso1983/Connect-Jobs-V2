@@ -89,4 +89,28 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject
     {
         return $this->hasOne(\App\Models\JobSeeker::class);
     }
+
+    /**
+     * Get the FCM tokens associated with the user.
+     */
+    public function fcmTokens()
+    {
+        return $this->hasMany(\App\Models\UserFcmToken::class);
+    }
+
+    /**
+     * Get only active FCM tokens for the user.
+     */
+    public function activeFcmTokens()
+    {
+        return $this->hasMany(\App\Models\UserFcmToken::class)->active();
+    }
+
+    /**
+     * Get the push notifications for the user.
+     */
+    public function pushNotifications()
+    {
+        return $this->hasMany(\App\Models\PushNotification::class);
+    }
 }

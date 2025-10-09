@@ -55,4 +55,10 @@ return [
         'site_verification' => env('GOOGLE_SITE_VERIFICATION'),
     ],
 
+    'firebase' => [
+        'project_id' => env('FIREBASE_PROJECT_ID', 'connect-job-c6a8f'),
+        'credentials' => env('FIREBASE_CREDENTIALS_PATH'),
+        'database_url' => env('FIREBASE_DATABASE_URL'),
+    ],
+
 ];

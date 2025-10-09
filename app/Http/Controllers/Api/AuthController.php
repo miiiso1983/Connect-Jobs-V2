@@ -7,6 +7,8 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\JobSeeker;
+use App\Models\UserFcmToken;
+use App\Services\NotificationHelperService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -60,7 +62,7 @@ class AuthController extends Controller
 
             // Create role-specific profile
             if ($request->role === 'company') {
-                Company::create([
+                $company = Company::create([
                     'user_id' => $user->id,
                     'company_name' => $request->company_name,
                     'scientific_office_name' => $request->scientific_office_name,
@@ -70,6 +72,15 @@ class AuthController extends Controller
                     'industry' => $request->industry,
                     'status' => 'pending',
                 ]);
+
+                // Send notification to admins about new company registration
+                try {
+                    $notificationService = app(NotificationHelperService::class);
+                    $notificationService->notifyAdminsNewCompanyRegistration($user, $company);
+                } catch (\Exception $e) {
+                    // Log error but don't fail registration
+                    \Log::error('Failed to send admin notification for new company registration: ' . $e->getMessage());
+                }
             } elseif ($request->role === 'jobseeker') {
                 JobSeeker::create([
                     'user_id' => $user->id,
@@ -235,6 +246,149 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Could not refresh token'
+            ], 500);
+        }
+    }
+
+    /**
+     * Register FCM token for push notifications
+     */
+    public function registerFcmToken(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'fcm_token' => 'required|string|max:500',
+                'device_type' => 'nullable|string|in:ios,android,web,unknown',
+                'device_id' => 'nullable|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $user = auth()->user();
+            $fcmToken = $request->fcm_token;
+            $deviceType = $request->device_type ?? 'unknown';
+            $deviceId = $request->device_id;
+
+            // Check if token already exists for this user
+            $existingToken = UserFcmToken::where('fcm_token', $fcmToken)
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($existingToken) {
+                // Update existing token
+                $existingToken->update([
+                    'device_type' => $deviceType,
+                    'device_id' => $deviceId,
+                    'is_active' => true,
+                    'last_used_at' => now(),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'FCM token updated successfully',
+                    'data' => $existingToken
+                ]);
+            }
+
+            // Create new token record
+            $userFcmToken = UserFcmToken::create([
+                'user_id' => $user->id,
+                'fcm_token' => $fcmToken,
+                'device_type' => $deviceType,
+                'device_id' => $deviceId,
+                'is_active' => true,
+                'last_used_at' => now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'FCM token registered successfully',
+                'data' => $userFcmToken
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to register FCM token',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Unregister FCM token
+     */
+    public function unregisterFcmToken(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'fcm_token' => 'required|string|max:500',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $user = auth()->user();
+            $fcmToken = $request->fcm_token;
+
+            // Find and deactivate the token
+            $userFcmToken = UserFcmToken::where('fcm_token', $fcmToken)
+                ->where('user_id', $user->id)
+                ->first();
+
+            if (!$userFcmToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'FCM token not found'
+                ], 404);
+            }
+
+            $userFcmToken->deactivate();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'FCM token unregistered successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to unregister FCM token',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get user's FCM tokens
+     */
+    public function getFcmTokens()
+    {
+        try {
+            $user = auth()->user();
+            $tokens = $user->activeFcmTokens()->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $tokens
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to get FCM tokens',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

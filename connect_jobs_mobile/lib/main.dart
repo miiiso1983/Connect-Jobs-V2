@@ -23,8 +23,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:io' show Platform;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'services/cache/jobs_cache.dart';
+
 
 
 @pragma('vm:entry-point')
@@ -40,6 +43,19 @@ const AndroidNotificationChannel _defaultAndroidChannel = AndroidNotificationCha
   description: 'General notifications',
   importance: Importance.defaultImportance,
 );
+
+/// Store FCM token locally using Hive for later use when user logs in
+Future<void> _storeFCMTokenLocally(String token) async {
+  try {
+    final box = await Hive.openBox('app_data');
+    await box.put('fcm_token', token);
+    await box.close();
+  } catch (e) {
+    debugPrint('Error storing FCM token locally: $e');
+  }
+}
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,8 +76,19 @@ void main() async {
             messagingSenderId: '577210737623',
             projectId: 'connect-job-c6a8f',
             storageBucket: 'connect-job-c6a8f.firebasestorage.app',
+
           ),
   );
+
+  // Android 13+ runtime notification permission (request before any notifications)
+  try {
+    if (Platform.isAndroid) {
+      final notifStatus = await Permission.notification.status;
+      if (!notifStatus.isGranted) {
+        await Permission.notification.request();
+      }
+    }
+  } catch (_) {}
 
   // Request notification permissions (iOS) and obtain the FCM token
   try {
@@ -71,8 +98,12 @@ void main() async {
       sound: true,
     );
     final token = await FirebaseMessaging.instance.getToken();
-    // TODO: send this token to your backend and associate with the logged-in user
-    debugPrint('FCM token: $token');
+    if (token != null) {
+
+      // Store token locally for later use when user logs in
+      await _storeFCMTokenLocally(token);
+      debugPrint('FCM token: $token');
+    }
   } catch (_) {}
   // Local notifications + FCM handlers
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
@@ -186,6 +217,17 @@ class _LoginScreenState extends State<LoginScreen> {
         final String token = (data['data']?['token'] as String?) ?? '';
         final Map<String, dynamic> user = (data['data']?['user'] as Map<String, dynamic>?) ?? {};
         final String role = (user['role'] as String?) ?? '';
+
+        // Register FCM token with backend after successful login
+        if (token.isNotEmpty) {
+          try {
+            await auth.registerFCMTokenAfterLogin(token);
+          } catch (e) {
+            debugPrint('Failed to register FCM token after login: $e');
+            // Don't block login flow if FCM registration fails
+          }
+        }
+
         Widget home;
         if (role == 'admin') {
           home = AdminDashboardScreen(token: token, user: user);
@@ -194,6 +236,8 @@ class _LoginScreenState extends State<LoginScreen> {
         } else {
           home = JobSeekerDashboardScreen(token: token, user: user);
         }
+
+        if (!mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => home),
@@ -418,10 +462,12 @@ class _RegisterJobSeekerScreenState extends State<RegisterJobSeekerScreen> {
   @override
   Widget build(BuildContext context) {
     final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
-    final url = '${site}register/jobseeker';
+    final url = '${site}register';
+    const js = "(function(){try{var r=document.getElementById('role');if(r){r.value='jobseeker';r.dispatchEvent(new Event('change'));}}catch(e){}})();";
     return AdminWebViewScreen(
       title: 'إنشاء حساب - باحث عن عمل',
       url: url,
+      postLoadJs: js,
     );
   }
 }
@@ -437,10 +483,12 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
   @override
   Widget build(BuildContext context) {
     final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
-    final url = '${site}register/company';
+    final url = '${site}register';
+    const js = "(function(){try{var r=document.getElementById('role');if(r){r.value='company';r.dispatchEvent(new Event('change'));}}catch(e){}})();";
     return AdminWebViewScreen(
       title: 'إنشاء حساب - شركة',
       url: url,
+      postLoadJs: js,
     );
   }
 }
@@ -665,7 +713,17 @@ class _JobsScreenState extends State<JobsScreen> {
     }
   }
 
-  void _logout() {
+  Future<void> _logout() async {
+    try {
+      // Unregister FCM token before logout
+      final auth = AuthService();
+      await auth.unregisterFCMTokenOnLogout(widget.token);
+    } catch (e) {
+      debugPrint('Failed to unregister FCM token on logout: $e');
+      // Don't block logout flow if FCM unregistration fails
+    }
+
+    if (!mounted) return;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),

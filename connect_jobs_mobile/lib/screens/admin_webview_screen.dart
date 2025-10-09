@@ -4,7 +4,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 class AdminWebViewScreen extends StatefulWidget {
   final String title;
   final String url;
-  const AdminWebViewScreen({super.key, required this.title, required this.url});
+  final String? postLoadJs; // optional JS to run after page finished
+  const AdminWebViewScreen({super.key, required this.title, required this.url, this.postLoadJs});
 
   @override
   State<AdminWebViewScreen> createState() => _AdminWebViewScreenState();
@@ -71,6 +72,10 @@ class _AdminWebViewScreenState extends State<AdminWebViewScreen> {
                 } catch(e) {}
               })();
             ''');
+            // Optionally run post-load JS (e.g., pre-select role on /register)
+            if (widget.postLoadJs != null && widget.postLoadJs!.trim().isNotEmpty) {
+              try { await _controller.runJavaScript(widget.postLoadJs!); } catch (_) {}
+            }
           },
         ),
       )

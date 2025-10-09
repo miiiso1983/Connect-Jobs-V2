@@ -13,5 +13,7 @@ class AppConfig {
   static const String authLoginPath = 'auth/login';
   static const String registerJobSeekerPath = 'auth/register';
   static const String registerCompanyPath = 'auth/register';
+  static const String registerFcmTokenPath = 'auth/register-fcm-token';
+  static const String unregisterFcmTokenPath = 'auth/unregister-fcm-token';
 }
 

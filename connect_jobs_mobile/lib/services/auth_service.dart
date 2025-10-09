@@ -1,10 +1,17 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../utils/app_config.dart';
+import 'notification_service.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthService {
   final http.Client _client;
-  AuthService({http.Client? client}) : _client = client ?? http.Client();
+  final NotificationService _notificationService;
+
+  AuthService({http.Client? client})
+    : _client = client ?? http.Client(),
+      _notificationService = NotificationService(client: client);
 
   Uri _loginUri() => Uri.parse('${AppConfig.baseUrl}${AppConfig.authLoginPath}');
 
@@ -155,6 +162,75 @@ class AuthService {
     return {'success': raw['success'] == true, 'data': raw['data'], 'message': raw['message']};
   }
 
-  void close() => _client.close();
+  /// Register FCM token with backend after successful login
+  Future<Map<String, dynamic>> registerFCMTokenAfterLogin(String authToken) async {
+    try {
+      // Get stored FCM token
+      final box = await Hive.openBox('app_data');
+      final fcmToken = box.get('fcm_token') as String?;
+      await box.close();
+
+      if (fcmToken == null || fcmToken.isEmpty) {
+        debugPrint('No FCM token found to register');
+        return {'success': false, 'message': 'No FCM token available'};
+      }
+
+      // Register token with backend
+      final result = await _notificationService.registerFCMToken(
+        authToken: authToken,
+        fcmToken: fcmToken,
+      );
+
+      if (result['success'] == true) {
+        debugPrint('FCM token registered successfully with backend');
+        // Start listening for token refresh
+        _notificationService.listenForTokenRefresh(authToken: authToken);
+      } else {
+        debugPrint('Failed to register FCM token: ${result['message']}');
+      }
+
+      return result;
+    } catch (e) {
+      debugPrint('Error registering FCM token after login: $e');
+      return {'success': false, 'message': 'Error: $e'};
+    }
+  }
+
+  /// Unregister FCM token on logout
+  Future<Map<String, dynamic>> unregisterFCMTokenOnLogout(String authToken) async {
+    try {
+      // Get stored FCM token
+      final box = await Hive.openBox('app_data');
+      final fcmToken = box.get('fcm_token') as String?;
+      await box.close();
+
+      if (fcmToken == null || fcmToken.isEmpty) {
+        debugPrint('No FCM token found to unregister');
+        return {'success': true, 'message': 'No FCM token to unregister'};
+      }
+
+      // Unregister token from backend
+      final result = await _notificationService.unregisterFCMToken(
+        authToken: authToken,
+        fcmToken: fcmToken,
+      );
+
+      if (result['success'] == true) {
+        debugPrint('FCM token unregistered successfully from backend');
+      } else {
+        debugPrint('Failed to unregister FCM token: ${result['message']}');
+      }
+
+      return result;
+    } catch (e) {
+      debugPrint('Error unregistering FCM token on logout: $e');
+      return {'success': false, 'message': 'Error: $e'};
+    }
+  }
+
+  void close() {
+    _client.close();
+    _notificationService.close();
+  }
 }
 

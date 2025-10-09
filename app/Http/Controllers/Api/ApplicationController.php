@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Job;
 use App\Models\JobSeeker;
+use App\Services\NotificationHelperService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -82,6 +83,16 @@ class ApplicationController extends Controller
             }
 
             $application = Application::create($applicationData);
+
+            // Send notification to company about new job application
+            try {
+                $notificationService = app(NotificationHelperService::class);
+                $application->load(['job.company', 'jobSeeker.user']);
+                $notificationService->notifyCompanyNewJobApplication($application);
+            } catch (\Exception $e) {
+                // Log error but don't fail application submission
+                \Log::error('Failed to send company notification for new job application: ' . $e->getMessage());
+            }
 
             return response()->json([
                 'success' => true,

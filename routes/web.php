@@ -48,6 +48,9 @@ Route::middleware(['auth'])->get('/logout', function(){
     return redirect('/');
 })->name('logout.get');
 
+    // Privacy policy page
+    Route::get('/privacy', function(){ return view('privacy'); })->name('privacy');
+
     Route::get('/jobs', [\App\Http\Controllers\Public\JobPublicController::class,'index'])->name('jobs.index');
     Route::get('/jobs/{job}', [\App\Http\Controllers\Public\JobPublicController::class,'show'])->name('jobs.show');
     Route::get('/sitemap.xml', \App\Http\Controllers\Public\SitemapController::class)->name('sitemap');
