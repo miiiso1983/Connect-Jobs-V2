@@ -14,6 +14,18 @@ class _AdminWebViewScreenState extends State<AdminWebViewScreen> {
   late final WebViewController _controller;
   bool _isLoading = true;
 
+  // Enforce a canonical host/protocol to avoid cookie loss across www/http variants
+  late final Uri _startUri = Uri.parse(widget.url);
+  late final String _canonicalHost = _startUri.host.startsWith('www.') ? _startUri.host : 'www.${_startUri.host}';
+
+  Uri _toCanonical(Uri uri) {
+    // Force https and canonical host for connect-job.com domain family
+    if (uri.host.endsWith('connect-job.com')) {
+      return uri.replace(scheme: 'https', host: _canonicalHost);
+    }
+    return uri;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -23,10 +35,46 @@ class _AdminWebViewScreenState extends State<AdminWebViewScreen> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (_) => setState(() => _isLoading = true),
-          onPageFinished: (_) => setState(() => _isLoading = false),
+          onNavigationRequest: (request) {
+            // Normalize host/protocol to keep cookies valid (avoid jumping between www/non-www or http/https)
+            try {
+              final uri = Uri.parse(request.url);
+              final canon = _toCanonical(uri);
+              if (canon.toString() != request.url) {
+                _controller.loadRequest(canon);
+                return NavigationDecision.prevent;
+              }
+            } catch (_) {}
+            return NavigationDecision.navigate;
+          },
+          onPageFinished: (_) async {
+            setState(() => _isLoading = false);
+            // Patch links that open in a new window/tab so they stay in this WebView
+            await _controller.runJavaScript('''
+              (function(){
+                try {
+                  // Force window.open to use same window
+                  window.open = function(url){ window.location.href = url; return null; };
+                  // Ensure all anchors open in same frame and normalized to canonical host/protocol
+                  var as = document.querySelectorAll('a');
+                  for (var i = 0; i < as.length; i++) {
+                    try {
+                      as[i].setAttribute('target','_self');
+                      var a = document.createElement('a'); a.href = as[i].href;
+                      if (a.host.endsWith('connect-job.com')) {
+                        if (!a.host.startsWith('www.')) { a.host = 'www.' + a.host; }
+                        a.protocol = 'https:';
+                        as[i].href = a.href;
+                      }
+                    } catch(e2){}
+                  }
+                } catch(e) {}
+              })();
+            ''');
+          },
         ),
       )
-      ..loadRequest(Uri.parse(widget.url));
+      ..loadRequest(_toCanonical(_startUri));
   }
 
   @override

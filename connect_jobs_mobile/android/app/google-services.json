@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "577210737623",
+    "project_id": "connect-job-c6a8f",
+    "storage_bucket": "connect-job-c6a8f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577210737623:android:61e19f2080cb43af70a192",
+        "android_client_info": {
+          "package_name": "com.job.connectjob"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHszAXbSPPyDLt9U09In-QdS07GW36QEg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

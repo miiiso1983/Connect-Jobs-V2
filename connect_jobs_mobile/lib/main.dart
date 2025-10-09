@@ -18,7 +18,44 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 
-void main() {
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Firebase using explicit options for both platforms
+  await Firebase.initializeApp(
+    options: (Platform.isIOS || Platform.isMacOS)
+        ? const FirebaseOptions(
+            apiKey: 'AIzaSyAsN-KvkiIK2X7RBbXT0OsXaoCWPt6Fh4o',
+            appId: '1:577210737623:ios:af500400fb288d9470a192',
+            messagingSenderId: '577210737623',
+            projectId: 'connect-job-c6a8f',
+            storageBucket: 'connect-job-c6a8f.firebasestorage.app',
+            iosBundleId: 'com.job.connectjob',
+          )
+        : const FirebaseOptions(
+            apiKey: 'AIzaSyBHszAXbSPPyDLt9U09In-QdS07GW36QEg',
+            appId: '1:577210737623:android:61e19f2080cb43af70a192',
+            messagingSenderId: '577210737623',
+            projectId: 'connect-job-c6a8f',
+            storageBucket: 'connect-job-c6a8f.firebasestorage.app',
+          ),
+  );
+
+  // Request notification permissions (iOS) and obtain the FCM token
+  try {
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    final token = await FirebaseMessaging.instance.getToken();
+    // TODO: send this token to your backend and associate with the logged-in user
+    debugPrint('FCM token: $token');
+  } catch (_) {}
+
   runApp(const ConnectJobsApp());
 }
 
@@ -3400,11 +3437,14 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : errorMessage.isNotEmpty
-              ? Center(child: Text(errorMessage, style: const TextStyle(color: Colors.red)))
-              : Column(
-                  children: [
-                    Padding(
+          : Column(
+              children: [
+                if (errorMessage.isNotEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Text('فشل في تحميل البيانات، سيتم عرض الواجهة دون إحصاءات', style: TextStyle(color: Colors.red)),
+                  ),
+                Padding(
                       padding: const EdgeInsets.all(12),
                       child: Row(
                         children: [
