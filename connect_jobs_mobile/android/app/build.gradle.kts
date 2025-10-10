@@ -50,15 +50,23 @@ android {
         }
     }
 
+    packaging {
+        jniLibs {
+            // Keep debug symbols in .so files to avoid strip step (workaround for missing NDK tools)
+            keepDebugSymbols += setOf("**/*.so")
+        }
+    }
+
     buildTypes {
         release {
-            // Enable code shrinking to support resource shrinking if enabled by plugins
             isMinifyEnabled = true
-            signingConfig = if (keystoreProperties.isNotEmpty()) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
+            ndk {
+                debugSymbolLevel = "none"
             }
+            if (keystoreProperties.isEmpty()) {
+                throw GradleException("Release signing is not configured. Please create android/key.properties and an upload keystore.")
+            }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
