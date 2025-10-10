@@ -462,12 +462,10 @@ class _RegisterJobSeekerScreenState extends State<RegisterJobSeekerScreen> {
   @override
   Widget build(BuildContext context) {
     final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
-    final url = '${site}register';
-    const js = "(function(){try{var r=document.getElementById('role');if(r){r.value='jobseeker';r.dispatchEvent(new Event('change'));}}catch(e){}})();";
+    final url = '${site}register?role=jobseeker';
     return AdminWebViewScreen(
       title: 'إنشاء حساب - باحث عن عمل',
       url: url,
-      postLoadJs: js,
     );
   }
 }
@@ -483,12 +481,10 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
   @override
   Widget build(BuildContext context) {
     final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
-    final url = '${site}register';
-    const js = "(function(){try{var r=document.getElementById('role');if(r){r.value='company';r.dispatchEvent(new Event('change'));}}catch(e){}})();";
+    final url = '${site}register?role=company';
     return AdminWebViewScreen(
       title: 'إنشاء حساب - شركة',
       url: url,
-      postLoadJs: js,
     );
   }
 }
