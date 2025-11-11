@@ -11,8 +11,8 @@
         .title { font-size: 12px; margin: 2px 0 0 0; }
         .grid { display: grid; grid-template-columns: 5fr 2fr; grid-gap: 24px; margin-top: 16px; }
         .section-title { color:#1f3a5f; padding:0 0 6px 0; border-bottom:1px solid #e5e7eb; border-radius:0; font-size:13px; font-weight:700; margin:10px 0 8px; }
-        .text { font-size: 11px; line-height: 1.7; margin: 0 0 6px 0; }
-        .bullet { font-size: 11px; margin: 0 0 4px 0; }
+        .text { font-size: 18px; line-height: 1.7; margin: 0 0 6px 0; }
+        .bullet { font-size: 18px; margin: 0 0 4px 0; }
         ul { padding:0 14px 0 0; margin:0; }
         .muted { color:#6b7280; }
         .right-col { border-right:1px solid #e5e7eb; padding-right:18px; }
@@ -31,10 +31,10 @@
         <div>
             @php
                 $img = $js->profile_image ?? '';
-                $imgSrc = $img ? (preg_match('/^https?:\/\//', $img) ? $img : public_path('storage/'.ltrim($img,'/'))) : '';
+                $imgUrl = $img ? (preg_match('/^https?:\/\//', $img) ? $img : asset('storage/'.ltrim($img,'/'))) : '';
             @endphp
-            @if(!empty($imgSrc))
-                <img src="{{ $imgSrc }}" alt="avatar" style="width: 110px; height: 110px; object-fit: cover; border-radius: 999px; margin-bottom: 12px; border:4px solid #fff;"/>
+            @if(!empty($imgUrl))
+                <img src="{{ $imgUrl }}" alt="avatar" style="width: 110px; height: 110px; object-fit: cover; border-radius: 999px; margin-bottom: 12px; border:4px solid #fff;"/>
             @endif
 
             @if(!empty($js->summary))

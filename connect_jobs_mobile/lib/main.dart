@@ -2827,7 +2827,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       List<pw.Widget> bulletFromText(String text) {
         final lines = text.split('\n').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
-        return lines.map((l) => pw.Bullet(text: l, style: pw.TextStyle(font: regular, fontSize: 11, fontFallback: [latin]))).toList();
+        return lines.map((l) => pw.Bullet(text: l, style: pw.TextStyle(font: regular, fontSize: 18, fontFallback: [latin]))).toList();
       }
 
       doc.addPage(
@@ -2866,7 +2866,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       pw.SizedBox(height: 12),
                     ],
                     if (summary.trim().isNotEmpty)
-                      section('نبذة عني', [pw.Text(summary, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+                      section('نبذة عني', [pw.Text(summary, style: pw.TextStyle(fontSize: 18, fontFallback: [latin]))]),
                     section('الخبرات المهنية', bulletFromText(experiences)),
                   ]),
                 ),
@@ -2875,20 +2875,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   flex: 2,
                   child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
                     section('بيانات التواصل', [
-                      if (email.isNotEmpty) pw.Text('البريد: $email', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
-                      if (phone.isNotEmpty) pw.Text('رقم الموبايل: $phone', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
-                      if (province.toString().isNotEmpty) pw.Text('المحافظة: $province', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
-                      pw.Text('امتلاك السيارة: ${hasCar ? 'نعم' : 'لا'}', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
+                      if (email.isNotEmpty) pw.Text('البريد: $email', style: pw.TextStyle(font: regular, fontSize: 18, fontFallback: [latin])),
+                      if (phone.isNotEmpty) pw.Text('رقم الموبايل: $phone', style: pw.TextStyle(font: regular, fontSize: 18, fontFallback: [latin])),
+                      if (province.toString().isNotEmpty) pw.Text('المحافظة: $province', style: pw.TextStyle(font: regular, fontSize: 18, fontFallback: [latin])),
+                      pw.Text('امتلاك السيارة: ${hasCar ? 'نعم' : 'لا'}', style: pw.TextStyle(font: regular, fontSize: 18, fontFallback: [latin])),
                     ]),
                     if (districts.isNotEmpty)
-                      section('المناطق', districts.map((d) => pw.Bullet(text: d, style: pw.TextStyle(font: regular, fontSize: 11, fontFallback: [latin]))).toList()),
+                      section('المناطق', districts.map((d) => pw.Bullet(text: d, style: pw.TextStyle(font: regular, fontSize: 18, fontFallback: [latin]))).toList()),
                     if (specialities.isNotEmpty)
-                      section('التخصصات', specialities.map((s) => pw.Bullet(text: s, style: pw.TextStyle(font: regular, fontSize: 11, fontFallback: [latin]))).toList()),
-                    section('التعليم', education.toString().isEmpty ? [] : [pw.Text(education, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+                      section('التخصصات', specialities.map((s) => pw.Bullet(text: s, style: pw.TextStyle(font: regular, fontSize: 18, fontFallback: [latin]))).toList()),
+                    section('التعليم', education.toString().isEmpty ? [] : [pw.Text(education, style: pw.TextStyle(fontSize: 18, fontFallback: [latin]))]),
                     section('المهارات', bulletFromText(skills)),
                     section('اللغات', bulletFromText(languages)),
                     section('المؤهلات', bulletFromText(qualifications)),
-                    section('التخصص', speciality.toString().isEmpty ? [] : [pw.Text(speciality, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+                    section('التخصص', speciality.toString().isEmpty ? [] : [pw.Text(speciality, style: pw.TextStyle(fontSize: 18, fontFallback: [latin]))]),
                   ]),
                 ),
               ],
