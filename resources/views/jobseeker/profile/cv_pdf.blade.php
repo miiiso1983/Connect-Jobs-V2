@@ -27,10 +27,40 @@
 
     <div class="grid">
         <div>
+            @php
+                $img = $js->profile_image ?? '';
+                $imgSrc = $img ? (preg_match('/^https?:\/\//', $img) ? $img : public_path('storage/'.ltrim($img,'/'))) : '';
+            @endphp
+            @if(!empty($imgSrc))
+                <img src="{{ $imgSrc }}" alt="avatar" style="width: 90px; height: 90px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;"/>
+                <hr style="border:none;border-top:1px solid #e5e7eb;margin:8px 0;"/>
+            @endif
+
             <div class="section-title">بيانات التواصل</div>
             @if(!empty(auth()->user()->email))<p class="text">البريد: {{ auth()->user()->email }}</p>@endif
-            @if(!empty($js->phone))<p class="text">الهاتف: {{ $js->phone }}</p>@endif
-            @if(!empty($js->province))<p class="text">الموقع: {{ $js->province }}</p>@endif
+            @if(!empty($js->phone))<p class="text">رقم الموبايل: {{ $js->phone }}</p>@endif
+            @if(!empty($js->province))<p class="text">المحافظة: {{ $js->province }}</p>@endif
+            <p class="text">امتلاك السيارة: {{ ($js->own_car ?? false) ? 'نعم' : 'لا' }}</p>
+
+            <hr style="border:none;border-top:1px solid #e5e7eb;margin:10px 0;"/>
+
+            @if(!empty($js->districts) && is_array($js->districts))
+                <div class="section-title">المناطق</div>
+                <ul>
+                    @foreach($js->districts as $d)
+                        @if(strlen(trim($d)))<li class="bullet">{{ trim($d) }}</li>@endif
+                    @endforeach
+                </ul>
+            @endif
+
+            @if(!empty($js->specialities) && is_array($js->specialities))
+                <div class="section-title">التخصصات</div>
+                <ul>
+                    @foreach($js->specialities as $s)
+                        @if(strlen(trim($s)))<li class="bullet">{{ trim($s) }}</li>@endif
+                    @endforeach
+                </ul>
+            @endif
 
             @if(!empty($js->skills))
                 <div class="section-title">المهارات</div>
@@ -51,6 +81,19 @@
             @endif
         </div>
         <div>
+            @if(!empty($js->job_title))
+                <div class="section-title">
+
+
+
+
+
+
+                    المسمى الوظيفي
+</div>
+                <p class="text">{{ $js->job_title }}</p>
+                <hr style="border:none;border-top:1px solid #e5e7eb;margin:10px 0;"/>
+            @endif
             @if(!empty($js->summary))
                 <div class="section-title">الملخص</div>
                 <p class="text">{!! nl2br(e($js->summary)) !!}</p>
