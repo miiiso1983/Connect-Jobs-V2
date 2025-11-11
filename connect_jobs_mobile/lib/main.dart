@@ -20,6 +20,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart' show PdfColors;
 import 'package:printing/printing.dart' show PdfGoogleFonts;
 import 'package:file_saver/file_saver.dart';
 
@@ -2794,8 +2795,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       pw.Widget section(String title, List<pw.Widget> children) {
         if (children.isEmpty) return pw.SizedBox();
         return pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-          pw.SizedBox(height: 12),
-          pw.Text(title, style: pw.TextStyle(font: bold, fontSize: 14, fontFallback: [latinBold])),
+          pw.SizedBox(height: 10),
+          pw.Container(
+            padding: const pw.EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+            decoration: pw.BoxDecoration(
+              color: PdfColors.blue,
+              borderRadius: pw.BorderRadius.circular(4),
+            ),
+            child: pw.Text(
+              title,
+              style: pw.TextStyle(font: bold, fontSize: 13, color: PdfColors.white, fontFallback: [latinBold]),
+            ),
+          ),
           pw.SizedBox(height: 6),
           ...children,
         ]);
@@ -2814,27 +2825,51 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             theme: pw.ThemeData.withFont(base: regular, bold: bold),
           ),
           build: (ctx) => [
+            // Header bar
+            pw.Container(
+              padding: const pw.EdgeInsets.all(14),
+              decoration: pw.BoxDecoration(color: PdfColors.blue),
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+                    pw.Text(fullName.isEmpty ? 'سيرة ذاتية' : fullName, style: pw.TextStyle(font: bold, fontSize: 22, color: PdfColors.white, fontFallback: [latinBold])),
+                    if (jobTitle.toString().isNotEmpty) pw.Text(jobTitle, style: pw.TextStyle(font: regular, fontSize: 12, color: PdfColors.white, fontFallback: [latin])),
+                  ]),
+                ],
+              ),
+            ),
+            pw.SizedBox(height: 14),
+            // Two-column layout
             pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-                  pw.Text(fullName.isEmpty ? 'سيرة ذاتية' : fullName, style: pw.TextStyle(font: bold, fontSize: 22, fontFallback: [latinBold])),
-                  if (jobTitle.toString().isNotEmpty) pw.Text(jobTitle, style: pw.TextStyle(font: regular, fontSize: 12, fontFallback: [latin])),
-                ]),
-                pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.end, children: [
-                  if (email.isNotEmpty) pw.Text(email, style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
-                  if (phone.isNotEmpty) pw.Text(phone, style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
-                  if (province.toString().isNotEmpty) pw.Text(province, style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
-                ]),
+                pw.Expanded(
+                  flex: 2,
+                  child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+                    section('بيانات التواصل', [
+                      if (email.isNotEmpty) pw.Text('البريد: $email', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
+                      if (phone.isNotEmpty) pw.Text('الهاتف: $phone', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
+                      if (province.toString().isNotEmpty) pw.Text('الموقع: $province', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
+                    ]),
+                    section('المهارات', bulletFromText(skills)),
+                    section('اللغات', bulletFromText(languages)),
+                  ]),
+                ),
+                pw.SizedBox(width: 18),
+                pw.Expanded(
+                  flex: 5,
+                  child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+                    if (summary.trim().isNotEmpty) section('الملخص', [pw.Text(summary, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+                    section('الخبرات', bulletFromText(experiences)),
+                    section('التعليم', education.toString().isEmpty ? [] : [pw.Text(education, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+                    section('المؤهلات', bulletFromText(qualifications)),
+                    section('التخصص', speciality.toString().isEmpty ? [] : [pw.Text(speciality, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+                  ]),
+                ),
               ],
             ),
-            section('الملخص', summary.trim().isEmpty ? [] : [pw.Text(summary, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
-            section('الخبرات', bulletFromText(experiences)),
-            section('المهارات', bulletFromText(skills)),
-            section('المؤهلات', bulletFromText(qualifications)),
-            section('التعليم', education.toString().isEmpty ? [] : [pw.Text(education, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
-            section('التخصص', speciality.toString().isEmpty ? [] : [pw.Text(speciality, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
-            section('اللغات', languages.trim().isEmpty ? [] : [pw.Text(languages, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
           ],
         ),
       );
