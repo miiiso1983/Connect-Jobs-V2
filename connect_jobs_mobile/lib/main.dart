@@ -2859,36 +2859,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Expanded(
-                  flex: 2,
+                  flex: 5,
                   child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
                     if (avatar != null) ...[
-                      pw.Image(avatar as pw.ImageProvider, width: 90, height: 90, fit: pw.BoxFit.cover),
-                      pw.SizedBox(height: 8),
-                      pw.Divider(),
+                      pw.Image(avatar, width: 110, height: 110, fit: pw.BoxFit.cover),
+                      pw.SizedBox(height: 12),
                     ],
-                    section('بيانات التواصل', [
-                      if (email.isNotEmpty) pw.Text('البريد: $email', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
-                      if (phone.isNotEmpty) pw.Text('الهاتف: $phone', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
-                      if (province.toString().isNotEmpty) pw.Text('الموقع: $province', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
-                      pw.Text('امتلاك السيارة: ${hasCar ? 'نعم' : 'لا'}', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
-                    ]),
-                    if (districts.isNotEmpty)
-                      section('المناطق', districts.map((d) => pw.Bullet(text: d, style: pw.TextStyle(font: regular, fontSize: 11, fontFallback: [latin]))).toList()),
-                    section('المهارات', bulletFromText(skills)),
-                    section('اللغات', bulletFromText(languages)),
+                    if (summary.trim().isNotEmpty)
+                      section('نبذة عني', [pw.Text(summary, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+                    section('الخبرات المهنية', bulletFromText(experiences)),
                   ]),
                 ),
                 pw.SizedBox(width: 18),
                 pw.Expanded(
-                  flex: 5,
+                  flex: 2,
                   child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-                    if (specialities.isNotEmpty) section('التخصصات', specialities.map((s) => pw.Bullet(text: s, style: pw.TextStyle(font: regular, fontSize: 11, fontFallback: [latin]))).toList()),
-                    if (jobTitle.toString().isNotEmpty) section('المسمى الوظيفي', [pw.Text(jobTitle, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
-                    pw.Divider(),
-                    if (summary.trim().isNotEmpty) section('الملخص', [pw.Text(summary, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
-                    section('المؤهلات', bulletFromText(qualifications)),
-                    section('الخبرات', bulletFromText(experiences)),
+                    section('بيانات التواصل', [
+                      if (email.isNotEmpty) pw.Text('البريد: $email', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
+                      if (phone.isNotEmpty) pw.Text('رقم الموبايل: $phone', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
+                      if (province.toString().isNotEmpty) pw.Text('المحافظة: $province', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
+                      pw.Text('امتلاك السيارة: ${hasCar ? 'نعم' : 'لا'}', style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
+                    ]),
+                    if (districts.isNotEmpty)
+                      section('المناطق', districts.map((d) => pw.Bullet(text: d, style: pw.TextStyle(font: regular, fontSize: 11, fontFallback: [latin]))).toList()),
+                    if (specialities.isNotEmpty)
+                      section('التخصصات', specialities.map((s) => pw.Bullet(text: s, style: pw.TextStyle(font: regular, fontSize: 11, fontFallback: [latin]))).toList()),
                     section('التعليم', education.toString().isEmpty ? [] : [pw.Text(education, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+                    section('المهارات', bulletFromText(skills)),
+                    section('اللغات', bulletFromText(languages)),
+                    section('المؤهلات', bulletFromText(qualifications)),
                     section('التخصص', speciality.toString().isEmpty ? [] : [pw.Text(speciality, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
                   ]),
                 ),
