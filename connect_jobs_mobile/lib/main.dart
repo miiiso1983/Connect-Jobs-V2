@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'utils/app_config.dart';
@@ -18,13 +19,16 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart' show PdfGoogleFonts;
+import 'package:file_saver/file_saver.dart';
+
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'dart:io' show Platform;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'services/cache/jobs_cache.dart';
 
@@ -2765,6 +2769,102 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  Future<void> _exportCvAsPdf() async {
+    try {
+      final js = widget.profileData?['job_seeker'] ?? {};
+      final fullName = _fullNameController.text.isNotEmpty ? _fullNameController.text : (js['full_name'] ?? widget.user['name'] ?? '');
+      final email = (widget.profileData?['email'] as String?) ?? '';
+      final phone = (js['phone']?.toString() ?? '');
+      final jobTitle = _jobTitleController.text.isNotEmpty ? _jobTitleController.text : (js['job_title'] ?? '');
+      final province = _selectedProvince ?? js['province'] ?? '';
+      final speciality = _selectedSpeciality ?? js['speciality'] ?? '';
+      final education = _selectedEducationLevel ?? js['education_level'] ?? '';
+      final summary = _summaryController.text;
+      final qualifications = _qualificationsController.text;
+      final experiences = _experiencesController.text;
+      final skills = _skillsController.text;
+      final languages = _languagesController.text;
+
+      final doc = pw.Document();
+      final regular = await PdfGoogleFonts.notoNaskhArabicRegular();
+      final bold = await PdfGoogleFonts.notoNaskhArabicBold();
+      final latin = await PdfGoogleFonts.robotoRegular();
+      final latinBold = await PdfGoogleFonts.robotoBold();
+
+      pw.Widget section(String title, List<pw.Widget> children) {
+        if (children.isEmpty) return pw.SizedBox();
+        return pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+          pw.SizedBox(height: 12),
+          pw.Text(title, style: pw.TextStyle(font: bold, fontSize: 14, fontFallback: [latinBold])),
+          pw.SizedBox(height: 6),
+          ...children,
+        ]);
+      }
+
+      List<pw.Widget> bulletFromText(String text) {
+        final lines = text.split('\n').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+        return lines.map((l) => pw.Bullet(text: l, style: pw.TextStyle(font: regular, fontSize: 11, fontFallback: [latin]))).toList();
+      }
+
+      doc.addPage(
+        pw.MultiPage(
+          pageTheme: pw.PageTheme(
+            margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+            textDirection: pw.TextDirection.rtl,
+            theme: pw.ThemeData.withFont(base: regular, bold: bold),
+          ),
+          build: (ctx) => [
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+                  pw.Text(fullName.isEmpty ? 'سيرة ذاتية' : fullName, style: pw.TextStyle(font: bold, fontSize: 22, fontFallback: [latinBold])),
+                  if (jobTitle.toString().isNotEmpty) pw.Text(jobTitle, style: pw.TextStyle(font: regular, fontSize: 12, fontFallback: [latin])),
+                ]),
+                pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.end, children: [
+                  if (email.isNotEmpty) pw.Text(email, style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
+                  if (phone.isNotEmpty) pw.Text(phone, style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
+                  if (province.toString().isNotEmpty) pw.Text(province, style: pw.TextStyle(font: regular, fontSize: 10, fontFallback: [latin])),
+                ]),
+              ],
+            ),
+            section('الملخص', summary.trim().isEmpty ? [] : [pw.Text(summary, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+            section('الخبرات', bulletFromText(experiences)),
+            section('المهارات', bulletFromText(skills)),
+            section('المؤهلات', bulletFromText(qualifications)),
+            section('التعليم', education.toString().isEmpty ? [] : [pw.Text(education, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+            section('التخصص', speciality.toString().isEmpty ? [] : [pw.Text(speciality, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+            section('اللغات', languages.trim().isEmpty ? [] : [pw.Text(languages, style: pw.TextStyle(fontSize: 11, fontFallback: [latin]))]),
+          ],
+        ),
+      );
+
+      final bytes = await doc.save();
+      final safeName = (fullName.isEmpty ? 'cv' : fullName).replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+      if (kIsWeb) {
+        await FileSaver.instance.saveFile(
+          name: 'CV_$safeName',
+          bytes: bytes,
+          fileExtension: 'pdf',
+          mimeType: MimeType.pdf,
+        );
+      } else {
+        await FileSaver.instance.saveAs(
+          name: 'CV_$safeName',
+          bytes: bytes,
+          fileExtension: 'pdf',
+          mimeType: MimeType.pdf,
+        );
+      }
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم إنشاء وحفظ السيرة الذاتية (PDF) بنجاح')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تعذر إنشاء PDF: $e')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -3142,6 +3242,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: isLoading ? null : _exportCvAsPdf,
+                              icon: const Icon(Icons.picture_as_pdf),
+                              label: const Text('تصدير السيرة الذاتية كـ PDF'),
+                            ),
+                          ),
+                        ],
+                      ),
+
                     ],
                   ),
                 ),
