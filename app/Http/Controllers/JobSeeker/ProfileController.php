@@ -14,6 +14,24 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
+    public function exportPdf() {
+        $js = \App\Models\JobSeeker::firstWhere('user_id', \Illuminate\Support\Facades\Auth::id());
+        abort_if(!$js, 404);
+
+        $data = [
+            'js' => $js,
+            'user' => \Illuminate\Support\Facades\Auth::user(),
+        ];
+
+        // If Dompdf is available, return a PDF download; otherwise return HTML preview
+        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('jobseeker.profile.cv_pdf', $data)->setPaper('a4');
+            $safeName = preg_replace('/[\\\/:*?"<>|]/', '_', $js->full_name ?: 'cv');
+            return $pdf->download("CV_{$safeName}.pdf");
+        }
+
+        return view('jobseeker.profile.cv_pdf', $data);
+    }
     public function dashboard(): View
     {
         return view('jobseeker.dashboard');

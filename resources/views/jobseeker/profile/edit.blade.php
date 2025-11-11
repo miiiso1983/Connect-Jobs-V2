@@ -164,8 +164,12 @@ function districtPicker(){
                 @endif
             </div>
 
-            <div class="md:col-span-2">
+            <div class="md:col-span-2 flex items-center gap-3">
                 <x-primary-button>حفظ</x-primary-button>
+                <a href="{{ route('jobseeker.profile.pdf') }}" target="_blank" class="btn btn-outline btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a1 1 0 00-1 1v2H4a2 2 0 00-2 2v7a2 2 0 002 2h5v-2H4V7h1v1a1 1 0 002 0V7h4v1a1 1 0 002 0V7h1v3h2V7a2 2 0 00-2-2h-1V3a1 1 0 00-1-1H6zm6 9a1 1 0 00-1 1v2h-2l3 4 3-4h-2v-2a1 1 0 00-1-1z"/></svg>
+                    تصدير السيرة الذاتية كـ PDF
+                </a>
             </div>
         </form>
     </div>
