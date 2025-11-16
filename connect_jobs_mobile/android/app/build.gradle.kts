@@ -50,19 +50,9 @@ android {
         }
     }
 
-    packaging {
-        jniLibs {
-            // Keep debug symbols in .so files to avoid strip step (workaround for missing NDK tools)
-            keepDebugSymbols += setOf("**/*.so")
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = true
-            ndk {
-                debugSymbolLevel = "none"
-            }
             if (keystoreProperties.isEmpty()) {
                 throw GradleException("Release signing is not configured. Please create android/key.properties and an upload keystore.")
             }
