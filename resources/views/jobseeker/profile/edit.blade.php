@@ -1,147 +1,263 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">بروفايل المتقدم</h2>
+        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+            <h2 class="text-xl font-bold">الملف الشخصي</h2>
+            <p class="text-[#E7C66A] text-sm mt-1">أكمل بياناتك لزيادة فرصك في الحصول على الوظيفة المناسبة</p>
+        </div>
     </x-slot>
 
-    <div class="py-8 max-w-4xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-8 max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
         @if (session('status'))
-            <div class="mb-4 p-3 rounded bg-green-100 text-green-800">{{ session('status') }}</div>
+            <div class="alert alert-success shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span>{{ session('status') }}</span>
+            </div>
         @endif
-        <form method="POST" action="{{ route('jobseeker.profile.update') }}" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 p-6 rounded shadow grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <form method="POST" action="{{ route('jobseeker.profile.update') }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
 
-            <div class="md:col-span-2 flex items-center gap-4">
-                <div class="avatar">
-                    <div class="w-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden">
-                        @if(!empty($js->profile_image))
-                            @php
-                                $imgPath = $js->profile_image;
-                                $base = \Illuminate\Support\Str::of($imgPath)->beforeLast('.');
-                                $sm = (string)$base . '_sm.webp';
-                                $md = (string)$base . '_md.webp';
-                                $lg = (string)$base . '_lg.webp';
-                                $srcsetArr = [];
-                                if (Storage::disk('public')->exists($sm)) { $srcsetArr[] = Storage::url($sm).' 160w'; }
-                                if (Storage::disk('public')->exists($md)) { $srcsetArr[] = Storage::url($md).' 320w'; }
-                                if (Storage::disk('public')->exists($lg)) { $srcsetArr[] = Storage::url($lg).' 640w'; }
-                                $srcset = implode(', ', $srcsetArr);
-                            @endphp
-                            <img src="{{ Storage::url($js->profile_image) }}" @if($srcset) srcset="{{ $srcset }}" sizes="64px" @endif alt="Avatar" />
-                        @else
-                            <img src="https://api.dicebear.com/7.x/initials/svg?seed={{ urlencode($js->full_name ?? auth()->user()->name) }}" alt="Avatar" />
+            {{-- Profile Header Card --}}
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-r from-[#0D2660] to-[#1a3a7a] p-6">
+                    <div class="flex flex-col md:flex-row items-center gap-6">
+                        {{-- Profile Image --}}
+                        <div class="relative group">
+                            <div class="w-28 h-28 rounded-full ring-4 ring-[#E7C66A] ring-offset-4 ring-offset-[#0D2660] overflow-hidden bg-white">
+                                @if(!empty($js->profile_image))
+                                    @php
+                                        $imgPath = $js->profile_image;
+                                        $base = \Illuminate\Support\Str::of($imgPath)->beforeLast('.');
+                                        $sm = (string)$base . '_sm.webp';
+                                        $md = (string)$base . '_md.webp';
+                                        $lg = (string)$base . '_lg.webp';
+                                        $srcsetArr = [];
+                                        if (Storage::disk('public')->exists($sm)) { $srcsetArr[] = Storage::url($sm).' 160w'; }
+                                        if (Storage::disk('public')->exists($md)) { $srcsetArr[] = Storage::url($md).' 320w'; }
+                                        if (Storage::disk('public')->exists($lg)) { $srcsetArr[] = Storage::url($lg).' 640w'; }
+                                        $srcset = implode(', ', $srcsetArr);
+                                    @endphp
+                                    <img src="{{ Storage::url($js->profile_image) }}" @if($srcset) srcset="{{ $srcset }}" sizes="112px" @endif alt="Avatar" class="w-full h-full object-cover" />
+                                @else
+                                    <img src="https://api.dicebear.com/7.x/initials/svg?seed={{ urlencode($js->full_name ?? auth()->user()->name) }}&backgroundColor=0D2660&textColor=E7C66A" alt="Avatar" class="w-full h-full object-cover" />
+                                @endif
+                            </div>
+                            <label for="profile_image" class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </label>
+                            <input id="profile_image" name="profile_image" type="file" class="hidden" accept="image/png,image/jpeg,image/webp" />
+                        </div>
+                        {{-- User Info --}}
+                        <div class="text-center md:text-right flex-1">
+                            <h3 class="text-2xl font-bold text-white">{{ $js->full_name ?? auth()->user()->name ?? 'الباحث عن عمل' }}</h3>
+                            <p class="text-[#E7C66A] mt-1">{{ $js->job_title ?? 'لم يتم تحديد المسمى الوظيفي' }}</p>
+                            <div class="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
+                                @if($js->profile_completed ?? false)
+                                    <span class="badge badge-success gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> الملف مكتمل</span>
+                                @else
+                                    <span class="badge badge-warning gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg> أكمل ملفك</span>
+                                @endif
+                                @if($js->province ?? false)
+                                    <span class="badge badge-ghost bg-white/20 text-white">{{ $js->province }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 dark:bg-gray-700/50 text-sm text-gray-600 dark:text-gray-300">
+                    <p>💡 انقر على الصورة لتغييرها • الصيغ المدعومة: PNG, JPG, WebP (حتى 2MB)</p>
+                </div>
+            </div>
+
+            {{-- Basic Information Section --}}
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
+                        <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white">المعلومات الأساسية</h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <x-input-label for="full_name" value="الاسم الكامل" class="text-gray-700 dark:text-gray-300 font-medium" />
+                        <x-text-input id="full_name" name="full_name" class="block mt-2 w-full border-gray-300 dark:border-gray-600 focus:border-[#0D2660] focus:ring-[#0D2660]" value="{{ old('full_name', $js->full_name ?? '') }}" placeholder="أدخل اسمك الكامل" />
+                    </div>
+                    <div x-data="districtPicker()" x-init="init('{{ old('province', $js->province ?? '') }}', @js(old('districts', $js->districts ?? [])))" class="md:col-span-2">
+                        <x-input-label for="province" value="المحافظة" class="text-gray-700 dark:text-gray-300 font-medium" />
+                        <select id="province" name="province" @change="load()" class="select select-bordered w-full mt-2 bg-white dark:bg-gray-700">
+                            <option value="">— اختر المحافظة —</option>
+                            @foreach($provinces as $p)
+                                <option value="{{ $p }}" @selected(old('province', $js->province ?? '')===$p)>{{ $p }}</option>
+                            @endforeach
+                        </select>
+                        <div class="mt-4">
+                            <x-input-label value="المناطق المفضلة للعمل" class="text-gray-700 dark:text-gray-300 font-medium" />
+                            <div class="mt-2 max-h-40 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-600 p-3 bg-gray-50 dark:bg-gray-700/50">
+                                <template x-for="d in districts" :key="d">
+                                    <label class="flex items-center gap-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 px-2 rounded cursor-pointer">
+                                        <input type="checkbox" :value="d" name="districts[]" x-model="selected" class="checkbox checkbox-sm checkbox-primary">
+                                        <span x-text="d" class="text-sm text-gray-700 dark:text-gray-200"></span>
+                                    </label>
+                                </template>
+                                <template x-if="!districts.length">
+                                    <div class="text-sm text-gray-500 text-center py-4">اختر محافظة لعرض المناطق</div>
+                                </template>
+                            </div>
+                            <div class="mt-3 flex flex-wrap gap-2" x-show="selected.length">
+                                <template x-for="s in selected" :key="s">
+                                    <span class="px-3 py-1 rounded-full bg-[#0D2660] text-white text-xs font-medium" x-text="s"></span>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <x-input-label for="job_title" value="المسمى الوظيفي" class="text-gray-700 dark:text-gray-300 font-medium" />
+                        <select id="job_title" name="job_title" class="select select-bordered w-full mt-2 bg-white dark:bg-gray-700">
+                            <option value="">— اختر المسمى —</option>
+                            @foreach(($titles->sort() ?? collect()) as $t)
+                                <option value="{{ $t }}" @selected(old('job_title', $js->job_title ?? '')===$t)>{{ $t }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <x-input-label for="gender" value="الجنس" class="text-gray-700 dark:text-gray-300 font-medium" />
+                        <select id="gender" name="gender" class="select select-bordered w-full mt-2 bg-white dark:bg-gray-700">
+                            <option value="">— اختر —</option>
+                            <option value="male" @selected(($js->gender ?? '')==='male')>ذكر</option>
+                            <option value="female" @selected(($js->gender ?? '')==='female')>أنثى</option>
+                        </select>
+                    </div>
+                    <div>
+                        <x-input-label for="own_car" value="امتلاك سيارة" class="text-gray-700 dark:text-gray-300 font-medium" />
+                        <select id="own_car" name="own_car" class="select select-bordered w-full mt-2 bg-white dark:bg-gray-700">
+                            <option value="0" @selected(($js->own_car ?? 0)==0)>لا</option>
+                            <option value="1" @selected(($js->own_car ?? 0)==1)>نعم</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Specializations Section --}}
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
+                        <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white">التخصصات</h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div x-data="{selected: @js(old('specialities', $js->specialities ?? [])), options: @js($specialities->sort()->values())}">
+                        <x-input-label value="التخصصات المتاحة" class="text-gray-700 dark:text-gray-300 font-medium" />
+                        <div class="mt-2 max-h-48 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-600 p-3 bg-gray-50 dark:bg-gray-700/50">
+                            <template x-for="s in options" :key="s">
+                                <label class="flex items-center gap-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 px-2 rounded cursor-pointer">
+                                    <input type="checkbox" :value="s" name="specialities[]" x-model="selected" class="checkbox checkbox-sm checkbox-primary">
+                                    <span x-text="s" class="text-sm text-gray-700 dark:text-gray-200"></span>
+                                </label>
+                            </template>
+                            <template x-if="!options.length">
+                                <div class="text-sm text-gray-500 text-center py-4">لا توجد تخصصات</div>
+                            </template>
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2" x-show="selected.length">
+                            <template x-for="s in selected" :key="s">
+                                <span class="px-3 py-1 rounded-full bg-[#E7C66A] text-[#0D2660] text-xs font-medium" x-text="s"></span>
+                            </template>
+                        </div>
+                    </div>
+                    <div>
+                        <x-input-label for="speciality" value="تخصص إضافي (اختياري)" class="text-gray-700 dark:text-gray-300 font-medium" />
+                        <input list="specialities_list" id="speciality" name="speciality" class="input input-bordered w-full mt-2 bg-white dark:bg-gray-700" value="{{ old('speciality', $js->speciality ?? '') }}" placeholder="أدخل تخصصاً آخر..." />
+                        <datalist id="specialities_list">@foreach($specialities as $s)<option value="{{ $s }}" />@endforeach</datalist>
+                    </div>
+                </div>
+            </div>
+
+            {{-- About Section --}}
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
+                        <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white">نبذة عني</h4>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <x-input-label for="summary" value="الملخص الشخصي" class="text-gray-700 dark:text-gray-300 font-medium" />
+                        <textarea id="summary" name="summary" rows="3" class="textarea textarea-bordered w-full mt-2 bg-white dark:bg-gray-700" placeholder="اكتب نبذة مختصرة عن نفسك وأهدافك المهنية...">{{ old('summary', $js->summary ?? '') }}</textarea>
+                    </div>
+                    <div>
+                        <x-input-label for="qualifications" value="المؤهلات العلمية" class="text-gray-700 dark:text-gray-300 font-medium" />
+                        <textarea id="qualifications" name="qualifications" rows="3" class="textarea textarea-bordered w-full mt-2 bg-white dark:bg-gray-700" placeholder="مثال: بكالوريوس صيدلة - جامعة بغداد 2020">{{ old('qualifications', $js->qualifications ?? '') }}</textarea>
+                    </div>
+                    <div>
+                        <x-input-label for="experiences" value="الخبرات العملية" class="text-gray-700 dark:text-gray-300 font-medium" />
+                        <textarea id="experiences" name="experiences" rows="3" class="textarea textarea-bordered w-full mt-2 bg-white dark:bg-gray-700" placeholder="اذكر خبراتك السابقة مع المدة الزمنية...">{{ old('experiences', $js->experiences ?? '') }}</textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <x-input-label for="languages" value="اللغات" class="text-gray-700 dark:text-gray-300 font-medium" />
+                            <textarea id="languages" name="languages" rows="2" class="textarea textarea-bordered w-full mt-2 bg-white dark:bg-gray-700" placeholder="مثال: العربية (ممتاز)، الإنجليزية (جيد)">{{ old('languages', $js->languages ?? '') }}</textarea>
+                        </div>
+                        <div>
+                            <x-input-label for="skills" value="المهارات" class="text-gray-700 dark:text-gray-300 font-medium" />
+                            <textarea id="skills" name="skills" rows="2" class="textarea textarea-bordered w-full mt-2 bg-white dark:bg-gray-700" placeholder="مثال: Excel, التواصل، العمل الجماعي">{{ old('skills', $js->skills ?? '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- CV Upload Section --}}
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
+                        <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white">السيرة الذاتية</h4>
+                </div>
+                <div class="flex flex-col md:flex-row gap-6 items-start">
+                    <div class="flex-1">
+                        <x-input-label for="cv" value="رفع السيرة الذاتية (PDF/Word)" class="text-gray-700 dark:text-gray-300 font-medium" />
+                        <div class="mt-2 flex items-center justify-center w-full">
+                            <label for="cv" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-700/50 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 transition-colors">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">انقر للرفع</span> أو اسحب الملف هنا</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">PDF, DOC, DOCX (حتى 5MB)</p>
+                                </div>
+                                <input id="cv" name="cv" type="file" class="hidden" accept=".pdf,.doc,.docx" />
+                            </label>
+                        </div>
+                        @if(!empty($js->cv_file))
+                            <div class="mt-3 flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span class="text-sm text-green-700 dark:text-green-400">لديك سيرة ذاتية مرفوعة:</span>
+                                <a href="{{ Storage::url($js->cv_file) }}" class="text-sm font-medium text-[#0D2660] dark:text-[#E7C66A] hover:underline" target="_blank">عرض الملف</a>
+                            </div>
                         @endif
                     </div>
                 </div>
-                <div class="flex-1">
-                    <x-input-label for="profile_image" value="الصورة الشخصية (PNG/JPG/WebP، حتى 2MB)" />
-                    <input id="profile_image" name="profile_image" type="file" class="mt-1 block w-full" accept="image/png,image/jpeg,image/webp" />
-                    <p class="text-xs text-gray-500 mt-1">سيتم حفظ الصورة في النظام وتستخدم كالصورة الرمزية.</p>
-                </div>
             </div>
 
-            <div>
-                <x-input-label for="full_name" value="الاسم الكامل" />
-                <x-text-input id="full_name" name="full_name" class="block mt-1 w-full" value="{{ old('full_name', $js->full_name ?? '') }}" />
-            </div>
-            <div x-data="districtPicker()" x-init="init('{{ old('province', $js->province ?? '') }}', @js(old('districts', $js->districts ?? [])))">
-                <x-input-label for="province" value="المحافظة" />
-                <select id="province" name="province" @change="load()" class="block mt-1 w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700">
-                    <option value="">—</option>
-                    @foreach($provinces as $p)
-                        <option value="{{ $p }}" @selected(old('province', $js->province ?? '')===$p)>{{ $p }}</option>
-                    @endforeach
-                </select>
-                <div class="mt-3">
-                    <x-input-label value="المناطق" />
-                    <div class="mt-2 max-h-48 overflow-y-auto rounded border border-gray-200 dark:border-gray-700 p-3 space-y-2">
-                        <template x-for="d in districts" :key="d">
-                            <label class="flex items-center gap-2">
-                                <input type="checkbox" :value="d" name="districts[]" x-model="selected" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                <span x-text="d" class="text-sm text-gray-700 dark:text-gray-200"></span>
-                            </label>
-                        </template>
-                        <template x-if="!districts.length">
-                            <div class="text-sm text-gray-500">اختر محافظة لعرض المناطق</div>
-                        </template>
+            {{-- Action Buttons --}}
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <button type="submit" class="btn bg-[#0D2660] hover:bg-[#0a1d4d] text-white border-none px-8">
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            حفظ التغييرات
+                        </button>
+                        <a href="{{ route('jobseeker.dashboard') }}" class="btn btn-ghost">إلغاء</a>
                     </div>
-                    <div class="mt-2 flex flex-wrap gap-2" x-show="selected.length">
-                        <template x-for="s in selected" :key="s">
-                            <span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs" x-text="s"></span>
-                        </template>
-                    </div>
+                    <a href="{{ route('jobseeker.profile.pdf') }}" target="_blank" class="btn bg-[#E7C66A] hover:bg-[#d4b55a] text-[#0D2660] border-none gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"/></svg>
+                        تصدير كـ PDF
+                    </a>
                 </div>
             </div>
-            <div>
-                <x-input-label for="job_title" value="المسمى الوظيفي" />
-                <select id="job_title" name="job_title" class="block mt-1 w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700">
-                    <option value="">—</option>
-                    @foreach(($titles->sort() ?? collect()) as $t)
-                        <option value="{{ $t }}" @selected(old('job_title', $js->job_title ?? '')===$t)>{{ $t }}</option>
-                    @endforeach
-                </select>
-            </div>
+        </form>
+    </div>
 
-            <div x-data="{selected: @js(old('specialities', $js->specialities ?? [])), options: @js($specialities->sort()->values())}">
-                <x-input-label value="التخصصات" />
-                <div class="mt-2 max-h-48 overflow-y-auto rounded border border-gray-200 dark:border-gray-700 p-3 space-y-2">
-                    <template x-for="s in options" :key="s">
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" :value="s" name="specialities[]" x-model="selected" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                            <span x-text="s" class="text-sm text-gray-700 dark:text-gray-200"></span>
-                        </label>
-                    </template>
-                    <template x-if="!options.length">
-                        <div class="text-sm text-gray-500">لا توجد تخصصات</div>
-                    </template>
-                </div>
-                <div class="mt-2 flex flex-wrap gap-2" x-show="selected.length">
-                    <template x-for="s in selected" :key="s">
-                        <span class="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-xs" x-text="s"></span>
-                    </template>
-                </div>
-            </div>
-            <div>
-                <x-input-label for="speciality" value="التخصص" />
-                <input list="specialities" id="speciality" name="speciality" class="block mt-1 w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700" value="{{ old('speciality', $js->speciality ?? '') }}" />
-                <datalist id="specialities">@foreach($specialities as $s)<option value="{{ $s }}" />@endforeach</datalist>
-            </div>
-            <div>
-                <x-input-label for="gender" value="الجنس" />
-                <select id="gender" name="gender" class="block mt-1 w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700">
-                    <option value="">--</option>
-                    <option value="male" @selected(($js->gender ?? '')==='male')>Male</option>
-                    <option value="female" @selected(($js->gender ?? '')==='female')>Female</option>
-
-                </select>
-            </div>
-            <div>
-                <x-input-label for="own_car" value="امتلاك سيارة" />
-                <select id="own_car" name="own_car" class="block mt-1 w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700">
-                    <option value="0" @selected(($js->own_car ?? 0)==0)>No</option>
-                    <option value="1" @selected(($js->own_car ?? 0)==1)>Yes</option>
-                </select>
-            </div>
-
-            <div class="md:col-span-2">
-                <x-input-label for="summary" value="الملخص" />
-                <textarea id="summary" name="summary" rows="3" class="mt-1 block w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700">{{ old('summary', $js->summary ?? '') }}</textarea>
-            </div>
-            <div class="md:col-span-2">
-                <x-input-label for="qualifications" value="المؤهلات" />
-                <textarea id="qualifications" name="qualifications" rows="3" class="mt-1 block w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700">{{ old('qualifications', $js->qualifications ?? '') }}</textarea>
-            </div>
-            <div class="md:col-span-2">
-                <x-input-label for="experiences" value="الخبرات" />
-                <textarea id="experiences" name="experiences" rows="3" class="mt-1 block w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700">{{ old('experiences', $js->experiences ?? '') }}</textarea>
-            </div>
-            <div class="md:col-span-2">
-                <x-input-label for="languages" value="اللغات" />
-                <textarea id="languages" name="languages" rows="2" class="mt-1 block w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700">{{ old('languages', $js->languages ?? '') }}</textarea>
-            </div>
-            <div class="md:col-span-2">
-                <x-input-label for="skills" value="المهارات" />
-                <textarea id="skills" name="skills" rows="2" class="mt-1 block w-full rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700" placeholder="مثال: excel, sales, pediatrics">{{ old('skills', $js->skills ?? '') }}</textarea>
-            </div>
 @push('scripts')
 <script>
 function districtPicker(){
@@ -156,22 +272,5 @@ function districtPicker(){
 }
 </script>
 @endpush
-            <div class="md:col-span-2">
-                <x-input-label for="cv" value="السيرة الذاتية (PDF/Word)" />
-                <input id="cv" name="cv" type="file" class="mt-1 block w-full" accept=".pdf,.doc,.docx" />
-                @if(!empty($js->cv_file))
-                    <p class="text-sm mt-1">الملف الحالي: <a href="{{ Storage::url($js->cv_file) }}" class="text-primary" target="_blank">عرض</a></p>
-                @endif
-            </div>
-
-            <div class="md:col-span-2 flex items-center gap-3">
-                <x-primary-button>حفظ</x-primary-button>
-                <a href="{{ route('jobseeker.profile.pdf') }}" target="_blank" class="btn btn-outline btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a1 1 0 00-1 1v2H4a2 2 0 00-2 2v7a2 2 0 002 2h5v-2H4V7h1v1a1 1 0 002 0V7h4v1a1 1 0 002 0V7h1v3h2V7a2 2 0 00-2-2h-1V3a1 1 0 00-1-1H6zm6 9a1 1 0 00-1 1v2h-2l3 4 3-4h-2v-2a1 1 0 00-1-1z"/></svg>
-                    تصدير السيرة الذاتية كـ PDF
-                </a>
-            </div>
-        </form>
-    </div>
 </x-app-layout>
 
