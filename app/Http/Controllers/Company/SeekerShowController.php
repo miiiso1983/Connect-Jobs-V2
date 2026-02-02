@@ -14,16 +14,14 @@ class SeekerShowController extends Controller
     {
         $user = Auth::user();
         // Allow admin or company users to view job seeker profiles
-        abort_unless($user && in_array($user->role ?? '', ['admin', 'company'], true), 403);
+        abort_unless($user && \in_array($user->role ?? '', ['admin', 'company'], true), 403);
 
-        $jobSeeker->load(['user']);
+        // Load all relationships for complete profile view
+        $jobSeeker->load(['user', 'applications.job']);
 
-        // Use admin-specific view for admin users
-        if ($user->role === 'admin') {
-            return view('company.seekers.show', compact('jobSeeker'));
-        }
+        $context = ($user->role === 'admin') ? 'admin' : 'company';
 
-        return view('company.seekers.show', compact('jobSeeker'));
+        return view('company.seekers.show', compact('jobSeeker', 'context'));
     }
 }
 
