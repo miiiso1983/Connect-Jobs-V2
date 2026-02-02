@@ -8,49 +8,57 @@
 
     <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
         @if (session('status'))
-            <div class="alert alert-success shadow">{{ session('status') }}</div>
+            <div class="flex items-center gap-3 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="text-green-800 dark:text-green-400">{{ session('status') }}</span>
+            </div>
         @endif
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="stats bg-white shadow">
-                <div class="stat">
-                    <div class="stat-title">إجمالي الباحثين</div>
-                    <div class="stat-value text-primary">{{ $totalSeekers }}</div>
+        {{-- KPIs --}}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                 </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">إحصائيات الباحثين عن عمل</h3>
             </div>
-            <div class="stats bg-white shadow">
-                <div class="stat">
-                    <div class="stat-title">نشط</div>
-                    <div class="stat-value text-emerald-600">{{ $activeUsers }}</div>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div class="text-center p-4 rounded-lg bg-gradient-to-br from-[#0D2660]/5 to-[#0D2660]/10 dark:from-[#0D2660]/20 dark:to-[#0D2660]/30">
+                    <div class="text-3xl font-bold text-[#0D2660] dark:text-[#E7C66A]">{{ $totalSeekers }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">إجمالي الباحثين</div>
                 </div>
-            </div>
-            <div class="stats bg-white shadow">
-                <div class="stat">
-                    <div class="stat-title">موقوف</div>
-                    <div class="stat-value text-amber-600">{{ $suspendedUsers }}</div>
+                <div class="text-center p-4 rounded-lg bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 dark:from-emerald-500/20 dark:to-emerald-500/30">
+                    <div class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{{ $activeUsers }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">نشط</div>
                 </div>
-            </div>
-        </div>
-        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-            @if(!is_null($completedCount))
-            <div class="stats bg-white shadow">
-                <div class="stat">
-                    <div class="stat-title">أكمل الملف</div>
-                    <div class="stat-value text-indigo-600">{{ $completedCount }}</div>
+                <div class="text-center p-4 rounded-lg bg-gradient-to-br from-amber-500/5 to-amber-500/10 dark:from-amber-500/20 dark:to-amber-500/30">
+                    <div class="text-3xl font-bold text-amber-600 dark:text-amber-400">{{ $suspendedUsers }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">موقوف</div>
                 </div>
-            </div>
-            @endif
-            @if(!is_null($cvCount))
-            <div class="stats bg-white shadow">
-                <div class="stat">
-                    <div class="stat-title">سيرة ذاتية مرفوعة</div>
-                    <div class="stat-value text-indigo-600">{{ $cvCount }}</div>
+                @if(!is_null($completedCount))
+                <div class="text-center p-4 rounded-lg bg-gradient-to-br from-indigo-500/5 to-indigo-500/10 dark:from-indigo-500/20 dark:to-indigo-500/30">
+                    <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{{ $completedCount }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">أكمل الملف</div>
                 </div>
+                @endif
+                @if(!is_null($cvCount))
+                <div class="text-center p-4 rounded-lg bg-gradient-to-br from-purple-500/5 to-purple-500/10 dark:from-purple-500/20 dark:to-purple-500/30">
+                    <div class="text-3xl font-bold text-purple-600 dark:text-purple-400">{{ $cvCount }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">سيرة ذاتية مرفوعة</div>
+                </div>
+                @endif
             </div>
-            @endif
         </div>
 
-        <form method="GET" class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow grid grid-cols-1 md:grid-cols-6 gap-3">
+        {{-- Filters --}}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">خيارات الفلترة</h3>
+            </div>
+            <form method="GET" class="p-6 grid grid-cols-1 md:grid-cols-6 gap-3">
             <div class="md:col-span-2">
                 <x-input-label for="q" value="بحث (اسم، بريد، مسمى، تخصص)" />
                 <input type="text" id="q" name="q" value="{{ $q }}" class="input input-bordered w-full" />
@@ -113,28 +121,37 @@
                 </select>
             </div>
             <div class="md:col-span-6 flex gap-2">
-                <x-primary-button>تطبيق</x-primary-button>
-                <a href="{{ route('admin.jobseekers.index') }}" class="btn">تفريغ</a>
+                <button class="px-6 py-2 rounded-lg bg-[#0D2660] hover:bg-[#0A1E46] text-white font-medium transition-colors">تطبيق</button>
+                <a href="{{ route('admin.jobseekers.index') }}" class="btn btn-ghost">تفريغ</a>
             </div>
-        </form>
+            </form>
+        </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-x-auto">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>المستخدم</th>
-                        <th>الاسم الكامل</th>
-                        <th>المحافظة</th>
-                        <th>المسمى</th>
-                        <th>الحالة</th>
-                        <th>الملف</th>
-                        <th>السيرة الذاتية</th>
-                        <th>أُنشئ</th>
-                        <th>آخر ظهور</th>
-
-                        <th></th>
-                    </tr>
-                </thead>
+        {{-- Jobseekers Table --}}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">قائمة الباحثين عن عمل</h3>
+                <span class="bg-[#0D2660] text-white text-xs font-bold px-3 py-1 rounded-full">{{ $seekers->total() }} باحث</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 dark:bg-gray-700/50">
+                        <tr>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المستخدم</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الاسم الكامل</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المحافظة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المسمى</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الحالة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الملف</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">السيرة الذاتية</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">أُنشئ</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">آخر ظهور</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">إجراءات</th>
+                        </tr>
+                    </thead>
                 <tbody>
                     @forelse($seekers as $s)
                         <tr>
@@ -188,13 +205,15 @@
 
 
                     @empty
-                        <tr><td colspan="10" class="text-center text-gray-500">لا نتائج.</td></tr>
+                        <tr><td colspan="10" class="text-center py-8 text-gray-500 dark:text-gray-400">لا نتائج.</td></tr>
                     @endforelse
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
 
-        <div>
+        {{-- Pagination --}}
+        <div class="flex justify-center">
             {{ $seekers->links() }}
         </div>
     </div>

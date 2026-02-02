@@ -1,48 +1,70 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">الشركات</h2>
+        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+            <h2 class="text-xl font-bold">إدارة الشركات</h2>
+            <p class="text-[#E7C66A] text-sm mt-1">عرض وإدارة جميع الشركات المسجلة في النظام</p>
+        </div>
     </x-slot>
 
     <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
         @if (session('status'))
-            <div class="p-3 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-200">{{ session('status') }}</div>
+            <div class="flex items-center gap-3 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="text-green-800 dark:text-green-400">{{ session('status') }}</span>
+            </div>
         @endif
 
-        <div class="bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800 p-4 rounded-xl shadow-sm">
+        {{-- KPIs --}}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">إحصائيات الشركات</h3>
+            </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="p-4 rounded-lg bg-white dark:bg-gray-800 shadow">
-                    <div class="text-xs text-gray-500">إجمالي الشركات</div>
-                    <div class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ $companies->count() }}</div>
+                <div class="text-center p-4 rounded-lg bg-gradient-to-br from-[#0D2660]/5 to-[#0D2660]/10 dark:from-[#0D2660]/20 dark:to-[#0D2660]/30">
+                    <div class="text-3xl font-bold text-[#0D2660] dark:text-[#E7C66A]">{{ $companies->count() }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">إجمالي الشركات</div>
                 </div>
-                <div class="p-4 rounded-lg bg-white dark:bg-gray-800 shadow">
-                    <div class="text-xs text-gray-500">خطط فعالة</div>
-                    <div class="text-2xl font-bold text-gray-800 dark:text-gray-100">—</div>
+                <div class="text-center p-4 rounded-lg bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 dark:from-emerald-500/20 dark:to-emerald-500/30">
+                    <div class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">—</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">خطط فعالة</div>
                 </div>
-                <div class="p-4 rounded-lg bg-white dark:bg-gray-800 shadow">
-                    <div class="text-xs text-gray-500">بانتظار الموافقة</div>
-                    <div class="text-2xl font-bold text-gray-800 dark:text-gray-100">—</div>
+                <div class="text-center p-4 rounded-lg bg-gradient-to-br from-amber-500/5 to-amber-500/10 dark:from-amber-500/20 dark:to-amber-500/30">
+                    <div class="text-3xl font-bold text-amber-600 dark:text-amber-400">—</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">بانتظار الموافقة</div>
                 </div>
-                <div class="p-4 rounded-lg bg-white dark:bg-gray-800 shadow">
-                    <div class="text-xs text-gray-500">موقوفة</div>
-                    <div class="text-2xl font-bold text-gray-800 dark:text-gray-100">—</div>
+                <div class="text-center p-4 rounded-lg bg-gradient-to-br from-red-500/5 to-red-500/10 dark:from-red-500/20 dark:to-red-500/30">
+                    <div class="text-3xl font-bold text-red-600 dark:text-red-400">—</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">موقوفة</div>
                 </div>
             </div>
         </div>
 
-        <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow">
-            <table class="min-w-full text-sm">
-                <thead class="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                        <th class="px-4 py-2 text-start">#</th>
-                        <th class="px-4 py-2 text-start">الشركة</th>
-                        <th class="px-4 py-2 text-start">البريد الإلكتروني</th>
-                        <th class="px-4 py-2 text-start">المحافظة</th>
-                        <th class="px-4 py-2 text-start">الخطة</th>
-                        <th class="px-4 py-2 text-start">انتهاء الاشتراك</th>
-                        <th class="px-4 py-2 text-start">حالة</th>
-                        <th class="px-4 py-2 text-start">إجراءات</th>
-                    </tr>
-                </thead>
+        {{-- Companies Table --}}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">قائمة الشركات</h3>
+                <span class="bg-[#0D2660] text-white text-xs font-bold px-3 py-1 rounded-full">{{ $companies->count() }} شركة</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-gray-50 dark:bg-gray-700/50">
+                        <tr>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">#</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الشركة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">البريد الإلكتروني</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المحافظة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الخطة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">انتهاء الاشتراك</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">حالة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">إجراءات</th>
+                        </tr>
+                    </thead>
                 <tbody>
                     @foreach ($companies as $c)
                         <tr class="border-t border-gray-100 dark:border-gray-700">
@@ -107,7 +129,8 @@
                         </tr>
                     @endforeach
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
     </div>
 </x-app-layout>

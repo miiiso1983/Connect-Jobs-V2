@@ -1,61 +1,89 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">وظائف بانتظار الموافقة</h2>
+        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+            <h2 class="text-xl font-bold">وظائف بانتظار الموافقة</h2>
+            <p class="text-[#E7C66A] text-sm mt-1">مراجعة والموافقة على الوظائف المقدمة من الشركات</p>
+        </div>
     </x-slot>
 
     <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-        <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-3 text-sm">
-            تلميح: يمكنك الموافقة أو الرفض مباشرة من هنا. انقر على العنوان لرؤية تفاصيل أكثر.
+        {{-- Tip Alert --}}
+        <div class="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-800 flex items-center justify-center">
+                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <p class="text-amber-800 dark:text-amber-300">تلميح: يمكنك الموافقة أو الرفض مباشرة من هنا. انقر على "عرض التفاصيل" لرؤية معلومات أكثر.</p>
         </div>
+
         @if (session('status'))
-            <div class="p-3 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-200">{{ session('status') }}</div>
+            <div class="flex items-center gap-3 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="text-green-800 dark:text-green-400">{{ session('status') }}</span>
+            </div>
         @endif
 
         <!-- Filters / Sorting -->
-        <form method="GET" class="bg-white dark:bg-gray-800 rounded-xl shadow p-4 grid grid-cols-1 md:grid-cols-6 gap-3">
-            <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="بحث بعنوان/وصف" class="input input-bordered input-sm md:col-span-2">
-            <input type="text" name="province" value="{{ $province ?? '' }}" placeholder="المحافظة" class="input input-bordered input-sm">
-            <select name="approved" class="select select-bordered select-sm">
-                @php $approved ??= 'pending'; @endphp
-                <option value="pending" @selected(($approved??'pending')==='pending')>بانتظار</option>
-                <option value="approved" @selected(($approved??'pending')==='approved')>معتمدة</option>
-                <option value="all" @selected(($approved??'pending')==='all')>الكل</option>
-            </select>
-            <select name="status" class="select select-bordered select-sm">
-                @php $status ??= ''; @endphp
-                <option value="" @selected(($status??'')==='')>كل الحالات</option>
-                <option value="open" @selected(($status??'')==='open')>مفتوحة</option>
-                <option value="closed" @selected(($status??'')==='closed')>مغلقة</option>
-            </select>
-            <div class="flex items-center gap-2">
-                <select name="sort" class="select select-bordered select-sm">
-                    <option value="id" @selected(($sort??'id')==='id')>#</option>
-                    <option value="title" @selected(($sort??'id')==='title')>العنوان</option>
-                    <option value="province" @selected(($sort??'id')==='province')>المحافظة</option>
-                </select>
-                <select name="dir" class="select select-bordered select-sm">
-                    <option value="desc" @selected(($dir??'desc')==='desc')>تنازلي</option>
-                    <option value="asc" @selected(($dir??'desc')==='asc')>تصاعدي</option>
-                </select>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">خيارات الفلترة والترتيب</h3>
             </div>
-            <div class="md:col-span-6 flex gap-2 justify-end">
-                <a href="{{ route('admin.jobs.pending') }}" class="btn btn-ghost btn-sm">إفراغ</a>
-                <button class="btn btn-primary btn-sm">تطبيق</button>
-            </div>
-        </form>
+            <form method="GET" class="p-6 grid grid-cols-1 md:grid-cols-6 gap-4">
+                <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="بحث بعنوان/وصف" class="input input-bordered md:col-span-2">
+                <input type="text" name="province" value="{{ $province ?? '' }}" placeholder="المحافظة" class="input input-bordered">
+                <select name="approved" class="select select-bordered">
+                    @php $approved ??= 'pending'; @endphp
+                    <option value="pending" @selected(($approved??'pending')==='pending')>بانتظار</option>
+                    <option value="approved" @selected(($approved??'pending')==='approved')>معتمدة</option>
+                    <option value="all" @selected(($approved??'pending')==='all')>الكل</option>
+                </select>
+                <select name="status" class="select select-bordered">
+                    @php $status ??= ''; @endphp
+                    <option value="" @selected(($status??'')==='')>كل الحالات</option>
+                    <option value="open" @selected(($status??'')==='open')>مفتوحة</option>
+                    <option value="closed" @selected(($status??'')==='closed')>مغلقة</option>
+                </select>
+                <div class="flex items-center gap-2">
+                    <select name="sort" class="select select-bordered flex-1">
+                        <option value="id" @selected(($sort??'id')==='id')>#</option>
+                        <option value="title" @selected(($sort??'id')==='title')>العنوان</option>
+                        <option value="province" @selected(($sort??'id')==='province')>المحافظة</option>
+                    </select>
+                    <select name="dir" class="select select-bordered flex-1">
+                        <option value="desc" @selected(($dir??'desc')==='desc')>تنازلي</option>
+                        <option value="asc" @selected(($dir??'desc')==='asc')>تصاعدي</option>
+                    </select>
+                </div>
+                <div class="md:col-span-6 flex gap-2 justify-end">
+                    <a href="{{ route('admin.jobs.pending') }}" class="btn btn-ghost">إفراغ</a>
+                    <button class="px-6 py-2 rounded-lg bg-[#0D2660] hover:bg-[#0A1E46] text-white font-medium transition-colors">تطبيق</button>
+                </div>
+            </form>
+        </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
-            <table class="min-w-full text-sm">
-                <thead class="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                        <th class="px-4 py-3 text-start">#</th>
-                        <th class="px-4 py-3 text-start">العنوان</th>
-                        <th class="px-4 py-3 text-start">الشركة</th>
-                        <th class="px-4 py-3 text-start">المحافظة</th>
-                        <th class="px-4 py-3 text-start">الحالة</th>
-                        <th class="px-4 py-3 text-start">إجراءات</th>
-                    </tr>
-                </thead>
+        {{-- Jobs Table --}}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">قائمة الوظائف</h3>
+                <span class="bg-[#0D2660] text-white text-xs font-bold px-3 py-1 rounded-full">{{ $jobs->count() }} وظيفة</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-gray-50 dark:bg-gray-700/50">
+                        <tr>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">#</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">العنوان</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الشركة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المحافظة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الحالة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">إجراءات</th>
+                        </tr>
+                    </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                     @foreach ($jobs as $j)
                         <tr>
@@ -105,7 +133,8 @@
                         </tr>
                     @endforeach
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
     </div>
 </x-app-layout>

@@ -1,15 +1,21 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">فلترة المتقدمين</h2>
+        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+            <h2 class="text-xl font-bold">فلترة المتقدمين</h2>
+            <p class="text-[#E7C66A] text-sm mt-1">ابحث عن أفضل المرشحين باستخدام الفلاتر المتقدمة</p>
+        </div>
     </x-slot>
 
     <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
         <!-- Filter Form -->
-        <div class="card bg-base-100 shadow-lg">
-            <div class="card-header">
-                <h3 class="card-title text-lg font-semibold p-6 pb-0">فلترة المتقدمين</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">خيارات الفلترة</h3>
             </div>
-            <div class="card-body">
+            <div class="p-6">
                 <form method="GET" class="space-y-6">
                     <!-- Row 1: Job and Job Title -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -215,30 +221,31 @@
         @endif
 
         <!-- Results Table -->
-        <div class="card bg-base-100 shadow-lg">
-            <div class="card-header">
-                <h3 class="card-title text-lg font-semibold p-6 pb-0">
-                    نتائج البحث
-                    @if(count($applicants) > 0)
-                        <span class="badge badge-primary">{{ count($applicants) }} متقدم</span>
-                    @endif
-                </h3>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">نتائج البحث</h3>
+                @if(count($applicants) > 0)
+                    <span class="bg-[#0D2660] text-white text-xs font-bold px-3 py-1 rounded-full">{{ count($applicants) }} متقدم</span>
+                @endif
             </div>
-            <div class="card-body p-0">
+            <div class="p-0">
                 <!-- Desktop Table View -->
                 <div class="hidden lg:block overflow-x-auto">
-                    <table class="table table-zebra">
-                        <thead>
-                            <tr class="bg-base-200">
-                                <th class="text-right">#</th>
-                                <th class="text-right">الاسم الكامل</th>
-                                <th class="text-right">المسمى الوظيفي</th>
-                                <th class="text-right">المحافظة</th>
-                                <th class="text-right">التخصصات</th>
-                                <th class="text-right">المناطق</th>
-                                <th class="text-right">سيارة</th>
-                                <th class="text-right">نسبة المطابقة</th>
-                                <th class="text-right">العمليات</th>
+                    <table class="w-full">
+                        <thead class="bg-gray-50 dark:bg-gray-700/50">
+                            <tr>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">#</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الاسم الكامل</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المسمى الوظيفي</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المحافظة</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">التخصصات</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المناطق</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">سيارة</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">نسبة المطابقة</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">العمليات</th>
                             </tr>
                         </thead>
                         <tbody>
