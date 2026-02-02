@@ -52,7 +52,7 @@
                     @if($context==='company')
                         <a href="{{ route('company.seekers.show', $s) }}" class="btn btn-xs">عرض الملف</a>
                     @else
-                        <a href="{{ route('admin.jobseekers.show', $s) }}" class="btn btn-xs">عرض</a>
+                        <a href="{{ route('admin.seekers.show', $s) }}" class="btn btn-xs">عرض الملف</a>
                     @endif
                 </td>
             </tr>

@@ -168,6 +168,8 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
 
     // Admin browse all job seekers (shared)
     Route::get('/seekers', [\App\Http\Controllers\Shared\JobSeekerBrowseController::class, 'index'])->name('seekers.browse');
+    // Admin view individual job seeker profile
+    Route::get('/seekers/{jobSeeker}', \App\Http\Controllers\Company\SeekerShowController::class)->name('seekers.show');
 
     // Jobs approvals
     Route::get('/jobs/pending', [\App\Http\Controllers\Admin\JobAdminController::class, 'pending'])->name('jobs.pending');

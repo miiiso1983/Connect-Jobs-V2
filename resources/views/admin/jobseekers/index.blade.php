@@ -172,6 +172,7 @@
                             @php($ts = $lastSeenTs[$s->user_id] ?? null)
                             <td>{{ $ts ? \Carbon\Carbon::createFromTimestamp($ts)->toDateTimeString() : '—' }}</td>
                             <td class="whitespace-nowrap">
+                                <a href="{{ route('admin.seekers.show', $s) }}" class="btn btn-xs btn-primary">عرض الملف</a>
                                 <form method="POST" action="{{ route('admin.jobseekers.toggle', $s->user) }}" class="inline">
                                     @csrf
                                     @method('PUT')
