@@ -441,6 +441,40 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(child: Divider(color: Colors.grey[300])),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Text('أو'),
+                                ),
+                                Expanded(child: Divider(color: Colors.grey[300])),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextButton.icon(
+                                    onPressed: () => Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => JobsScreen(
+                                          token: '',
+                                          user: const {'role': 'guest'},
+                                        ),
+                                      ),
+                                    ),
+                                    icon: const Icon(Icons.visibility, color: Color(0xFF0D2660)),
+                                    label: const Text(
+                                      'تصفح الوظائف كضيف',
+                                      style: TextStyle(color: Color(0xFF0D2660)),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -898,11 +932,13 @@ class _JobsScreenState extends State<JobsScreen> {
     }
   }
 
+  bool get _isGuest => widget.user['role'] == 'guest';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('الوظائف المتاحة (${jobs.length})'),
+        title: Text(_isGuest ? 'تصفح الوظائف (ضيف)' : 'الوظائف المتاحة (${jobs.length})'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         actions: [
@@ -911,22 +947,23 @@ class _JobsScreenState extends State<JobsScreen> {
             icon: const Icon(Icons.search),
             onPressed: _showSearchDialog,
           ),
-          // 2) Profile (always visible, placed early to avoid truncation on small screens)
-          IconButton(
-            icon: const Icon(Icons.person),
-            tooltip: 'الملف الشخصي',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProfileScreen(
-                    token: widget.token,
-                    user: widget.user,
+          // 2) Profile (hidden for guests)
+          if (!_isGuest)
+            IconButton(
+              icon: const Icon(Icons.person),
+              tooltip: 'الملف الشخصي',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfileScreen(
+                      token: widget.token,
+                      user: widget.user,
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
+                );
+              },
+            ),
           // 3) Company dashboard
           if (widget.user['role'] == 'company')
             IconButton(
@@ -979,10 +1016,16 @@ class _JobsScreenState extends State<JobsScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: _refreshJobs,
           ),
-          // 6) Logout
+          // 6) Login (for guests) or Logout (for authenticated users)
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
+            icon: Icon(_isGuest ? Icons.login : Icons.logout),
+            tooltip: _isGuest ? 'تسجيل الدخول' : 'تسجيل الخروج',
+            onPressed: _isGuest
+                ? () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    )
+                : _logout,
           ),
         ],
       ),
@@ -1308,6 +1351,33 @@ class JobDetailsScreen extends StatefulWidget {
 
 class _JobDetailsScreenState extends State<JobDetailsScreen> {
   bool _isApplying = false;
+  bool get _isGuest => widget.user['role'] == 'guest';
+
+  void _showLoginPrompt() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تسجيل الدخول مطلوب'),
+        content: const Text('يجب عليك تسجيل الدخول أو إنشاء حساب للتقديم على الوظائف.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            },
+            child: const Text('تسجيل الدخول'),
+          ),
+        ],
+      ),
+    );
+  }
 
   Future<void> _applyForJob() async {
     if (widget.user['role'] != 'jobseeker') {
@@ -1622,18 +1692,22 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: (widget.job['status'] == 'open' && !_isApplying) ? _showApplicationDialog : null,
+                onPressed: widget.job['status'] == 'open' && !_isApplying
+                    ? (_isGuest ? _showLoginPrompt : _showApplicationDialog)
+                    : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: widget.job['status'] == 'open'
-                      ? Theme.of(context).colorScheme.secondary
+                      ? (_isGuest ? const Color(0xFF0D2660) : Theme.of(context).colorScheme.secondary)
                       : Colors.grey,
-                  foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                  foregroundColor: _isGuest ? Colors.white : Theme.of(context).colorScheme.onSecondary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: _isApplying
                     ? const CircularProgressIndicator(color: Colors.white)
                     : Text(
-                        widget.job['status'] == 'open' ? 'تقديم على الوظيفة' : 'الوظيفة مغلقة',
+                        widget.job['status'] != 'open'
+                            ? 'الوظيفة مغلقة'
+                            : (_isGuest ? 'سجّل الدخول للتقديم' : 'تقديم على الوظيفة'),
                         style: const TextStyle(fontSize: 16),
                       ),
               ),
@@ -2362,6 +2436,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildInfoRow('مستوى الخبرة', jobSeeker['experience_level'] ?? 'غير محدد'),
           ],
         ),
+        const SizedBox(height: 24),
+        // Account Management Section
+        _buildDeleteAccountButton(),
       ],
     );
   }
@@ -2420,7 +2497,176 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
+        const SizedBox(height: 24),
+        // Account Management Section
+        _buildDeleteAccountButton(),
       ],
+    );
+  }
+
+  Widget _buildDeleteAccountButton() {
+    return Card(
+      color: Colors.red[50],
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.warning, color: Colors.red[700]),
+                const SizedBox(width: 8),
+                Text(
+                  'إدارة الحساب',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red[700],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'حذف الحساب سيؤدي إلى إزالة جميع بياناتك بشكل نهائي ولا يمكن التراجع عن هذا الإجراء.',
+              style: TextStyle(color: Colors.red[600], fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _showDeleteAccountDialog,
+                icon: const Icon(Icons.delete_forever),
+                label: const Text('حذف الحساب نهائياً'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteAccountDialog() {
+    final passwordController = TextEditingController();
+    bool isDeleting = false;
+    String? errorMessage;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.warning, color: Colors.red[700]),
+              const SizedBox(width: 8),
+              const Text('تأكيد حذف الحساب'),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه!\n\nسيتم حذف:\n• جميع بياناتك الشخصية\n• جميع طلبات التوظيف\n• جميع المفضلات\n• السيرة الذاتية والصور',
+                    style: TextStyle(color: Colors.red[700], fontSize: 13),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text('أدخل كلمة المرور للتأكيد:'),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  enabled: !isDeleting,
+                  decoration: InputDecoration(
+                    labelText: 'كلمة المرور',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.lock),
+                    errorText: errorMessage,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isDeleting ? null : () => Navigator.pop(dialogContext),
+              child: const Text('إلغاء'),
+            ),
+            ElevatedButton(
+              onPressed: isDeleting
+                  ? null
+                  : () async {
+                      if (passwordController.text.isEmpty) {
+                        setDialogState(() => errorMessage = 'الرجاء إدخال كلمة المرور');
+                        return;
+                      }
+                      setDialogState(() {
+                        isDeleting = true;
+                        errorMessage = null;
+                      });
+
+                      final auth = AuthService();
+                      final result = await auth.deleteAccount(
+                        authToken: widget.token,
+                        password: passwordController.text,
+                      );
+                      auth.close();
+
+                      if (!context.mounted) return;
+
+                      if (result['success'] == true) {
+                        Navigator.pop(dialogContext);
+                        // Navigate to login screen
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                          (route) => false,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(result['message'] ?? 'تم حذف الحساب بنجاح'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      } else {
+                        setDialogState(() {
+                          isDeleting = false;
+                          errorMessage = result['message'] ?? 'فشل في حذف الحساب';
+                        });
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: isDeleting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Text('حذف الحساب'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

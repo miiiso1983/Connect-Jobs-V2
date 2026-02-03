@@ -137,7 +137,7 @@ class AuthController extends Controller
 
         try {
             $credentials = $request->only('email', 'password');
-            
+
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json([
                     'success' => false,
@@ -146,7 +146,7 @@ class AuthController extends Controller
             }
 
             $user = auth()->user();
-            
+
             // Check if user is active
             if ($user->status !== 'active') {
                 return response()->json([
@@ -181,7 +181,7 @@ class AuthController extends Controller
     {
         try {
             $user = auth()->user();
-            
+
             if (!$user) {
                 return response()->json([
                     'success' => false,
@@ -211,7 +211,7 @@ class AuthController extends Controller
     {
         try {
             JWTAuth::invalidate(JWTAuth::getToken());
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Successfully logged out'
@@ -232,7 +232,7 @@ class AuthController extends Controller
     {
         try {
             $token = JWTAuth::refresh(JWTAuth::getToken());
-            
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -388,6 +388,99 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to get FCM tokens',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete user account permanently
+     * Required by Apple App Store Guidelines 5.1.1(v)
+     */
+    public function deleteAccount(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'password' => 'required|string',
+                'confirmation' => 'required|string|in:DELETE,delete',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $user = auth()->user();
+
+            // Verify password
+            if (!Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'كلمة المرور غير صحيحة'
+                ], 401);
+            }
+
+            // Delete related data based on role
+            if ($user->role === 'company') {
+                $company = $user->company;
+                if ($company) {
+                    // Delete company's jobs and their applications
+                    foreach ($company->jobs as $job) {
+                        $job->applications()->delete();
+                        if ($job->jd_file) {
+                            \Storage::disk('public')->delete($job->jd_file);
+                        }
+                        $job->delete();
+                    }
+                    // Delete company profile image
+                    if ($company->profile_image) {
+                        \Storage::disk('public')->delete($company->profile_image);
+                    }
+                    $company->delete();
+                }
+            } elseif ($user->role === 'jobseeker') {
+                $jobSeeker = $user->jobSeeker;
+                if ($jobSeeker) {
+                    // Delete job seeker's applications
+                    $jobSeeker->applications()->delete();
+                    // Delete job seeker's favorites
+                    $jobSeeker->favorites()->delete();
+                    // Delete profile image and CV
+                    if ($jobSeeker->profile_image) {
+                        \Storage::disk('public')->delete($jobSeeker->profile_image);
+                    }
+                    if ($jobSeeker->cv_file) {
+                        \Storage::disk('public')->delete($jobSeeker->cv_file);
+                    }
+                    $jobSeeker->delete();
+                }
+            }
+
+            // Delete FCM tokens
+            $user->fcmTokens()->delete();
+
+            // Invalidate JWT token
+            try {
+                JWTAuth::invalidate(JWTAuth::getToken());
+            } catch (\Exception $e) {
+                // Continue even if token invalidation fails
+            }
+
+            // Delete user
+            $user->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف حسابك بنجاح. نأسف لرؤيتك تغادر.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في حذف الحساب',
                 'error' => $e->getMessage()
             ], 500);
         }

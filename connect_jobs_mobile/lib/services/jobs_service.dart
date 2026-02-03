@@ -8,7 +8,7 @@ class JobsService {
   JobsService({http.Client? client}) : _client = client ?? http.Client();
 
   Future<Map<String, dynamic>> listJobs({
-    required String token,
+    String? token,
     String? search,
     String? province,
     String? speciality,
@@ -28,10 +28,14 @@ class JobsService {
     // Try network first
     try {
       final uri = Uri.parse('${AppConfig.baseUrl}jobs').replace(queryParameters: query);
-      final resp = await _client.get(uri, headers: {
+      final headers = <String, String>{
         'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      });
+      };
+      // Add authorization header only if token is provided
+      if (token != null && token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+      final resp = await _client.get(uri, headers: headers);
       final body = _safeDecode(resp.body);
       final success = body['success'] == true || resp.statusCode == 200;
       final result = {

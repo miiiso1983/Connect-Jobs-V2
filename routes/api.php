@@ -23,7 +23,7 @@ use App\Http\Controllers\Api\NotificationTestController;
 
 // Public routes (no authentication required)
 Route::prefix('v1')->group(function () {
-    
+
     // Authentication routes
     Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register']);
@@ -41,7 +41,7 @@ Route::prefix('v1')->group(function () {
 
 // Protected routes (authentication required)
 Route::prefix('v1')->middleware(['auth:api'])->group(function () {
-    
+
     // Authentication routes
     Route::prefix('auth')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
@@ -51,6 +51,9 @@ Route::prefix('v1')->middleware(['auth:api'])->group(function () {
         Route::post('register-fcm-token', [AuthController::class, 'registerFcmToken']);
         Route::delete('unregister-fcm-token', [AuthController::class, 'unregisterFcmToken']);
         Route::get('fcm-tokens', [AuthController::class, 'getFcmTokens']);
+
+        // Account deletion (Apple App Store Guideline 5.1.1(v))
+        Route::delete('delete-account', [AuthController::class, 'deleteAccount']);
     });
 
     // Profile management

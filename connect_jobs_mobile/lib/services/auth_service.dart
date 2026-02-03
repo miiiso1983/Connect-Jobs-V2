@@ -228,6 +228,49 @@ class AuthService {
     }
   }
 
+  /// Delete user account permanently (Apple App Store Guideline 5.1.1(v))
+  Future<Map<String, dynamic>> deleteAccount({
+    required String authToken,
+    required String password,
+  }) async {
+    try {
+      final uri = Uri.parse('${AppConfig.baseUrl}auth/delete-account');
+      final resp = await _client.delete(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        },
+        body: jsonEncode({
+          'password': password,
+          'confirmation': 'DELETE',
+        }),
+      );
+
+      Map<String, dynamic> data;
+      try {
+        final decoded = jsonDecode(resp.body);
+        data = decoded is Map<String, dynamic> ? decoded : <String, dynamic>{};
+      } catch (_) {
+        data = <String, dynamic>{};
+      }
+
+      if (resp.statusCode == 200) {
+        return {'success': true, 'message': data['message'] ?? 'تم حذف الحساب بنجاح'};
+      }
+
+      return {
+        'success': false,
+        'message': data['message'] ?? 'فشل في حذف الحساب',
+        'statusCode': resp.statusCode,
+      };
+    } catch (e) {
+      debugPrint('Error deleting account: $e');
+      return {'success': false, 'message': 'خطأ في الاتصال: $e'};
+    }
+  }
+
   void close() {
     _client.close();
     _notificationService.close();
