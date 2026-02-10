@@ -266,222 +266,418 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [Color(0xFFF8FAFF), Color(0xFFEFF3FF)],
-          ),
+          gradient: AppTheme.backgroundGradient,
         ),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppTheme.spacingL),
               child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 600),
                 opacity: _animateIn ? 1.0 : 0.0,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Logo
-                    CircleAvatar(
-                      radius: 56,
-                      backgroundColor: scheme.primary,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Image.network(
-                          '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}images/brand/logo.png',
-                          width: 88,
-                          height: 88,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Title
-                    Text(
-                      'Connect Jobs',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: scheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'منصة التوظيف الطبي',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: scheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Form Card
-                    Card(
-                      elevation: 8,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            TextField(
-                              controller: _emailController,
-                              keyboardType: TextInputType.emailAddress,
-                              decoration: InputDecoration(
-                                labelText: 'البريد الإلكتروني',
-                                prefixIcon: const Icon(Icons.email_outlined),
-                                filled: true,
-                                fillColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.95),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: _passwordController,
-                              obscureText: _obscure,
-                              decoration: InputDecoration(
-                                labelText: 'كلمة المرور',
-                                prefixIcon: const Icon(Icons.lock_outline),
-                                suffixIcon: IconButton(
-                                  icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
-                                  onPressed: () => setState(() => _obscure = !_obscure),
-                                ),
-                                filled: true,
-                                fillColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.95),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-
-                            // Error Message
-                            if (_errorMessage.isNotEmpty)
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(12),
-                                margin: const EdgeInsets.only(bottom: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.red[50],
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.red[200]!),
-                                ),
-                                child: Text(
-                                  _errorMessage,
-                                  textAlign: TextAlign.right,
-                                  style: TextStyle(color: Colors.red[700]),
-                                ),
-                              ),
-
-                            // Login Button
-                            SizedBox(
-                              width: double.infinity,
-                              child: FilledButton.icon(
-                                onPressed: _isLoading ? null : _login,
-                                icon: _isLoading
-                                    ? const SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                      )
-                                    : const Icon(Icons.login),
-                                label: const Text('تسجيل الدخول'),
-                                style: FilledButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(child: Divider(color: Colors.grey[300])),
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                  child: Text('أو'),
-                                ),
-                                Expanded(child: Divider(color: Colors.grey[300])),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => const RegisterJobSeekerScreen()),
-                                    ),
-                                    icon: const Icon(Icons.person_add_alt_1),
-                                    label: const Text('إنشاء حساب كباحث عن عمل'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => const RegisterCompanyScreen()),
-                                    ),
-                                    icon: const Icon(Icons.apartment),
-                                    label: const Text('إنشاء حساب كشركة'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(child: Divider(color: Colors.grey[300])),
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                  child: Text('أو'),
-                                ),
-                                Expanded(child: Divider(color: Colors.grey[300])),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextButton.icon(
-                                    onPressed: () => Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => JobsScreen(
-                                          token: '',
-                                          user: const {'role': 'guest'},
-                                        ),
-                                      ),
-                                    ),
-                                    icon: const Icon(Icons.visibility, color: Color(0xFF0D2660)),
-                                    label: const Text(
-                                      'تصفح الوظائف كضيف',
-                                      style: TextStyle(color: Color(0xFF0D2660)),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                child: AnimatedSlide(
+                  duration: const Duration(milliseconds: 600),
+                  offset: _animateIn ? Offset.zero : const Offset(0, 0.1),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Logo with gradient background
+                      Container(
+                        width: 110,
+                        height: 110,
+                        decoration: BoxDecoration(
+                          gradient: AppTheme.primaryGradient,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.primaryNavy.withValues(alpha: 0.3),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
                             ),
                           ],
                         ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Image.network(
+                            '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}images/brand/logo.png',
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => const Icon(
+                              Icons.work_rounded,
+                              size: 50,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: AppTheme.spacingL),
+
+                      // App Title
+                      const Text(
+                        'Connect Jobs',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryNavy,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: AppTheme.spacingXS),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppTheme.secondaryGold.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+                        ),
+                        child: const Text(
+                          'منصة التوظيف الطبي',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppTheme.primaryNavy,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: AppTheme.spacingXL),
+
+                      // Login Form Card
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceWhite,
+                          borderRadius: BorderRadius.circular(AppTheme.radiusXLarge),
+                          boxShadow: AppTheme.mediumShadow,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppTheme.spacingL),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Welcome text
+                              const Text(
+                                'مرحباً بعودتك! 👋',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                'سجّل دخولك للوصول إلى حسابك',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                              const SizedBox(height: AppTheme.spacingL),
+
+                              // Email Field
+                              _buildInputField(
+                                controller: _emailController,
+                                label: 'البريد الإلكتروني',
+                                hint: 'example@email.com',
+                                icon: Icons.email_outlined,
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+                              const SizedBox(height: AppTheme.spacingM),
+
+                              // Password Field
+                              _buildInputField(
+                                controller: _passwordController,
+                                label: 'كلمة المرور',
+                                hint: '••••••••',
+                                icon: Icons.lock_outline,
+                                isPassword: true,
+                                obscureText: _obscure,
+                                onToggleObscure: () => setState(() => _obscure = !_obscure),
+                              ),
+                              const SizedBox(height: AppTheme.spacingL),
+
+                              // Error Message
+                              if (_errorMessage.isNotEmpty)
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(12),
+                                  margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.accentRed.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                                    border: Border.all(color: AppTheme.accentRed.withValues(alpha: 0.3)),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.error_outline, color: AppTheme.accentRed, size: 20),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          _errorMessage,
+                                          style: const TextStyle(color: AppTheme.accentRed, fontSize: 13),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              // Login Button with gradient
+                              SizedBox(
+                                width: double.infinity,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: _isLoading ? null : AppTheme.primaryGradient,
+                                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                                    boxShadow: _isLoading ? null : [
+                                      BoxShadow(
+                                        color: AppTheme.primaryNavy.withValues(alpha: 0.3),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: _isLoading ? null : _login,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      shadowColor: Colors.transparent,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                                      ),
+                                    ),
+                                    child: _isLoading
+                                        ? const SizedBox(
+                                            width: 22,
+                                            height: 22,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.5,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : const Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.login_rounded, color: Colors.white),
+                                              SizedBox(width: 8),
+                                              Text(
+                                                'تسجيل الدخول',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: AppTheme.spacingL),
+
+                      // Divider with text
+                      Row(
+                        children: [
+                          Expanded(child: Container(height: 1, color: AppTheme.borderLight)),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: const Text(
+                              'أو',
+                              style: TextStyle(color: AppTheme.textMuted, fontSize: 14),
+                            ),
+                          ),
+                          Expanded(child: Container(height: 1, color: AppTheme.borderLight)),
+                        ],
+                      ),
+
+                      const SizedBox(height: AppTheme.spacingL),
+
+                      // Register Options
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildSecondaryButton(
+                              icon: Icons.person_add_alt_1_rounded,
+                              label: 'باحث عن عمل',
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const RegisterJobSeekerScreen()),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: AppTheme.spacingM),
+                          Expanded(
+                            child: _buildSecondaryButton(
+                              icon: Icons.business_rounded,
+                              label: 'شركة',
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const RegisterCompanyScreen()),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: AppTheme.spacingM),
+
+                      // Guest Browse Button
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppTheme.secondaryGold, width: 1.5),
+                          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                        ),
+                        child: TextButton.icon(
+                          onPressed: () => Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => JobsScreen(
+                                token: '',
+                                user: const {'role': 'guest'},
+                              ),
+                            ),
+                          ),
+                          icon: const Icon(Icons.visibility_rounded, color: AppTheme.secondaryGoldDark),
+                          label: const Text(
+                            'تصفح الوظائف كضيف',
+                            style: TextStyle(
+                              color: AppTheme.secondaryGoldDark,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    TextInputType? keyboardType,
+    bool isPassword = false,
+    bool obscureText = false,
+    VoidCallback? onToggleObscure,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          keyboardType: keyboardType,
+          obscureText: isPassword && obscureText,
+          style: const TextStyle(fontSize: 15),
+          decoration: InputDecoration(
+            hintText: hint,
+            prefixIcon: Container(
+              margin: const EdgeInsets.only(left: 12, right: 8),
+              child: Icon(icon, color: AppTheme.primaryNavy, size: 22),
+            ),
+            prefixIconConstraints: const BoxConstraints(minWidth: 48),
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(
+                      obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      color: AppTheme.textMuted,
+                    ),
+                    onPressed: onToggleObscure,
+                  )
+                : null,
+            filled: true,
+            fillColor: AppTheme.surfaceLight,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              borderSide: const BorderSide(color: AppTheme.borderLight),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              borderSide: const BorderSide(color: AppTheme.primaryNavy, width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSecondaryButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        border: Border.all(color: AppTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryNavy.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+            child: Column(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryNavy.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: AppTheme.primaryNavy, size: 24),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -766,142 +962,239 @@ class _JobsScreenState extends State<JobsScreen> {
   }
 
   void _showSearchDialog() {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('البحث والفلترة'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Search field
-              TextField(
-                controller: _searchController,
-                decoration: const InputDecoration(
-                  labelText: 'البحث في الوظائف',
-                  hintText: 'ادخل كلمة البحث...',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          decoration: const BoxDecoration(
+            color: AppTheme.surfaceWhite,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXLarge)),
+          ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppTheme.spacingL),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Handle bar
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppTheme.borderLight,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.spacingM),
 
-              // Province filter
-              DropdownButtonFormField<String>(
-                value: _selectedProvince,
-                decoration: const InputDecoration(
-                  labelText: 'المحافظة',
-                  border: OutlineInputBorder(),
+                // Title
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryNavy.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.search_rounded, color: AppTheme.primaryNavy),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'البحث والفلترة',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                  ],
                 ),
-                items: [
-                  const DropdownMenuItem<String>(
-                    value: null,
-                    child: Text('جميع المحافظات'),
-                  ),
-                  ..._provinces.map((province) => DropdownMenuItem<String>(
-                    value: province,
-                    child: Text(province),
-                  )),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedProvince = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.spacingL),
 
-              // Speciality filter
-              DropdownButtonFormField<String>(
-                value: _selectedSpeciality,
-                decoration: const InputDecoration(
-                  labelText: 'التخصص',
-                  border: OutlineInputBorder(),
-                ),
-                items: [
-                  const DropdownMenuItem<String>(
-                    value: null,
-                    child: Text('جميع التخصصات'),
+                // Search field
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'ابحث عن وظيفة...',
+                    prefixIcon: const Icon(Icons.search_rounded, color: AppTheme.primaryNavy),
+                    filled: true,
+                    fillColor: AppTheme.surfaceLight,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                      borderSide: const BorderSide(color: AppTheme.borderLight),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                      borderSide: const BorderSide(color: AppTheme.primaryNavy, width: 2),
+                    ),
                   ),
-                  ..._specialities.map((speciality) => DropdownMenuItem<String>(
-                    value: speciality,
-                    child: Text(_getSpecialityName(speciality)),
-                  )),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _selectedSpeciality = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
+                ),
+                const SizedBox(height: AppTheme.spacingM),
 
-              // Sort options
-              DropdownButtonFormField<String>(
-                value: '$_sortBy-$_sortOrder',
-                decoration: const InputDecoration(
-                  labelText: 'ترتيب النتائج',
-                  border: OutlineInputBorder(),
+                // Province filter
+                _buildFilterDropdown<String>(
+                  label: 'المحافظة',
+                  icon: Icons.location_on_rounded,
+                  value: _selectedProvince,
+                  items: [
+                    const DropdownMenuItem<String>(value: null, child: Text('جميع المحافظات')),
+                    ..._provinces.map((p) => DropdownMenuItem<String>(value: p, child: Text(p))),
+                  ],
+                  onChanged: (v) => setModalState(() => _selectedProvince = v),
                 ),
-                items: const [
-                  DropdownMenuItem<String>(
-                    value: 'id-desc',
-                    child: Text('الأحدث أولاً'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'id-asc',
-                    child: Text('الأقدم أولاً'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'title-asc',
-                    child: Text('العنوان (أ-ي)'),
-                  ),
-                  DropdownMenuItem<String>(
-                    value: 'title-desc',
-                    child: Text('العنوان (ي-أ)'),
-                  ),
-                ],
-                onChanged: (value) {
-                  if (value != null) {
-                    final parts = value.split('-');
-                    setState(() {
-                      _sortBy = parts[0];
-                      _sortOrder = parts[1];
-                    });
-                  }
-                },
-              ),
-            ],
+                const SizedBox(height: AppTheme.spacingM),
+
+                // Speciality filter
+                _buildFilterDropdown<String>(
+                  label: 'التخصص',
+                  icon: Icons.medical_services_rounded,
+                  value: _selectedSpeciality,
+                  items: [
+                    const DropdownMenuItem<String>(value: null, child: Text('جميع التخصصات')),
+                    ..._specialities.map((s) => DropdownMenuItem<String>(value: s, child: Text(_getSpecialityName(s)))),
+                  ],
+                  onChanged: (v) => setModalState(() => _selectedSpeciality = v),
+                ),
+                const SizedBox(height: AppTheme.spacingM),
+
+                // Sort options
+                _buildFilterDropdown<String>(
+                  label: 'ترتيب النتائج',
+                  icon: Icons.sort_rounded,
+                  value: '$_sortBy-$_sortOrder',
+                  items: const [
+                    DropdownMenuItem<String>(value: 'id-desc', child: Text('الأحدث أولاً')),
+                    DropdownMenuItem<String>(value: 'id-asc', child: Text('الأقدم أولاً')),
+                    DropdownMenuItem<String>(value: 'title-asc', child: Text('العنوان (أ-ي)')),
+                    DropdownMenuItem<String>(value: 'title-desc', child: Text('العنوان (ي-أ)')),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) {
+                      final parts = v.split('-');
+                      setModalState(() {
+                        _sortBy = parts[0];
+                        _sortOrder = parts[1];
+                      });
+                    }
+                  },
+                ),
+                const SizedBox(height: AppTheme.spacingL),
+
+                // Action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          setModalState(() {
+                            _searchController.clear();
+                            _selectedProvince = null;
+                            _selectedSpeciality = null;
+                            _sortBy = 'id';
+                            _sortOrder = 'desc';
+                          });
+                        },
+                        icon: const Icon(Icons.clear_all_rounded),
+                        label: const Text('مسح الكل'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.textSecondary,
+                          side: const BorderSide(color: AppTheme.borderLight),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppTheme.spacingM),
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: AppTheme.primaryGradient,
+                          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.primaryNavy.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            setState(() {});
+                            _loadJobs();
+                          },
+                          icon: const Icon(Icons.search_rounded, color: Colors.white),
+                          label: const Text('بحث', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppTheme.spacingM),
+              ],
+            ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _searchController.clear();
-                _selectedProvince = null;
-                _selectedSpeciality = null;
-                _sortBy = 'id';
-                _sortOrder = 'desc';
-              });
-              Navigator.pop(context);
-              _loadJobs();
-            },
-            child: const Text('مسح الفلاتر'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _loadJobs();
-            },
-            child: const Text('بحث'),
-          ),
-        ],
       ),
+    );
+  }
+
+  Widget _buildFilterDropdown<T>({
+    required String label,
+    required IconData icon,
+    required T? value,
+    required List<DropdownMenuItem<T>> items,
+    required ValueChanged<T?> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 16, color: AppTheme.textMuted),
+            const SizedBox(width: 6),
+            Text(label, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary, fontWeight: FontWeight.w500)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceLight,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            border: Border.all(color: AppTheme.borderLight),
+          ),
+          child: DropdownButtonFormField<T>(
+            value: value,
+            items: items,
+            onChanged: onChanged,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+            dropdownColor: AppTheme.surfaceWhite,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          ),
+        ),
+      ],
     );
   }
 
@@ -937,325 +1230,604 @@ class _JobsScreenState extends State<JobsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isGuest ? 'تصفح الوظائف (ضيف)' : 'الوظائف المتاحة (${jobs.length})'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        actions: [
-          // 1) Search
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: _showSearchDialog,
-          ),
-          // 2) Profile (hidden for guests)
-          if (!_isGuest)
-            IconButton(
-              icon: const Icon(Icons.person),
-              tooltip: 'الملف الشخصي',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfileScreen(
-                      token: widget.token,
-                      user: widget.user,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: AppTheme.backgroundGradient,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom AppBar with gradient
+              Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryNavy.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
-                  ),
-                );
-              },
-            ),
-          // 3) Company dashboard
-          if (widget.user['role'] == 'company')
-            IconButton(
-              icon: const Icon(Icons.dashboard),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CompanyDashboardScreen(
-                      token: widget.token,
-                      user: widget.user,
-                    ),
-                  ),
-                );
-              },
-            ),
-          // 4) Jobseeker quick actions
-          if (widget.user['role'] == 'jobseeker') ...[
-            IconButton(
-              icon: const Icon(Icons.favorite),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FavoritesScreen(
-                      token: widget.token,
-                      user: widget.user,
-                    ),
-                  ),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.assignment),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MyApplicationsScreen(
-                      token: widget.token,
-                      user: widget.user,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-          // 5) Refresh
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refreshJobs,
-          ),
-          // 6) Login (for guests) or Logout (for authenticated users)
-          IconButton(
-            icon: Icon(_isGuest ? Icons.login : Icons.logout),
-            tooltip: _isGuest ? 'تسجيل الدخول' : 'تسجيل الخروج',
-            onPressed: _isGuest
-                ? () => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    )
-                : _logout,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Active filters indicator
-          if (_hasActiveFilters())
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
-              child: Row(
-                children: [
-                  Icon(Icons.filter_list, size: 16, color: Theme.of(context).colorScheme.primary),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _getActiveFiltersText(),
-                      style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 12),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _searchController.clear();
-                        _selectedProvince = null;
-
-                        _selectedSpeciality = null;
-                        _sortBy = 'id';
-                        _sortOrder = 'desc';
-                      });
-                      _loadJobs();
-                    },
-                    child: const Text('مسح', style: TextStyle(fontSize: 12)),
-                  ),
-                ],
-              ),
-            ),
-
-          // Main content
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : errorMessage.isNotEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  child: Row(
+                    children: [
+                      // Title with icon
+                      Expanded(
+                        child: Row(
                           children: [
-                            Text(
-                              errorMessage,
-                              style: const TextStyle(color: Colors.red),
-                              textAlign: TextAlign.center,
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.work_rounded, color: Colors.white, size: 22),
                             ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: _loadJobs,
-                              child: const Text('إعادة المحاولة'),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _isGuest ? 'تصفح الوظائف' : 'الوظائف المتاحة',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (!isLoading)
+                                    Text(
+                                      _isGuest ? 'وضع الضيف' : '${jobs.length} وظيفة',
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.8),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                      )
-                    : jobs.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text('لا توجد نتائج مطابقة'),
-                                const SizedBox(height: 8),
-                                const Text('جرّب تعديل الفلاتر أو استخدام كلمة بحث أكثر عمومية', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                                const SizedBox(height: 8),
-                                if (_searchController.text.isNotEmpty || _selectedProvince != null || _selectedSpeciality != null)
-                                  OutlinedButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _searchController.clear();
-                                        _selectedProvince = null;
-                                        _selectedSpeciality = null;
-                                        _sortBy = 'id';
-                                        _sortOrder = 'desc';
-                                      });
-                                      _loadJobs();
-                                    },
-                                    child: const Text('مسح الفلاتر'),
-                                  ),
-                              ],
-                            ),
-                          )
-                        : RefreshIndicator(
-                          onRefresh: _loadJobs,
-                          child: ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: jobs.length + ((_currentPage < _lastPage) ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index >= jobs.length) {
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: OutlinedButton(
-                                onPressed: _isLoadingMore ? null : _loadMoreJobs,
-                                child: _isLoadingMore
-                                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                                    : const Text('\u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0645\u0632\u064a\u062f'),
+                      ),
+                      // Action buttons
+                      _buildAppBarButton(Icons.search_rounded, 'بحث', _showSearchDialog),
+                      if (!_isGuest)
+                        _buildAppBarButton(Icons.person_rounded, 'الملف', () {
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (_) => ProfileScreen(token: widget.token, user: widget.user),
+                          ));
+                        }),
+                      if (widget.user['role'] == 'company')
+                        _buildAppBarButton(Icons.dashboard_rounded, 'لوحة', () {
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (_) => CompanyDashboardScreen(token: widget.token, user: widget.user),
+                          ));
+                        }),
+                      if (widget.user['role'] == 'jobseeker') ...[
+                        _buildAppBarButton(Icons.favorite_rounded, 'المفضلة', () {
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (_) => FavoritesScreen(token: widget.token, user: widget.user),
+                          ));
+                        }),
+                        _buildAppBarButton(Icons.assignment_rounded, 'طلباتي', () {
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (_) => MyApplicationsScreen(token: widget.token, user: widget.user),
+                          ));
+                        }),
+                      ],
+                      _buildAppBarButton(
+                        _isGuest ? Icons.login_rounded : Icons.logout_rounded,
+                        _isGuest ? 'دخول' : 'خروج',
+                        _isGuest
+                          ? () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()))
+                          : _logout,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Active filters indicator
+              if (_hasActiveFilters())
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppTheme.secondaryGold.withValues(alpha: 0.1),
+                    border: Border(
+                      bottom: BorderSide(color: AppTheme.secondaryGold.withValues(alpha: 0.3)),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppTheme.secondaryGold.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.filter_list_rounded, size: 16, color: AppTheme.secondaryGoldDark),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          _getActiveFiltersText(),
+                          style: const TextStyle(color: AppTheme.secondaryGoldDark, fontSize: 12, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _searchController.clear();
+                            _selectedProvince = null;
+                            _selectedSpeciality = null;
+                            _sortBy = 'id';
+                            _sortOrder = 'desc';
+                          });
+                          _loadJobs();
+                        },
+                        icon: const Icon(Icons.close_rounded, size: 16),
+                        label: const Text('مسح'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppTheme.secondaryGoldDark,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              // Main content
+              Expanded(
+                child: isLoading
+                    ? _buildLoadingState()
+                    : errorMessage.isNotEmpty
+                        ? _buildErrorState()
+                        : jobs.isEmpty
+                            ? _buildEmptyState()
+                            : RefreshIndicator(
+                                onRefresh: _loadJobs,
+                                color: AppTheme.primaryNavy,
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                                  itemCount: jobs.length + ((_currentPage < _lastPage) ? 1 : 0),
+                                  itemBuilder: (context, index) {
+                                    if (index >= jobs.length) {
+                                      return _buildLoadMoreButton();
+                                    }
+                                    return _buildJobCard(jobs[index]);
+                                  },
+                                ),
                               ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppBarButton(IconData icon, String tooltip, VoidCallback onPressed) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: Colors.white, size: 20),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryNavy.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: AppTheme.primaryNavy,
+                strokeWidth: 3,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacingM),
+          const Text(
+            'جاري تحميل الوظائف...',
+            style: TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingXL),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppTheme.accentRed.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.error_outline_rounded, size: 40, color: AppTheme.accentRed),
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+            Text(
+              errorMessage,
+              style: const TextStyle(color: AppTheme.accentRed, fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppTheme.spacingL),
+            ElevatedButton.icon(
+              onPressed: _loadJobs,
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('إعادة المحاولة'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryNavy,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingXL),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: AppTheme.secondaryGold.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.search_off_rounded, size: 50, color: AppTheme.secondaryGold),
+            ),
+            const SizedBox(height: AppTheme.spacingL),
+            const Text(
+              'لا توجد نتائج مطابقة',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingS),
+            const Text(
+              'جرّب تعديل الفلاتر أو استخدام كلمة بحث أكثر عمومية',
+              style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            if (_hasActiveFilters()) ...[
+              const SizedBox(height: AppTheme.spacingL),
+              OutlinedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _searchController.clear();
+                    _selectedProvince = null;
+                    _selectedSpeciality = null;
+                    _sortBy = 'id';
+                    _sortOrder = 'desc';
+                  });
+                  _loadJobs();
+                },
+                icon: const Icon(Icons.filter_list_off_rounded),
+                label: const Text('مسح الفلاتر'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.primaryNavy,
+                  side: const BorderSide(color: AppTheme.primaryNavy),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadMoreButton() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: AppTheme.primaryNavy.withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _isLoadingMore ? null : _loadMoreJobs,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Center(
+                child: _isLoadingMore
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryNavy),
+                      )
+                    : const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.expand_more_rounded, color: AppTheme.primaryNavy),
+                          SizedBox(width: 8),
+                          Text(
+                            'تحميل المزيد',
+                            style: TextStyle(
+                              color: AppTheme.primaryNavy,
+                              fontWeight: FontWeight.w600,
                             ),
-                          );
-                        }
+                          ),
+                        ],
+                      ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-                        final job = jobs[index];
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          elevation: 2,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildJobCard(Map<String, dynamic> job) {
+    final jobId = (job['id'] is num) ? (job['id'] as num).toInt() : (int.tryParse('${job['id']}') ?? -1);
+    final isFavorite = _favoriteIds.contains(jobId);
+    final isOpen = job['status'] == 'open';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        boxShadow: AppTheme.lightShadow,
+        border: Border.all(color: AppTheme.borderLight),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => JobDetailsScreen(job: job, token: widget.token, user: widget.user),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingM),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header row: Title + Favorite
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Company logo placeholder
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryNavy.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.business_rounded, color: AppTheme.primaryNavy, size: 26),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            job['title'] ?? '',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textPrimary,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            job['company']?['company_name'] ?? 'شركة غير محددة',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppTheme.primaryNavy,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (widget.user['role'] == 'jobseeker')
+                      GestureDetector(
+                        onTap: () => _toggleFavorite(jobId),
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: isFavorite
+                                ? AppTheme.accentRed.withValues(alpha: 0.1)
+                                : AppTheme.surfaceLight,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                            color: AppTheme.accentRed,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: AppTheme.spacingM),
+
+                // Location and Speciality row
+                Row(
+                  children: [
+                    _buildInfoChip(Icons.location_on_rounded, job['province'] ?? ''),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildInfoChip(Icons.medical_services_rounded, _getSpecialityName(job['speciality'] ?? '')),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppTheme.spacingM),
+
+                // Description
+                Text(
+                  job['description'] ?? '',
+                  style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary, height: 1.4),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: AppTheme.spacingM),
+
+                // Footer: Status + View button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isOpen
+                            ? AppTheme.accentGreen.withValues(alpha: 0.1)
+                            : AppTheme.accentRed.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isOpen ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                            size: 14,
+                            color: isOpen ? AppTheme.accentGreen : AppTheme.accentRed,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            isOpen ? 'متاحة' : 'مغلقة',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: isOpen ? AppTheme.accentGreen : AppTheme.accentRed,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.primaryGradient,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primaryNavy.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => JobDetailsScreen(job: job, token: widget.token, user: widget.user),
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            child: Row(
                               children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-
-                                        job['title'] ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    if (widget.user['role'] == 'jobseeker')
-                                      IconButton(
-                                        icon: Icon(
-                                          _favoriteIds.contains((job['id'] is num) ? (job['id'] as num).toInt() : (int.tryParse('${job['id']}') ?? -1))
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          color: Colors.red[400],
-                                          size: 20,
-                                        ),
-                                        onPressed: () => _toggleFavorite((job['id'] is num) ? (job['id'] as num).toInt() : (int.tryParse('${job['id']}') ?? -1)),
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
                                 Text(
-                                  job['company']?['company_name'] ?? 'شركة غير محددة',
+                                  'التفاصيل',
                                   style: TextStyle(
-                                    fontSize: 14,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      job['province'] ?? '',
-                                      style: TextStyle(color: Colors.grey[600]),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Icon(Icons.work, size: 16, color: Colors.grey[600]),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        job['speciality'] ?? '',
-                                        style: TextStyle(color: Colors.grey[600]),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  job['description'] ?? '',
-                                  style: const TextStyle(fontSize: 14),
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-
-                                        color: job['status'] == 'open' ? Colors.green[50] : Colors.red[50],
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        job['status'] == 'open' ? 'متاحة' : 'مغلقة',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: job['status'] == 'open' ? Colors.green[700] : Colors.red[700],
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => JobDetailsScreen(
-                                              job: job,
-                                              token: widget.token,
-                                              user: widget.user,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Theme.of(context).colorScheme.primary,
-                                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                                      ),
-                                      child: const Text('عرض التفاصيل'),
-                                    ),
-                                  ],
-                                ),
+                                SizedBox(width: 4),
+                                Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16),
                               ],
                             ),
                           ),
-                        );
-                      },
-                    )),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceLight,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: AppTheme.textMuted),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),
@@ -1354,27 +1926,89 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
   bool get _isGuest => widget.user['role'] == 'guest';
 
   void _showLoginPrompt() {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('تسجيل الدخول مطلوب'),
-        content: const Text('يجب عليك تسجيل الدخول أو إنشاء حساب للتقديم على الوظائف.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-              );
-            },
-            child: const Text('تسجيل الدخول'),
-          ),
-        ],
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: AppTheme.surfaceWhite,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXLarge)),
+        ),
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppTheme.borderLight,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingL),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.secondaryGold.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.login_rounded, size: 40, color: AppTheme.secondaryGold),
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+            const Text(
+              'تسجيل الدخول مطلوب',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+            ),
+            const SizedBox(height: AppTheme.spacingS),
+            const Text(
+              'يجب عليك تسجيل الدخول أو إنشاء حساب للتقديم على الوظائف',
+              style: TextStyle(color: AppTheme.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppTheme.spacingL),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: const BorderSide(color: AppTheme.borderLight),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                    ),
+                    child: const Text('إلغاء'),
+                  ),
+                ),
+                const SizedBox(width: AppTheme.spacingM),
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.primaryGradient,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                    ),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+                      },
+                      icon: const Icon(Icons.login_rounded, color: Colors.white),
+                      label: const Text('تسجيل الدخول', style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+          ],
+        ),
       ),
     );
   }
@@ -1427,39 +2061,111 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
   }
 
   void _showApplicationDialog() {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('تأكيد التقديم'),
-        content: Column(
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: AppTheme.surfaceWhite,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXLarge)),
+        ),
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('هل أنت متأكد من التقديم على وظيفة "${widget.job['title']}"؟'),
-            const SizedBox(height: 16),
-            const Text(
-              'ملاحظة: سيتم استخدام ملفك الشخصي الحالي للتقديم.',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppTheme.borderLight,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
+            const SizedBox(height: AppTheme.spacingL),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.accentGreen.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.send_rounded, size: 40, color: AppTheme.accentGreen),
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+            const Text(
+              'تأكيد التقديم',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+            ),
+            const SizedBox(height: AppTheme.spacingS),
+            Text(
+              'هل أنت متأكد من التقديم على وظيفة "${widget.job['title']}"؟',
+              style: const TextStyle(color: AppTheme.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppTheme.spacingS),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceLight,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline_rounded, size: 18, color: AppTheme.textMuted),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'سيتم استخدام ملفك الشخصي الحالي للتقديم',
+                      style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingL),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: const BorderSide(color: AppTheme.borderLight),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                    ),
+                    child: const Text('إلغاء'),
+                  ),
+                ),
+                const SizedBox(width: AppTheme.spacingM),
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppTheme.accentGreen, Color(0xFF1B8B6A)],
+                      ),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                    ),
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _applyForJob();
+                      },
+                      icon: const Icon(Icons.check_rounded, color: Colors.white),
+                      label: const Text('تأكيد التقديم', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.spacingM),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _applyForJob();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('تأكيد التقديم'),
-          ),
-        ],
       ),
     );
   }
@@ -1467,253 +2173,382 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isOpen = widget.job['status'] == 'open';
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.job['title'] ?? ''),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Job Title
-            Text(
-              widget.job['title'] ?? '',
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Quick tags
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if ((widget.job['province'] ?? '').toString().isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      '\u0627\u0644\u0645\u062d\u0627\u0641\u0638\u0629: ${widget.job['province']}',
-                      style: TextStyle(color: Theme.of(context).colorScheme.primary),
-                    ),
-                  ),
-                if ((widget.job['speciality'] ?? '').toString().isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      '\u0627\u0644\u062a\u062e\u0635\u0635: ${widget.job['speciality']}',
-                      style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                    ),
-                  ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: (widget.job['status'] == 'open' ? Colors.green[50] : Colors.red[50]),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    widget.job['status'] == 'open' ? '\u0645\u062a\u0627\u062d\u0629' : '\u0645\u063a\u0644\u0642\u0629',
-                    style: TextStyle(
-                      color: widget.job['status'] == 'open' ? Colors.green[700] : Colors.red[700],
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-
-            // Company Info
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'معلومات الشركة',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'اسم الشركة: ${widget.job['company']?['company_name'] ?? 'غير محدد'}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'المحافظة: ${widget.job['company']?['province'] ?? 'غير محدد'}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'القطاع: ${widget.job['company']?['industry'] ?? 'غير محدد'}',
-                      style: const TextStyle(fontSize: 16),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: AppTheme.backgroundGradient,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header with gradient
+              Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryNavy.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Job Details
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'تفاصيل الوظيفة',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.work, color: Colors.grey[600]),
-                        const SizedBox(width: 8),
-                        Text(
-                          'التخصص: ${widget.job['speciality'] ?? 'غير محدد'}',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.location_on, color: Colors.grey[600]),
-                        const SizedBox(width: 8),
-                        Text(
-                          'المحافظة: ${widget.job['province'] ?? 'غير محدد'}',
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.info, color: Colors.grey[600]),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 40,
+                          height: 40,
                           decoration: BoxDecoration(
-                            color: widget.job['status'] == 'open' ? Colors.green[50] : Colors.red[50],
-                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Text(
-                            widget.job['status'] == 'open' ? 'متاحة' : 'مغلقة',
-                            style: TextStyle(
-                              color: widget.job['status'] == 'open' ? Colors.green[700] : Colors.red[700],
-                              fontWeight: FontWeight.bold,
+                          child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'تفاصيل الوظيفة',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isOpen
+                              ? AppTheme.accentGreen.withValues(alpha: 0.2)
+                              : AppTheme.accentRed.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isOpen ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                              size: 14,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isOpen ? 'متاحة' : 'مغلقة',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Job Title Card
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(AppTheme.spacingL),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceWhite,
+                          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                          boxShadow: AppTheme.lightShadow,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    gradient: AppTheme.primaryGradient,
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: const Icon(Icons.business_rounded, color: Colors.white, size: 30),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        widget.job['title'] ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppTheme.textPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        widget.job['company']?['company_name'] ?? 'شركة غير محددة',
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          color: AppTheme.primaryNavy,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: AppTheme.spacingM),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                _buildTag(Icons.location_on_rounded, widget.job['province'] ?? '', AppTheme.primaryNavy),
+                                _buildTag(Icons.medical_services_rounded, widget.job['speciality'] ?? '', AppTheme.secondaryGold),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppTheme.spacingM),
+
+                      // Company Info
+                      _buildInfoCard(
+                        title: 'معلومات الشركة',
+                        icon: Icons.business_rounded,
+                        children: [
+                          _buildInfoRow(Icons.apartment_rounded, 'اسم الشركة', widget.job['company']?['company_name'] ?? 'غير محدد'),
+                          _buildInfoRow(Icons.location_city_rounded, 'المحافظة', widget.job['company']?['province'] ?? 'غير محدد'),
+                          _buildInfoRow(Icons.category_rounded, 'القطاع', widget.job['company']?['industry'] ?? 'غير محدد'),
+                        ],
+                      ),
+                      const SizedBox(height: AppTheme.spacingM),
+
+                      // Job Details
+                      _buildInfoCard(
+                        title: 'تفاصيل الوظيفة',
+                        icon: Icons.work_rounded,
+                        children: [
+                          _buildInfoRow(Icons.medical_services_rounded, 'التخصص', widget.job['speciality'] ?? 'غير محدد'),
+                          _buildInfoRow(Icons.location_on_rounded, 'المحافظة', widget.job['province'] ?? 'غير محدد'),
+                        ],
+                      ),
+                      const SizedBox(height: AppTheme.spacingM),
+
+                      // Description
+                      _buildInfoCard(
+                        title: 'وصف الوظيفة',
+                        icon: Icons.description_rounded,
+                        children: [
+                          Text(
+                            widget.job['description'] ?? 'لا يوجد وصف متاح',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.textSecondary,
+                              height: 1.6,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      const SizedBox(height: AppTheme.spacingM),
+
+                      // Requirements
+                      _buildInfoCard(
+                        title: 'متطلبات الوظيفة',
+                        icon: Icons.checklist_rounded,
+                        children: [
+                          Text(
+                            widget.job['requirements'] ?? 'لا توجد متطلبات محددة',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.textSecondary,
+                              height: 1.6,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppTheme.spacingXL),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Apply Button
+              Container(
+                padding: const EdgeInsets.all(AppTheme.spacingM),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceWhite,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryNavy.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -4),
                     ),
                   ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Job Description
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'وصف الوظيفة',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: isOpen
+                        ? (_isGuest ? AppTheme.primaryGradient : const LinearGradient(colors: [AppTheme.accentGreen, Color(0xFF1B8B6A)]))
+                        : null,
+                    color: isOpen ? null : AppTheme.textMuted,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                    boxShadow: isOpen
+                        ? [
+                            BoxShadow(
+                              color: (_isGuest ? AppTheme.primaryNavy : AppTheme.accentGreen).withValues(alpha: 0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: ElevatedButton(
+                    onPressed: isOpen && !_isApplying
+                        ? (_isGuest ? _showLoginPrompt : _showApplicationDialog)
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      disabledBackgroundColor: Colors.transparent,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      widget.job['description'] ?? 'لا يوجد وصف متاح',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ],
+                    child: _isApplying
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                !isOpen ? Icons.block_rounded : (_isGuest ? Icons.login_rounded : Icons.send_rounded),
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                !isOpen
+                                    ? 'الوظيفة مغلقة'
+                                    : (_isGuest ? 'سجّل الدخول للتقديم' : 'تقديم على الوظيفة'),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-
-            // Job Requirements
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'متطلبات الوظيفة',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      widget.job['requirements'] ?? 'لا توجد متطلبات محددة',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Apply Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: widget.job['status'] == 'open' && !_isApplying
-                    ? (_isGuest ? _showLoginPrompt : _showApplicationDialog)
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: widget.job['status'] == 'open'
-                      ? (_isGuest ? const Color(0xFF0D2660) : Theme.of(context).colorScheme.secondary)
-                      : Colors.grey,
-                  foregroundColor: _isGuest ? Colors.white : Theme.of(context).colorScheme.onSecondary,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: _isApplying
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(
-                        widget.job['status'] != 'open'
-                            ? 'الوظيفة مغلقة'
-                            : (_isGuest ? 'سجّل الدخول للتقديم' : 'تقديم على الوظيفة'),
-                        style: const TextStyle(fontSize: 16),
-                      ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTag(IconData icon, String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: TextStyle(fontSize: 13, color: color, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppTheme.spacingM),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        boxShadow: AppTheme.lightShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryNavy.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 20, color: AppTheme.primaryNavy),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spacingM),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: AppTheme.textMuted),
+          const SizedBox(width: 10),
+          Text(
+            '$label: ',
+            style: const TextStyle(fontSize: 14, color: AppTheme.textMuted),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 14, color: AppTheme.textPrimary, fontWeight: FontWeight.w500),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1819,163 +2654,231 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('طلباتي (${applications.length})'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadApplications,
-          ),
-        ],
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : errorMessage.isNotEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  boxShadow: [BoxShadow(color: AppTheme.primaryNavy.withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 2))],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                  child: Row(
                     children: [
-                      Text(
-                        errorMessage,
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 40, height: 40,
+                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadApplications,
-                        child: const Text('إعادة المحاولة'),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('طلباتي', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text('${applications.length} طلب', style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: _loadApplications,
+                        child: Container(
+                          width: 40, height: 40,
+                          decoration: BoxDecoration(color: AppTheme.secondaryGold, borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.refresh_rounded, color: AppTheme.primaryNavy, size: 22),
+                        ),
                       ),
                     ],
                   ),
-                )
-              : applications.isEmpty
-                  ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.assignment, size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text(
-                            'لم تتقدم لأي وظيفة بعد',
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: applications.length,
-                      itemBuilder: (context, index) {
-                        final application = applications[index];
-                        final job = application['job'];
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          elevation: 2,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        job['title'] ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: _getStatusColor(application['status']).withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        _getStatusText(application['status']),
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: _getStatusColor(application['status']),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  job['company']?['company_name'] ?? 'شركة غير محددة',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.blue[700],
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      job['province'] ?? '',
-                                      style: TextStyle(color: Colors.grey[600]),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      application['applied_at']?.substring(0, 10) ?? '',
-                                      style: TextStyle(color: Colors.grey[600]),
-                                    ),
-                                  ],
-                                ),
-                                if (application['matching_percentage'] != null) ...[
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.percent, size: 16, color: Colors.grey[600]),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'نسبة التطابق: ${application['matching_percentage']}%',
-                                        style: TextStyle(color: Colors.grey[600]),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                                if (application['notes'] != null && application['notes'].isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'ملاحظات الشركة:',
-                                          style: TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(application['notes']),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+                ),
+              ),
+              // Content
+              Expanded(
+                child: isLoading
+                    ? _buildLoadingState()
+                    : errorMessage.isNotEmpty
+                        ? _buildErrorState()
+                        : applications.isEmpty
+                            ? _buildEmptyState()
+                            : ListView.builder(
+                                padding: const EdgeInsets.all(AppTheme.spacingM),
+                                itemCount: applications.length,
+                                itemBuilder: (context, index) => _buildApplicationCard(applications[index]),
+                              ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(color: AppTheme.surfaceWhite, borderRadius: BorderRadius.circular(AppTheme.radiusLarge), boxShadow: AppTheme.lightShadow),
+            child: const CircularProgressIndicator(color: AppTheme.primaryNavy),
+          ),
+          const SizedBox(height: AppTheme.spacingM),
+          const Text('جاري تحميل الطلبات...', style: TextStyle(color: AppTheme.textSecondary)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(color: AppTheme.accentRed.withValues(alpha: 0.1), shape: BoxShape.circle),
+              child: const Icon(Icons.error_outline_rounded, size: 50, color: AppTheme.accentRed),
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+            Text(errorMessage, style: const TextStyle(color: AppTheme.accentRed, fontSize: 14), textAlign: TextAlign.center),
+            const SizedBox(height: AppTheme.spacingL),
+            Container(
+              decoration: BoxDecoration(gradient: AppTheme.primaryGradient, borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+              child: ElevatedButton.icon(
+                onPressed: _loadApplications,
+                icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                label: const Text('إعادة المحاولة', style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(color: AppTheme.primaryNavy.withValues(alpha: 0.1), shape: BoxShape.circle),
+              child: const Icon(Icons.assignment_outlined, size: 60, color: AppTheme.primaryNavy),
+            ),
+            const SizedBox(height: AppTheme.spacingL),
+            const Text('لم تتقدم لأي وظيفة بعد', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+            const SizedBox(height: AppTheme.spacingS),
+            const Text('ابدأ بتصفح الوظائف المتاحة وتقدم للفرص المناسبة', style: TextStyle(color: AppTheme.textSecondary), textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildApplicationCard(dynamic application) {
+    final job = application['job'];
+    final status = application['status'] ?? 'pending';
+    final statusColor = _getStatusColor(status);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        boxShadow: AppTheme.lightShadow,
+        border: Border.all(color: AppTheme.borderLight),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingM),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 50, height: 50,
+                  decoration: BoxDecoration(gradient: AppTheme.primaryGradient, borderRadius: BorderRadius.circular(12)),
+                  child: const Icon(Icons.work_rounded, color: Colors.white, size: 24),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(job['title'] ?? '', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                      const SizedBox(height: 4),
+                      Text(job['company']?['company_name'] ?? 'شركة غير محددة', style: const TextStyle(fontSize: 14, color: AppTheme.primaryNavy, fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(AppTheme.radiusRound)),
+                  child: Text(_getStatusText(status), style: TextStyle(fontSize: 12, color: statusColor, fontWeight: FontWeight.w600)),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.spacingS),
+            Wrap(
+              spacing: 12,
+              children: [
+                _buildInfoChip(Icons.location_on_rounded, job['province'] ?? ''),
+                _buildInfoChip(Icons.calendar_today_rounded, application['applied_at']?.substring(0, 10) ?? ''),
+                if (application['matching_percentage'] != null)
+                  _buildInfoChip(Icons.percent_rounded, '${application['matching_percentage']}% تطابق'),
+              ],
+            ),
+            if (application['notes'] != null && application['notes'].isNotEmpty) ...[
+              const SizedBox(height: AppTheme.spacingS),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: AppTheme.surfaceLight, borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.comment_rounded, size: 14, color: AppTheme.textMuted),
+                        SizedBox(width: 6),
+                        Text('ملاحظات الشركة:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textMuted)),
+                      ],
                     ),
+                    const SizedBox(height: 4),
+                    Text(application['notes'], style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: AppTheme.textMuted),
+        const SizedBox(width: 4),
+        Text(text, style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+      ],
     );
   }
 }
@@ -2055,166 +2958,301 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('المفضلة (${favorites.length})'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadFavorites,
-          ),
-        ],
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : errorMessage.isNotEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  boxShadow: [BoxShadow(color: AppTheme.primaryNavy.withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 2))],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                  child: Row(
                     children: [
-                      Text(
-                        errorMessage,
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 40, height: 40,
+                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadFavorites,
-                        child: const Text('إعادة المحاولة'),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('المفضلة', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text('${favorites.length} وظيفة محفوظة', style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: _loadFavorites,
+                        child: Container(
+                          width: 40, height: 40,
+                          decoration: BoxDecoration(color: AppTheme.secondaryGold, borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.refresh_rounded, color: AppTheme.primaryNavy, size: 22),
+                        ),
                       ),
                     ],
                   ),
-                )
-              : favorites.isEmpty
-                  ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.favorite_border, size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text(
-                            'لا توجد وظائف في المفضلة',
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: favorites.length,
-                      itemBuilder: (context, index) {
-                        final favorite = favorites[index];
-                        final job = favorite['job'];
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          elevation: 2,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        job['title'] ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.favorite, color: Colors.red),
-                                      onPressed: () => _removeFavorite(job['id']),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  job['company']?['company_name'] ?? 'شركة غير محددة',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.blue[700],
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      job['province'] ?? '',
-                                      style: TextStyle(color: Colors.grey[600]),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Icon(Icons.work, size: 16, color: Colors.grey[600]),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        job['speciality'] ?? '',
-                                        style: TextStyle(color: Colors.grey[600]),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  job['description'] ?? '',
-                                  style: const TextStyle(fontSize: 14),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: job['status'] == 'open' ? Colors.green : Colors.red,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        job['status'] == 'open' ? 'متاحة' : 'مغلقة',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => JobDetailsScreen(
-                                              job: job,
-                                              token: widget.token,
-                                              user: widget.user,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue,
-                                        foregroundColor: Colors.white,
-                                      ),
-                                      child: const Text('عرض التفاصيل'),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+                ),
+              ),
+              // Content
+              Expanded(
+                child: isLoading
+                    ? _buildLoadingState()
+                    : errorMessage.isNotEmpty
+                        ? _buildErrorState()
+                        : favorites.isEmpty
+                            ? _buildEmptyState()
+                            : ListView.builder(
+                                padding: const EdgeInsets.all(AppTheme.spacingM),
+                                itemCount: favorites.length,
+                                itemBuilder: (context, index) => _buildFavoriteCard(favorites[index]),
+                              ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(color: AppTheme.surfaceWhite, borderRadius: BorderRadius.circular(AppTheme.radiusLarge), boxShadow: AppTheme.lightShadow),
+            child: const CircularProgressIndicator(color: AppTheme.primaryNavy),
+          ),
+          const SizedBox(height: AppTheme.spacingM),
+          const Text('جاري تحميل المفضلة...', style: TextStyle(color: AppTheme.textSecondary)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(color: AppTheme.accentRed.withValues(alpha: 0.1), shape: BoxShape.circle),
+              child: const Icon(Icons.error_outline_rounded, size: 50, color: AppTheme.accentRed),
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+            Text(errorMessage, style: const TextStyle(color: AppTheme.accentRed, fontSize: 14), textAlign: TextAlign.center),
+            const SizedBox(height: AppTheme.spacingL),
+            Container(
+              decoration: BoxDecoration(gradient: AppTheme.primaryGradient, borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+              child: ElevatedButton.icon(
+                onPressed: _loadFavorites,
+                icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                label: const Text('إعادة المحاولة', style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(color: AppTheme.accentRed.withValues(alpha: 0.1), shape: BoxShape.circle),
+              child: const Icon(Icons.favorite_border_rounded, size: 60, color: AppTheme.accentRed),
+            ),
+            const SizedBox(height: AppTheme.spacingL),
+            const Text('لا توجد وظائف في المفضلة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+            const SizedBox(height: AppTheme.spacingS),
+            const Text('احفظ الوظائف التي تهمك لتسهيل الوصول إليها لاحقاً', style: TextStyle(color: AppTheme.textSecondary), textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFavoriteCard(dynamic favorite) {
+    final job = favorite['job'];
+    final isOpen = job['status'] == 'open';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingM),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        boxShadow: AppTheme.lightShadow,
+        border: Border.all(color: AppTheme.borderLight),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingM),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 50, height: 50,
+                  decoration: BoxDecoration(gradient: AppTheme.primaryGradient, borderRadius: BorderRadius.circular(12)),
+                  child: const Icon(Icons.work_rounded, color: Colors.white, size: 24),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(job['title'] ?? '', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                      const SizedBox(height: 4),
+                      Text(job['company']?['company_name'] ?? 'شركة غير محددة', style: const TextStyle(fontSize: 14, color: AppTheme.primaryNavy, fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => _showRemoveConfirmation(job['id']),
+                  child: Container(
+                    width: 40, height: 40,
+                    decoration: BoxDecoration(color: AppTheme.accentRed.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                    child: const Icon(Icons.favorite_rounded, color: AppTheme.accentRed, size: 22),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.spacingS),
+            Wrap(
+              spacing: 12,
+              children: [
+                _buildInfoChip(Icons.location_on_rounded, job['province'] ?? ''),
+                _buildInfoChip(Icons.category_rounded, job['speciality'] ?? ''),
+              ],
+            ),
+            if (job['description'] != null && job['description'].isNotEmpty) ...[
+              const SizedBox(height: AppTheme.spacingS),
+              Text(job['description'], style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+            ],
+            const SizedBox(height: AppTheme.spacingM),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: isOpen ? AppTheme.accentGreen.withValues(alpha: 0.1) : AppTheme.accentRed.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+                  ),
+                  child: Text(isOpen ? 'متاحة' : 'مغلقة', style: TextStyle(fontSize: 12, color: isOpen ? AppTheme.accentGreen : AppTheme.accentRed, fontWeight: FontWeight.w600)),
+                ),
+                Container(
+                  decoration: BoxDecoration(gradient: AppTheme.primaryGradient, borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => JobDetailsScreen(job: job, token: widget.token, user: widget.user))),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('عرض التفاصيل', style: TextStyle(color: Colors.white, fontSize: 13)),
+                        SizedBox(width: 6),
+                        Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16),
+                      ],
                     ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRemoveConfirmation(int jobId) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        decoration: const BoxDecoration(
+          color: AppTheme.surfaceWhite,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXLarge)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: AppTheme.borderLight, borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: AppTheme.spacingL),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: AppTheme.accentRed.withValues(alpha: 0.1), shape: BoxShape.circle),
+              child: const Icon(Icons.favorite_rounded, color: AppTheme.accentRed, size: 32),
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+            const Text('إزالة من المفضلة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+            const SizedBox(height: AppTheme.spacingS),
+            const Text('هل تريد إزالة هذه الوظيفة من قائمة المفضلة؟', style: TextStyle(color: AppTheme.textSecondary), textAlign: TextAlign.center),
+            const SizedBox(height: AppTheme.spacingL),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14), side: const BorderSide(color: AppTheme.borderLight)),
+                    child: const Text('إلغاء', style: TextStyle(color: AppTheme.textSecondary)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(colors: [AppTheme.accentRed, Color(0xFFB23A3A)]),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _removeFavorite(jobId);
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, padding: const EdgeInsets.symmetric(vertical: 14)),
+                      child: const Text('إزالة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: AppTheme.textMuted),
+        const SizedBox(width: 4),
+        Text(text, style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+      ],
     );
   }
 }
@@ -2289,64 +3327,219 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('الملف الشخصي'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        actions: [
-          if (widget.user['role'] == 'jobseeker' || widget.user['role'] == 'company')
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditProfileScreen(
-                      token: widget.token,
-                      user: widget.user,
-                      profileData: profileData,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: AppTheme.backgroundGradient,
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header with gradient
+              Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryNavy.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
-                  ),
-                ).then((_) => _loadProfile()); // Reload after edit
-              },
-            ),
-        ],
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : errorMessage.isNotEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                  child: Row(
                     children: [
-                      Text(
-                        errorMessage,
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadProfile,
-                        child: const Text('إعادة المحاولة'),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'الملف الشخصي',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
+                      if (widget.user['role'] == 'jobseeker' || widget.user['role'] == 'company')
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditProfileScreen(
+                                  token: widget.token,
+                                  user: widget.user,
+                                  profileData: profileData,
+                                ),
+                              ),
+                            ).then((_) => _loadProfile());
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.secondaryGold,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.edit_rounded, size: 18, color: AppTheme.primaryNavy),
+                                SizedBox(width: 6),
+                                Text('تعديل', style: TextStyle(color: AppTheme.primaryNavy, fontWeight: FontWeight.w600, fontSize: 14)),
+                              ],
+                            ),
+                          ),
+                        ),
                     ],
                   ),
-                )
-              : profileData == null
-                  ? const Center(child: Text('لا توجد بيانات'))
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: widget.user['role'] == 'jobseeker'
-                          ? _buildJobSeekerProfile()
-                          : _buildCompanyProfile(),
-                    ),
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: isLoading
+                    ? _buildLoadingState()
+                    : errorMessage.isNotEmpty
+                        ? _buildErrorState()
+                        : profileData == null
+                            ? _buildEmptyState()
+                            : SingleChildScrollView(
+                                padding: const EdgeInsets.all(AppTheme.spacingM),
+                                child: widget.user['role'] == 'jobseeker'
+                                    ? _buildJobSeekerProfile()
+                                    : _buildCompanyProfile(),
+                              ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceWhite,
+              borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+              boxShadow: AppTheme.lightShadow,
+            ),
+            child: const CircularProgressIndicator(color: AppTheme.primaryNavy),
+          ),
+          const SizedBox(height: AppTheme.spacingM),
+          const Text('جاري تحميل الملف الشخصي...', style: TextStyle(color: AppTheme.textSecondary)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppTheme.accentRed.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.error_outline_rounded, size: 50, color: AppTheme.accentRed),
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+            Text(
+              errorMessage,
+              style: const TextStyle(color: AppTheme.accentRed, fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppTheme.spacingL),
+            Container(
+              decoration: BoxDecoration(
+                gradient: AppTheme.primaryGradient,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              ),
+              child: ElevatedButton.icon(
+                onPressed: _loadProfile,
+                icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                label: const Text('إعادة المحاولة', style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacingL),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryNavy.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.person_off_rounded, size: 50, color: AppTheme.primaryNavy),
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+            const Text('لا توجد بيانات', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+            const SizedBox(height: AppTheme.spacingS),
+            const Text('لم يتم العثور على بيانات الملف الشخصي', style: TextStyle(color: AppTheme.textSecondary)),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildJobSeekerProfile() {
     final jobSeeker = profileData!['job_seeker'];
     if (jobSeeker == null) {
-      return const Center(child: Text('لم يتم إنشاء الملف الشخصي بعد'));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppTheme.secondaryGold.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.person_add_rounded, size: 50, color: AppTheme.secondaryGold),
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+            const Text('لم يتم إنشاء الملف الشخصي بعد', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+          ],
+        ),
+      );
     }
 
     final List<String> subsList = _toStringList(jobSeeker['specialities']);
@@ -2354,89 +3547,100 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Profile Image and Basic Info
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: jobSeeker['profile_image'] != null
-                      ? NetworkImage(jobSeeker['profile_image'])
-                      : null,
+        // Profile Header Card
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppTheme.spacingL),
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryNavy.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppTheme.secondaryGold, width: 3),
+                ),
+                child: CircleAvatar(
+                  radius: 45,
+                  backgroundColor: Colors.white,
+                  backgroundImage: jobSeeker['profile_image'] != null ? NetworkImage(jobSeeker['profile_image']) : null,
                   child: jobSeeker['profile_image'] == null
                       ? Text(
                           (jobSeeker['full_name'] ?? 'U')[0].toUpperCase(),
-                          style: const TextStyle(fontSize: 24),
+                          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.primaryNavy),
                         )
                       : null,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        jobSeeker['full_name'] ?? 'غير محدد',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        jobSeeker['job_title'] ?? 'غير محدد',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
-                          const SizedBox(width: 4),
-                          Text(
-                            jobSeeker['province'] ?? 'غير محدد',
-                            style: TextStyle(color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+              ),
+              const SizedBox(height: AppTheme.spacingM),
+              Text(
+                jobSeeker['full_name'] ?? 'غير محدد',
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                jobSeeker['job_title'] ?? 'غير محدد',
+                style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.9)),
+              ),
+              const SizedBox(height: AppTheme.spacingS),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                 ),
-              ],
-            ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.location_on_rounded, size: 16, color: AppTheme.secondaryGold),
+                    const SizedBox(width: 6),
+                    Text(
+                      jobSeeker['province'] ?? 'غير محدد',
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.spacingM),
 
         // Contact Information
-        _buildInfoCard(
+        _buildProfileInfoCard(
           'معلومات الاتصال',
-          Icons.contact_phone,
+          Icons.contact_phone_rounded,
           [
-            _buildInfoRow('البريد الإلكتروني', profileData!['email'] ?? 'غير محدد'),
-            _buildInfoRow('الاسم الكامل', jobSeeker['full_name'] ?? 'غير محدد'),
+            _buildProfileInfoRow(Icons.email_rounded, 'البريد الإلكتروني', profileData!['email'] ?? 'غير محدد'),
+            _buildProfileInfoRow(Icons.person_rounded, 'الاسم الكامل', jobSeeker['full_name'] ?? 'غير محدد'),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.spacingM),
 
         // Professional Information
-        _buildInfoCard(
+        _buildProfileInfoCard(
           'المعلومات المهنية',
-          Icons.work,
+          Icons.work_rounded,
           [
-            _buildInfoRow('المسمى الوظيفي', jobSeeker['job_title'] ?? 'غير محدد'),
-            _buildInfoRow('التخصص الرئيسي', jobSeeker['speciality'] ?? 'غير محدد'),
-            if (subsList.isNotEmpty)
-              _buildInfoRow('التخصصات الفرعية', subsList.join(', ')),
-            _buildInfoRow('مستوى التعليم', jobSeeker['education_level'] ?? 'غير محدد'),
-            _buildInfoRow('مستوى الخبرة', jobSeeker['experience_level'] ?? 'غير محدد'),
+            _buildProfileInfoRow(Icons.badge_rounded, 'المسمى الوظيفي', jobSeeker['job_title'] ?? 'غير محدد'),
+            _buildProfileInfoRow(Icons.medical_services_rounded, 'التخصص الرئيسي', jobSeeker['speciality'] ?? 'غير محدد'),
+            if (subsList.isNotEmpty) _buildProfileInfoRow(Icons.category_rounded, 'التخصصات الفرعية', subsList.join(', ')),
+            _buildProfileInfoRow(Icons.school_rounded, 'مستوى التعليم', jobSeeker['education_level'] ?? 'غير محدد'),
+            _buildProfileInfoRow(Icons.trending_up_rounded, 'مستوى الخبرة', jobSeeker['experience_level'] ?? 'غير محدد'),
           ],
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppTheme.spacingL),
+
         // Account Management Section
         _buildDeleteAccountButton(),
       ],
@@ -2446,58 +3650,110 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildCompanyProfile() {
     final company = profileData!['company'];
     if (company == null) {
-      return const Center(child: Text('لم يتم إنشاء الملف الشخصي بعد'));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppTheme.secondaryGold.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.business_rounded, size: 50, color: AppTheme.secondaryGold),
+            ),
+            const SizedBox(height: AppTheme.spacingM),
+            const Text('لم يتم إنشاء الملف الشخصي بعد', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+          ],
+        ),
+      );
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Company Logo and Basic Info
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: company['profile_image'] != null
-                      ? NetworkImage(company['profile_image'])
-                      : null,
+        // Company Header Card
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppTheme.spacingL),
+          decoration: BoxDecoration(
+            gradient: AppTheme.primaryGradient,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryNavy.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppTheme.secondaryGold, width: 3),
+                ),
+                child: CircleAvatar(
+                  radius: 45,
+                  backgroundColor: Colors.white,
+                  backgroundImage: company['profile_image'] != null ? NetworkImage(company['profile_image']) : null,
                   child: company['profile_image'] == null
                       ? Text(
                           (company['company_name'] ?? 'C')[0].toUpperCase(),
-                          style: const TextStyle(fontSize: 24),
+                          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.primaryNavy),
                         )
                       : null,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              const SizedBox(height: AppTheme.spacingM),
+              Text(
+                company['company_name'] ?? 'غير محدد',
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                company['scientific_office_name'] ?? '',
+                style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.9)),
+                textAlign: TextAlign.center,
+              ),
+              if (company['province'] != null) ...[
+                const SizedBox(height: AppTheme.spacingS),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        company['company_name'] ?? 'غير محدد',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        company['scientific_office_name'] ?? 'غير محدد',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                      ),
+                      const Icon(Icons.location_on_rounded, size: 16, color: AppTheme.secondaryGold),
+                      const SizedBox(width: 6),
+                      Text(company['province'], style: const TextStyle(color: Colors.white, fontSize: 13)),
                     ],
                   ),
                 ),
               ],
-            ),
+            ],
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppTheme.spacingM),
+
+        // Company Information
+        _buildProfileInfoCard(
+          'معلومات الشركة',
+          Icons.business_rounded,
+          [
+            _buildProfileInfoRow(Icons.apartment_rounded, 'اسم الشركة', company['company_name'] ?? 'غير محدد'),
+            _buildProfileInfoRow(Icons.category_rounded, 'القطاع', company['industry'] ?? 'غير محدد'),
+            _buildProfileInfoRow(Icons.email_rounded, 'البريد الإلكتروني', profileData!['email'] ?? 'غير محدد'),
+          ],
+        ),
+        const SizedBox(height: AppTheme.spacingL),
+
         // Account Management Section
         _buildDeleteAccountButton(),
       ],
@@ -2505,48 +3761,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildDeleteAccountButton() {
-    return Card(
-      color: Colors.red[50],
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.warning, color: Colors.red[700]),
-                const SizedBox(width: 8),
-                Text(
-                  'إدارة الحساب',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red[700],
-                  ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppTheme.spacingM),
+      decoration: BoxDecoration(
+        color: AppTheme.accentRed.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        border: Border.all(color: AppTheme.accentRed.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.accentRed.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.warning_amber_rounded, color: AppTheme.accentRed, size: 22),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'إدارة الحساب',
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppTheme.accentRed),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spacingS),
+          const Text(
+            'حذف الحساب سيؤدي إلى إزالة جميع بياناتك بشكل نهائي ولا يمكن التراجع عن هذا الإجراء.',
+            style: TextStyle(color: AppTheme.textSecondary, fontSize: 13, height: 1.5),
+          ),
+          const SizedBox(height: AppTheme.spacingM),
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [AppTheme.accentRed, Color(0xFFB23A3A)]),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.accentRed.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              'حذف الحساب سيؤدي إلى إزالة جميع بياناتك بشكل نهائي ولا يمكن التراجع عن هذا الإجراء.',
-              style: TextStyle(color: Colors.red[600], fontSize: 13),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _showDeleteAccountDialog,
-                icon: const Icon(Icons.delete_forever),
-                label: const Text('حذف الحساب نهائياً'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
+            child: ElevatedButton.icon(
+              onPressed: _showDeleteAccountDialog,
+              icon: const Icon(Icons.delete_forever_rounded, color: Colors.white),
+              label: const Text('حذف الحساب نهائياً', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -2670,54 +3944,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildInfoCard(String title, IconData icon, List<Widget> children) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: Colors.blue),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+  Widget _buildProfileInfoCard(String title, IconData icon, List<Widget> children) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppTheme.spacingM),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        boxShadow: AppTheme.lightShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryNavy.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            ...children,
-          ],
-        ),
+                child: Icon(icon, size: 20, color: AppTheme.primaryNavy),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spacingM),
+          ...children,
+        ],
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildProfileInfoRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              '$label:',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
-            ),
-          ),
+          Icon(icon, size: 18, color: AppTheme.textMuted),
+          const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+                const SizedBox(height: 2),
+                Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppTheme.textPrimary)),
+              ],
             ),
           ),
         ],
@@ -3660,18 +4938,27 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
     }
   }
 
-  Widget _statCard(String label, dynamic value, Color color) {
+  Widget _statCard(String label, dynamic value, Color color, IconData icon) {
     return Expanded(
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            children: [
-              Text('$value', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-              const SizedBox(height: 4),
-              Text(label, style: const TextStyle(color: Colors.grey)),
-            ],
-          ),
+      child: Container(
+        padding: const EdgeInsets.all(AppTheme.spacingM),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceWhite,
+          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+          boxShadow: AppTheme.lightShadow,
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+              child: Icon(icon, size: 22, color: color),
+            ),
+            const SizedBox(height: 10),
+            Text('$value', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
+            const SizedBox(height: 4),
+            Text(label, style: const TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+          ],
         ),
       ),
     );
@@ -3685,23 +4972,24 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
           gradient: gradient,
+          boxShadow: [BoxShadow(color: gradient.colors[0].withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 3))],
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppTheme.spacingM),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, size: 48, color: Colors.white),
-            Text(
-              title,
-              textAlign: TextAlign.right,
-              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
+              child: Icon(icon, size: 28, color: Colors.white),
             ),
+            Text(title, textAlign: TextAlign.right, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -3732,39 +5020,99 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('لوحة تحكم الشركة'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: _loadDashboard),
-        ],
-      ),
-
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                if (errorMessage.isNotEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Text('فشل في تحميل البيانات، سيتم عرض الواجهة دون إحصاءات', style: TextStyle(color: Colors.red)),
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  boxShadow: [BoxShadow(color: AppTheme.primaryNavy.withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 2))],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 40, height: 40,
+                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('لوحة تحكم الشركة', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text(widget.user['name'] ?? '', style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: _loadDashboard,
+                        child: Container(
+                          width: 40, height: 40,
+                          decoration: BoxDecoration(color: AppTheme.secondaryGold, borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.refresh_rounded, color: AppTheme.primaryNavy, size: 22),
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+              ),
+              // Content
+              Expanded(
+                child: isLoading
+                    ? Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(color: AppTheme.surfaceWhite, borderRadius: BorderRadius.circular(AppTheme.radiusLarge), boxShadow: AppTheme.lightShadow),
+                          child: const CircularProgressIndicator(color: AppTheme.primaryNavy),
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (errorMessage.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.all(AppTheme.spacingM),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(color: AppTheme.accentRed.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.warning_rounded, color: AppTheme.accentRed, size: 20),
+                                      const SizedBox(width: 8),
+                                      const Expanded(child: Text('فشل في تحميل بعض البيانات', style: TextStyle(color: AppTheme.accentRed, fontSize: 13))),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: AppTheme.spacingS),
                 Padding(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM),
                       child: Row(
                         children: [
-                          _statCard('إجمالي الوظائف', stats?['total_jobs'] ?? 0, Colors.blue),
-                          _statCard('الوظائف النشطة', stats?['active_jobs'] ?? 0, Colors.green),
+                          _statCard('إجمالي الوظائف', stats?['total_jobs'] ?? 0, AppTheme.primaryNavy, Icons.work_rounded),
+                          const SizedBox(width: AppTheme.spacingS),
+                          _statCard('الوظائف النشطة', stats?['active_jobs'] ?? 0, AppTheme.accentGreen, Icons.check_circle_rounded),
                         ],
                       ),
                     ),
+                    const SizedBox(height: AppTheme.spacingS),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM),
                       child: Row(
                         children: [
-                          _statCard('طلبات التقديم', stats?['total_applications'] ?? 0, Colors.deepPurple),
-                          _statCard('طلبات قيد المراجعة', stats?['pending_applications'] ?? 0, Colors.orange),
+                          _statCard('طلبات التقديم', stats?['total_applications'] ?? 0, const Color(0xFF9333EA), Icons.inbox_rounded),
+                          const SizedBox(width: AppTheme.spacingS),
+                          _statCard('طلبات قيد المراجعة', stats?['pending_applications'] ?? 0, Colors.orange, Icons.pending_actions_rounded),
                         ],
                       ),
                     ),
@@ -3833,49 +5181,88 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                       ),
                     ),
 
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(12, 12, 12, 0),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text('وظائفي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                    Expanded(
-
-                      child: jobs.isEmpty
-                          ? const Center(child: Text('لا توجد وظائف'))
-                          : ListView.builder(
-                    // Gradient header like website
-
-                              padding: const EdgeInsets.all(12),
-                              itemCount: jobs.length,
-                              itemBuilder: (context, i) {
-                                final job = jobs[i];
-                                return Card(
-                                  child: ListTile(
-                                    title: Text(job['title'] ?? ''),
-                                    subtitle: Text('المتقدمون: ${job['applications_count'] ?? 0} • الحالة: ${job['status'] ?? ''}'),
-                                    trailing: const Icon(Icons.chevron_left),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ApplicantsScreen(
-                                            token: widget.token,
-                                            user: widget.user,
-                                            jobId: job['id'],
-                                            jobTitle: job['title'] ?? '',
+                            const SizedBox(height: AppTheme.spacingM),
+                            // وظائفي section
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(color: AppTheme.primaryNavy.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+                                    child: const Icon(Icons.list_alt_rounded, size: 20, color: AppTheme.primaryNavy),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  const Text('وظائفي', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: AppTheme.spacingS),
+                            jobs.isEmpty
+                                ? Container(
+                                    margin: const EdgeInsets.all(AppTheme.spacingM),
+                                    padding: const EdgeInsets.all(AppTheme.spacingL),
+                                    decoration: BoxDecoration(color: AppTheme.surfaceWhite, borderRadius: BorderRadius.circular(AppTheme.radiusLarge), boxShadow: AppTheme.lightShadow),
+                                    child: const Center(child: Text('لا توجد وظائف', style: TextStyle(color: AppTheme.textMuted))),
+                                  )
+                                : ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingM),
+                                    itemCount: jobs.length,
+                                    itemBuilder: (context, i) {
+                                      final job = jobs[i];
+                                      final isOpen = job['status'] == 'open';
+                                      return Container(
+                                        margin: const EdgeInsets.only(bottom: AppTheme.spacingS),
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.surfaceWhite,
+                                          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                                          boxShadow: AppTheme.lightShadow,
+                                        ),
+                                        child: ListTile(
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                          leading: Container(
+                                            width: 45, height: 45,
+                                            decoration: BoxDecoration(gradient: AppTheme.primaryGradient, borderRadius: BorderRadius.circular(10)),
+                                            child: const Icon(Icons.work_rounded, color: Colors.white, size: 22),
                                           ),
+                                          title: Text(job['title'] ?? '', style: const TextStyle(fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+                                          subtitle: Row(
+                                            children: [
+                                              const Icon(Icons.people_rounded, size: 14, color: AppTheme.textMuted),
+                                              const SizedBox(width: 4),
+                                              Text('${job['applications_count'] ?? 0}', style: const TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+                                              const SizedBox(width: 12),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: isOpen ? AppTheme.accentGreen.withValues(alpha: 0.1) : AppTheme.accentRed.withValues(alpha: 0.1),
+                                                  borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+                                                ),
+                                                child: Text(isOpen ? 'نشطة' : 'مغلقة', style: TextStyle(color: isOpen ? AppTheme.accentGreen : AppTheme.accentRed, fontSize: 11, fontWeight: FontWeight.w500)),
+                                              ),
+                                            ],
+                                          ),
+                                          trailing: Container(
+                                            width: 32, height: 32,
+                                            decoration: BoxDecoration(color: AppTheme.surfaceLight, borderRadius: BorderRadius.circular(8)),
+                                            child: const Icon(Icons.chevron_left_rounded, color: AppTheme.textMuted),
+                                          ),
+                                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ApplicantsScreen(token: widget.token, user: widget.user, jobId: job['id'], jobTitle: job['title'] ?? ''))),
                                         ),
                                       );
                                     },
                                   ),
-                                );
-                              },
-                            ),
-                    ),
-                  ],
-                ),
+                            const SizedBox(height: AppTheme.spacingM),
+                          ],
+                        ),
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -4242,113 +5629,102 @@ class AdminDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('لوحة تحكم الأدمن'),
-        backgroundColor: scheme.primary,
-        foregroundColor: scheme.onPrimary,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          children: [
-            // Use website routes inside WebView for full parity
-            _adminCard(
-              context,
-              title: 'الشركات',
-              icon: Icons.apartment,
-              gradient: const LinearGradient(colors: [Color(0xFF4F46E5), Color(0xFF3730A3)]),
-              onTap: () {
-                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
-                _open(context, 'إدارة الشركات', '${site}admin/companies');
-              },
-            ),
-            _adminCard(
-              context,
-              title: 'وظائف قيد المراجعة',
-              icon: Icons.fact_check,
-              gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
-              onTap: () {
-                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
-                _open(context, 'الوظائف قيد المراجعة', '${site}admin/jobs/pending');
-              },
-            ),
-            _adminCard(
-              context,
-              title: 'الباحثون عن عمل',
-              icon: Icons.people_alt,
-              gradient: const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFD97706)]),
-              onTap: () {
-                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
-                _open(context, 'إدارة الباحثين', '${site}admin/jobseekers');
-              },
-            ),
-            _adminCard(
-              context,
-              title: 'قاعدة بيانات الباحثين',
-              icon: Icons.manage_search,
-              gradient: const LinearGradient(colors: [Color(0xFF0EA5E9), Color(0xFF0369A1)]),
-              onTap: () {
-                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
-                _open(context, 'قاعدة بيانات الباحثين', '${site}admin/seekers');
-              },
-            ),
-            _adminCard(
-              context,
-              title: 'الإعدادات',
-              icon: Icons.settings,
-              gradient: const LinearGradient(colors: [Color(0xFF9333EA), Color(0xFF7E22CE)]),
-              onTap: () {
-                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
-                _open(context, 'الإعدادات', '${site}admin/settings');
-              },
-            ),
-            _adminCard(
-              context,
-              title: 'الأقضية والمناطق',
-              icon: Icons.map,
-              gradient: const LinearGradient(colors: [Color(0xFF14B8A6), Color(0xFF0F766E)]),
-              onTap: () {
-                final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
-                _open(context, 'الأقضية والمناطق', '${site}admin/districts');
-              },
-            ),
-          ],
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  boxShadow: [BoxShadow(color: AppTheme.primaryNavy.withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 2))],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 40, height: 40,
+                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('لوحة تحكم الأدمن', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text(user['name'] ?? 'المدير', style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(color: AppTheme.secondaryGold, borderRadius: BorderRadius.circular(10)),
+                        child: const Icon(Icons.admin_panel_settings_rounded, color: AppTheme.primaryNavy, size: 22),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Content
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: AppTheme.spacingS,
+                    mainAxisSpacing: AppTheme.spacingS,
+                    children: [
+                      _adminCard(context, title: 'الشركات', icon: Icons.apartment_rounded, gradient: const LinearGradient(colors: [Color(0xFF4F46E5), Color(0xFF3730A3)]),
+                        onTap: () => _open(context, 'إدارة الشركات', '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}admin/companies')),
+                      _adminCard(context, title: 'وظائف قيد المراجعة', icon: Icons.fact_check_rounded, gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
+                        onTap: () => _open(context, 'الوظائف قيد المراجعة', '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}admin/jobs/pending')),
+                      _adminCard(context, title: 'الباحثون عن عمل', icon: Icons.people_alt_rounded, gradient: const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFD97706)]),
+                        onTap: () => _open(context, 'إدارة الباحثين', '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}admin/jobseekers')),
+                      _adminCard(context, title: 'قاعدة بيانات الباحثين', icon: Icons.manage_search_rounded, gradient: const LinearGradient(colors: [Color(0xFF0EA5E9), Color(0xFF0369A1)]),
+                        onTap: () => _open(context, 'قاعدة بيانات الباحثين', '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}admin/seekers')),
+                      _adminCard(context, title: 'الإعدادات', icon: Icons.settings_rounded, gradient: const LinearGradient(colors: [Color(0xFF9333EA), Color(0xFF7E22CE)]),
+                        onTap: () => _open(context, 'الإعدادات', '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}admin/settings')),
+                      _adminCard(context, title: 'الأقضية والمناطق', icon: Icons.map_rounded, gradient: const LinearGradient(colors: [Color(0xFF14B8A6), Color(0xFF0F766E)]),
+                        onTap: () => _open(context, 'الأقضية والمناطق', '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}admin/districts')),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _adminCard(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required LinearGradient gradient,
-    required VoidCallback onTap,
-  }) {
+  Widget _adminCard(BuildContext context, {required String title, required IconData icon, required LinearGradient gradient, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
           gradient: gradient,
+          boxShadow: [BoxShadow(color: gradient.colors[0].withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 3))],
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppTheme.spacingM),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, size: 48, color: Colors.white.withValues(alpha: 0.95)),
-            Text(
-              title,
-              textAlign: TextAlign.right,
-              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
+              child: Icon(icon, size: 28, color: Colors.white),
             ),
+            Text(title, textAlign: TextAlign.right, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -4369,10 +5745,7 @@ class AdminDashboardScreen extends StatelessWidget {
 
   void _open(BuildContext context, String title, String url) {
     final bridged = _wrapSessionUrl(url);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: bridged)),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: bridged)));
   }
 }
 
@@ -4424,41 +5797,30 @@ class JobSeekerDashboardScreen extends StatelessWidget {
 
   void _open(BuildContext context, String title, String url) {
     final bridged = _wrapSessionUrl(url);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: bridged)),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: bridged)));
   }
 
-  Widget _jsCard(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required LinearGradient gradient,
-    required VoidCallback onTap,
-  }) {
+  Widget _jsCard(BuildContext context, {required String title, required IconData icon, required LinearGradient gradient, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
       child: Container(
         decoration: BoxDecoration(
           gradient: gradient,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+          boxShadow: [BoxShadow(color: gradient.colors[0].withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 3))],
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppTheme.spacingM),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, size: 48, color: Colors.white.withValues(alpha: 0.95)),
-            Text(
-              title,
-              textAlign: TextAlign.right,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
+              child: Icon(icon, size: 28, color: Colors.white),
             ),
+            Text(title, textAlign: TextAlign.right, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -4467,50 +5829,73 @@ class JobSeekerDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('لوحة الباحث'),
-        backgroundColor: scheme.primary,
-        foregroundColor: scheme.onPrimary,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          children: [
-            _jsCard(
-              context,
-              title: 'لوحتي',
-              icon: Icons.dashboard,
-              gradient: const LinearGradient(colors: [Color(0xFF4F46E5), Color(0xFF3730A3)]),
-              onTap: () => _open(context, 'لوحة الباحث', '${site}jobseeker'),
-            ),
-            _jsCard(
-              context,
-              title: 'الملف الشخصي',
-              icon: Icons.account_circle_outlined,
-              gradient: const LinearGradient(colors: [Color(0xFF9333EA), Color(0xFF7E22CE)]),
-              onTap: () => _open(context, 'الملف الشخصي', '${site}jobseeker/profile'),
-            ),
-            _jsCard(
-              context,
-              title: 'الإشعارات',
-              icon: Icons.notifications_active_outlined,
-              gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
-              onTap: () => _open(context, 'الإشعارات', '${site}notifications'),
-            ),
-            _jsCard(
-              context,
-              title: 'تصفح الوظائف',
-              icon: Icons.search,
-              gradient: const LinearGradient(colors: [Color(0xFF0EA5E9), Color(0xFF0369A1)]),
-              onTap: () => _open(context, 'الوظائف', '${site}jobs'),
-            ),
-          ],
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Container(
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  boxShadow: [BoxShadow(color: AppTheme.primaryNavy.withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 2))],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          width: 40, height: 40,
+                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)),
+                          child: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('لوحة الباحث عن عمل', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text(user['name'] ?? '', style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(color: AppTheme.secondaryGold, borderRadius: BorderRadius.circular(10)),
+                        child: const Icon(Icons.person_rounded, color: AppTheme.primaryNavy, size: 22),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Content
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppTheme.spacingM),
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: AppTheme.spacingS,
+                    mainAxisSpacing: AppTheme.spacingS,
+                    children: [
+                      _jsCard(context, title: 'لوحتي', icon: Icons.dashboard_rounded, gradient: const LinearGradient(colors: [Color(0xFF4F46E5), Color(0xFF3730A3)]),
+                        onTap: () => _open(context, 'لوحة الباحث', '${site}jobseeker')),
+                      _jsCard(context, title: 'الملف الشخصي', icon: Icons.account_circle_rounded, gradient: const LinearGradient(colors: [Color(0xFF9333EA), Color(0xFF7E22CE)]),
+                        onTap: () => _open(context, 'الملف الشخصي', '${site}jobseeker/profile')),
+                      _jsCard(context, title: 'الإشعارات', icon: Icons.notifications_active_rounded, gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
+                        onTap: () => _open(context, 'الإشعارات', '${site}notifications')),
+                      _jsCard(context, title: 'تصفح الوظائف', icon: Icons.search_rounded, gradient: const LinearGradient(colors: [Color(0xFF0EA5E9), Color(0xFF0369A1)]),
+                        onTap: () => _open(context, 'الوظائف', '${site}jobs')),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
