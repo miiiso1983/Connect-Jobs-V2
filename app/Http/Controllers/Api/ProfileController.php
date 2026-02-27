@@ -114,7 +114,7 @@ class ProfileController extends Controller
             if ($company->profile_image) {
                 Storage::disk('public')->delete($company->profile_image);
             }
-            
+
             $file = $request->file('profile_image');
             $filename = time() . '_company_' . $user->id . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('profile_images', $filename, 'public');
@@ -146,6 +146,12 @@ class ProfileController extends Controller
             'districts' => 'nullable|array',
             'education_level' => 'nullable|string|max:255',
             'experience_level' => 'nullable|string|max:255',
+            // Education (new)
+            'university_name' => 'nullable|string|max:190',
+            'college_name' => 'nullable|string|max:190',
+            'department_name' => 'nullable|string|max:190',
+            'graduation_year' => 'nullable|integer|min:1950|max:2100',
+            'is_fresh_graduate' => 'nullable|boolean',
             'gender' => 'nullable|in:male,female',
             'own_car' => 'nullable|boolean',
             'skills' => 'nullable|string|max:1000',
@@ -180,9 +186,20 @@ class ProfileController extends Controller
         $jobSeekerData = $request->only([
             'full_name', 'job_title', 'speciality', 'specialities',
             'province', 'districts', 'education_level', 'experience_level',
+            'university_name', 'college_name', 'department_name', 'graduation_year', 'is_fresh_graduate',
             'gender', 'own_car', 'skills', 'summary', 'qualifications',
             'experiences', 'languages'
         ]);
+
+        // Normalize types for new fields
+        if ($request->has('graduation_year')) {
+            $jobSeekerData['graduation_year'] = $request->filled('graduation_year')
+                ? (int) $request->input('graduation_year')
+                : null;
+        }
+        if ($request->has('is_fresh_graduate')) {
+            $jobSeekerData['is_fresh_graduate'] = $request->boolean('is_fresh_graduate');
+        }
 
         // Handle profile image upload
         if ($request->hasFile('profile_image')) {
@@ -190,7 +207,7 @@ class ProfileController extends Controller
             if ($jobSeeker->profile_image) {
                 Storage::disk('public')->delete($jobSeeker->profile_image);
             }
-            
+
             $file = $request->file('profile_image');
             $filename = time() . '_seeker_' . $user->id . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('profile_images', $filename, 'public');
@@ -203,7 +220,7 @@ class ProfileController extends Controller
             if ($jobSeeker->cv_file) {
                 Storage::disk('public')->delete($jobSeeker->cv_file);
             }
-            
+
             $file = $request->file('cv_file');
             $filename = time() . '_cv_' . $user->id . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('cvs', $filename, 'public');
@@ -285,7 +302,7 @@ class ProfileController extends Controller
     {
         try {
             $user = auth()->user();
-            
+
             if ($user->role === 'company') {
                 $profile = $user->company;
             } elseif ($user->role === 'jobseeker') {

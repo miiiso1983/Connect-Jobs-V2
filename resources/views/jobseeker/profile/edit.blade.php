@@ -173,6 +173,46 @@
                 </div>
             </div>
 
+	            {{-- Education Section --}}
+	            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+	                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+	                    <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
+	                        <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.5c0 4.418-4.03 8-9 8s-9-3.582-9-8c0-.64.06-1.267.176-1.875L12 14z"/></svg>
+	                    </div>
+	                    <h4 class="text-lg font-bold text-gray-800 dark:text-white">المؤهل الدراسي</h4>
+	                </div>
+	                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+	                    <div>
+	                        <x-input-label for="university_name" value="اسم الجامعة" class="text-gray-700 dark:text-gray-300 font-medium" />
+	                        <x-text-input id="university_name" name="university_name" class="block mt-2 w-full" value="{{ old('university_name', $js->university_name ?? '') }}" placeholder="مثال: جامعة بغداد" />
+	                    </div>
+	                    <div>
+	                        <x-input-label for="college_name" value="اسم الكلية" class="text-gray-700 dark:text-gray-300 font-medium" />
+	                        <x-text-input id="college_name" name="college_name" class="block mt-2 w-full" value="{{ old('college_name', $js->college_name ?? '') }}" placeholder="مثال: كلية الصيدلة" />
+	                    </div>
+	                    <div>
+	                        <x-input-label for="department_name" value="اسم القسم" class="text-gray-700 dark:text-gray-300 font-medium" />
+	                        <x-text-input id="department_name" name="department_name" class="block mt-2 w-full" value="{{ old('department_name', $js->department_name ?? '') }}" placeholder="مثال: صيدلة" />
+	                    </div>
+	                    <div>
+	                        <x-input-label for="graduation_year" value="سنة التخرج" class="text-gray-700 dark:text-gray-300 font-medium" />
+	                        <input id="graduation_year" name="graduation_year" type="number" min="1950" max="2100" class="input input-bordered w-full mt-2 bg-white dark:bg-gray-700" value="{{ old('graduation_year', $js->graduation_year ?? '') }}" placeholder="مثال: 2024" />
+	                    </div>
+	                    <div class="md:col-span-2">
+	                        <div class="flex items-center justify-between gap-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+	                            <div>
+	                                <div class="font-medium text-gray-800 dark:text-white">الخريجين الجدد</div>
+	                                <div class="text-sm text-gray-600 dark:text-gray-300">فعّل الخيار إذا كنت خريجاً جديداً.</div>
+	                            </div>
+	                            <label class="flex items-center gap-2 cursor-pointer">
+	                                <input type="checkbox" name="is_fresh_graduate" value="1" class="toggle toggle-primary" @checked((bool) old('is_fresh_graduate', $js->is_fresh_graduate ?? false))>
+	                                <span class="text-sm text-gray-700 dark:text-gray-200">نعم</span>
+	                            </label>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+
             {{-- About Section --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">

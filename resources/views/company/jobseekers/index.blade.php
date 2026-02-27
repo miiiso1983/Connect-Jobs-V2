@@ -105,6 +105,50 @@
                     </select>
                 </div>
             @endif
+	            @if(($hasUniversity ?? false))
+	                <div class="md:col-span-2">
+	                    <x-input-label for="university_name" value="اسم الجامعة" />
+	                    <input type="text" id="university_name" name="university_name" value="{{ $filters['university_name'] ?? '' }}" class="input input-bordered w-full" />
+	                </div>
+	            @endif
+	            @if(($hasCollege ?? false))
+	                <div class="md:col-span-2">
+	                    <x-input-label for="college_name" value="اسم الكلية" />
+	                    <input type="text" id="college_name" name="college_name" value="{{ $filters['college_name'] ?? '' }}" class="input input-bordered w-full" />
+	                </div>
+	            @endif
+	            @if(($hasDepartment ?? false))
+	                <div class="md:col-span-2">
+	                    <x-input-label for="department_name" value="اسم القسم" />
+	                    <input type="text" id="department_name" name="department_name" value="{{ $filters['department_name'] ?? '' }}" class="input input-bordered w-full" />
+	                </div>
+	            @endif
+	            @if(($hasGraduationYear ?? false))
+	                <div>
+	                    <x-input-label for="graduation_year" value="سنة التخرج" />
+	                    <input type="number" id="graduation_year" name="graduation_year" value="{{ $filters['graduation_year'] ?? '' }}" class="input input-bordered w-full" placeholder="مثال: 2024" />
+	                </div>
+	            @endif
+	            @if(($hasFreshGraduate ?? false))
+	                <div>
+	                    <x-input-label for="is_fresh_graduate" value="خريج جديد؟" />
+	                    <select id="is_fresh_graduate" name="is_fresh_graduate" class="select select-bordered w-full">
+	                        <option value="">—</option>
+	                        <option value="1" @selected(($filters['is_fresh_graduate'] ?? '')==='1')>نعم</option>
+	                        <option value="0" @selected(($filters['is_fresh_graduate'] ?? '')==='0')>لا</option>
+	                    </select>
+	                </div>
+	            @endif
+	            @if(($hasCvVerified ?? false))
+	                <div>
+	                    <x-input-label for="cv_verified" value="توثيق السيرة الذاتية" />
+	                    <select id="cv_verified" name="cv_verified" class="select select-bordered w-full">
+	                        <option value="">—</option>
+	                        <option value="1" @selected(($filters['cv_verified'] ?? '')==='1')>موثق</option>
+	                        <option value="0" @selected(($filters['cv_verified'] ?? '')==='0')>غير موثق</option>
+	                    </select>
+	                </div>
+	            @endif
             <div>
                 <x-input-label for="created_from" value="تاريخ التسجيل من" />
                 <input type="date" id="created_from" name="created_from" value="{{ $filters['created_from'] ?? '' }}" class="input input-bordered w-full" />

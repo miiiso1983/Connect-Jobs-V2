@@ -148,6 +148,11 @@ require __DIR__.'/auth.php';
 Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('admin.')->group(function(){
     Route::get('/', [\App\Http\Controllers\Admin\AdminDashboardController::class, '__invoke'])->name('dashboard');
 
+	    // CV Verification requests
+	    Route::get('/cv-verifications', [\App\Http\Controllers\Admin\CvVerificationController::class, 'index'])->name('cv_verifications.index');
+	    Route::put('/cv-verifications/{cvVerificationRequest}/approve', [\App\Http\Controllers\Admin\CvVerificationController::class, 'approve'])->name('cv_verifications.approve');
+	    Route::put('/cv-verifications/{cvVerificationRequest}/reject', [\App\Http\Controllers\Admin\CvVerificationController::class, 'reject'])->name('cv_verifications.reject');
+
     // Companies management
     Route::get('/companies', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'index'])->name('companies.index');
     Route::get('/companies/{company}', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'show'])->name('companies.show');
@@ -250,16 +255,13 @@ Route::middleware(['setlocale','auth','role:company','company.approved'])->prefi
 Route::middleware('setlocale')->get('/company/{company}', [\App\Http\Controllers\Public\CompanyPublicController::class, 'show'])->name('public.company.show');
 
 
-// Job seeker dashboard
-Route::middleware(['setlocale','auth','role:jobseeker'])->group(function(){
-    Route::get('/jobseeker', function(){ return view('dashboards.jobseeker'); })->name('jobseeker.dashboard');
-});
 // Jobseeker dashboard + profile + apply
 Route::middleware(['setlocale','auth','role:jobseeker'])->prefix('jobseeker')->name('jobseeker.')->group(function(){
     Route::get('/', [\App\Http\Controllers\JobSeeker\ProfileController::class,'dashboard'])->name('dashboard');
     Route::get('/profile', [\App\Http\Controllers\JobSeeker\ProfileController::class,'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\JobSeeker\ProfileController::class,'update'])->name('profile.update');
     Route::get('/profile/pdf', [\App\Http\Controllers\JobSeeker\ProfileController::class,'exportPdf'])->name('profile.pdf');
+	    Route::post('/cv-verification/request', [\App\Http\Controllers\JobSeeker\ProfileController::class,'requestCvVerification'])->name('cv_verification.request');
 
     Route::get('/apply/{job}', [\App\Http\Controllers\JobSeeker\ApplyController::class,'show'])->name('apply.show');
     Route::post('/apply/{job}', [\App\Http\Controllers\JobSeeker\ApplyController::class,'apply'])->name('apply');

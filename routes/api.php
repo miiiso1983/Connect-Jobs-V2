@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\CvController;
+use App\Http\Controllers\Api\CvVerificationController;
 use App\Http\Controllers\Api\NotificationTestController;
 
 /*
@@ -63,6 +64,12 @@ Route::prefix('v1')->middleware(['auth:api'])->group(function () {
         Route::post('change-password', [ProfileController::class, 'changePassword']);
         Route::delete('profile-image', [ProfileController::class, 'deleteProfileImage']);
     });
+
+	    // CV Verification (jobseekers only)
+	    Route::prefix('cv-verification')->middleware('role:jobseeker')->group(function () {
+	        Route::get('/', [CvVerificationController::class, 'status']);
+	        Route::post('/request', [CvVerificationController::class, 'request']);
+	    });
 
     // Job management
     Route::prefix('jobs')->group(function () {

@@ -198,10 +198,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    // Simple fade-in animation for a modern feel
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) setState(() => _animateIn = true);
-    });
+	  // Simple fade-in animation for a modern feel.
+	  // Use a post-frame callback (instead of Future.delayed) to avoid pending timers in widget tests.
+	  WidgetsBinding.instance.addPostFrameCallback((_) {
+	    if (mounted) setState(() => _animateIn = true);
+	  });
   }
 
   Future<void> _login() async {
@@ -944,21 +945,31 @@ class _JobsScreenState extends State<JobsScreen> {
     }
   }
 
+  bool _isLoggingOut = false;
+
   Future<void> _logout() async {
+    if (_isLoggingOut) return;
+    setState(() => _isLoggingOut = true);
+
+	  // Navigate immediately, then unregister FCM in background.
+	  // Use pushAndRemoveUntil to fully reset navigation stack (avoids occasional black screen on iOS).
+	  if (!mounted) return;
+	  Navigator.pushAndRemoveUntil(
+	    context,
+	    MaterialPageRoute(builder: (context) => const LoginScreen()),
+	    (route) => false,
+	  );
+
+    // Unregister FCM token in background (don't wait)
     try {
-      // Unregister FCM token before logout
       final auth = AuthService();
-      await auth.unregisterFCMTokenOnLogout(widget.token);
+      // ignore: unawaited_futures
+      auth.unregisterFCMTokenOnLogout(widget.token).then((_) {}, onError: (e) {
+        debugPrint('Failed to unregister FCM token on logout: $e');
+      });
     } catch (e) {
       debugPrint('Failed to unregister FCM token on logout: $e');
-      // Don't block logout flow if FCM unregistration fails
     }
-
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-    );
   }
 
   void _showSearchDialog() {
@@ -4029,6 +4040,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _skillsController = TextEditingController();
   final _languagesController = TextEditingController();
 
+  // Education (job seeker)
+  final _universityNameController = TextEditingController();
+  final _collegeNameController = TextEditingController();
+  final _departmentNameController = TextEditingController();
+  final _graduationYearController = TextEditingController();
+  bool _isFreshGraduate = false;
+
   // Company form controllers
   final _companyNameController = TextEditingController();
   final _companyIndustryController = TextEditingController();
@@ -4072,6 +4090,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _initializeForm();
   }
 
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _jobTitleController.dispose();
+    _summaryController.dispose();
+    _qualificationsController.dispose();
+    _experiencesController.dispose();
+    _skillsController.dispose();
+    _languagesController.dispose();
+    _universityNameController.dispose();
+    _collegeNameController.dispose();
+    _departmentNameController.dispose();
+    _graduationYearController.dispose();
+
+    _companyNameController.dispose();
+    _companyIndustryController.dispose();
+    _companyLocationController.dispose();
+    _companyWebsiteController.dispose();
+    _companyDescController.dispose();
+    super.dispose();
+  }
+
   void _initializeForm() {
     if (widget.profileData != null) {
       if (widget.user['role'] == 'jobseeker') {
@@ -4090,6 +4130,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _selectedExperienceLevel = jobSeeker['experience_level'];
           _selectedGender = jobSeeker['gender'];
           _ownCar = jobSeeker['own_car'] ?? false;
+
+          _universityNameController.text = jobSeeker['university_name'] ?? '';
+          _collegeNameController.text = jobSeeker['college_name'] ?? '';
+          _departmentNameController.text = jobSeeker['department_name'] ?? '';
+          final gy = jobSeeker['graduation_year'];
+          _graduationYearController.text = (gy == null || '$gy' == 'null') ? '' : '$gy';
+          final fg = jobSeeker['is_fresh_graduate'];
+          _isFreshGraduate = (fg == true) || (fg == 1) || ('$fg' == '1');
         }
       } else if (_isCompany) {
         final company = widget.profileData!['company'];
@@ -4135,6 +4183,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               if (_selectedExperienceLevel != null) 'experience_level': _selectedExperienceLevel,
               if (_selectedGender != null) 'gender': _selectedGender,
               'own_car': _ownCar,
+              // Education fields (send nulls to allow clearing)
+              'university_name': _universityNameController.text.trim().isEmpty ? null : _universityNameController.text.trim(),
+              'college_name': _collegeNameController.text.trim().isEmpty ? null : _collegeNameController.text.trim(),
+              'department_name': _departmentNameController.text.trim().isEmpty ? null : _departmentNameController.text.trim(),
+              'graduation_year': _graduationYearController.text.trim().isEmpty ? null : int.tryParse(_graduationYearController.text.trim()),
+              'is_fresh_graduate': _isFreshGraduate,
               if (_summaryController.text.isNotEmpty) 'summary': _summaryController.text,
               if (_qualificationsController.text.isNotEmpty) 'qualifications': _qualificationsController.text,
               if (_experiencesController.text.isNotEmpty) 'experiences': _experiencesController.text,
@@ -4181,6 +4235,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         if (_selectedExperienceLevel != null) fields['experience_level'] = _selectedExperienceLevel!;
         if (_selectedGender != null) fields['gender'] = _selectedGender!;
         fields['own_car'] = _ownCar ? '1' : '0';
+
+        // Education fields
+        fields['university_name'] = _universityNameController.text.trim();
+        fields['college_name'] = _collegeNameController.text.trim();
+        fields['department_name'] = _departmentNameController.text.trim();
+        fields['graduation_year'] = _graduationYearController.text.trim();
+        fields['is_fresh_graduate'] = _isFreshGraduate ? '1' : '0';
+
         if (_summaryController.text.isNotEmpty) fields['summary'] = _summaryController.text;
         if (_qualificationsController.text.isNotEmpty) fields['qualifications'] = _qualificationsController.text;
         if (_experiencesController.text.isNotEmpty) fields['experiences'] = _experiencesController.text;
@@ -4730,6 +4792,76 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+
+              // Education Information (Job Seeker)
+              if (!_isCompany)
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'المؤهل الدراسي',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _universityNameController,
+                          decoration: const InputDecoration(
+                            labelText: 'اسم الجامعة',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _collegeNameController,
+                          decoration: const InputDecoration(
+                            labelText: 'اسم الكلية',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _departmentNameController,
+                          decoration: const InputDecoration(
+                            labelText: 'اسم القسم',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _graduationYearController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'سنة التخرج',
+                            border: OutlineInputBorder(),
+                            hintText: 'مثال: 2024',
+                          ),
+                          validator: (value) {
+                            final v = (value ?? '').trim();
+                            if (v.isEmpty) return null;
+                            final y = int.tryParse(v);
+                            if (y == null) return 'يرجى إدخال سنة صحيحة';
+                            if (y < 1950 || y > 2100) return 'يرجى إدخال سنة بين 1950 و 2100';
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                        SwitchListTile.adaptive(
+                          contentPadding: EdgeInsets.zero,
+                          title: const Text('هل أنت خريج جديد؟'),
+                          value: _isFreshGraduate,
+                          onChanged: (v) => setState(() => _isFreshGraduate = v),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               const SizedBox(height: 16),
 
               // Additional Information
@@ -5777,6 +5909,254 @@ class AdminPlaceholderScreen extends StatelessWidget {
 }
 
 
+// ========================= CV Verification (Mobile) =========================
+class CvVerificationScreen extends StatefulWidget {
+  final String token;
+  const CvVerificationScreen({super.key, required this.token});
+
+  @override
+  State<CvVerificationScreen> createState() => _CvVerificationScreenState();
+}
+
+class _CvVerificationScreenState extends State<CvVerificationScreen> {
+  bool isLoading = true;
+  bool isRequesting = false;
+  String errorMessage = '';
+  Map<String, dynamic>? statusData;
+
+  Uri _path(String path) => Uri.parse('${AppConfig.baseUrl}$path');
+  Map<String, String> _headers() => {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ${widget.token}',
+      };
+
+  String _wrapSessionUrl(String absoluteUrl) {
+    final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+    String redirect = absoluteUrl;
+    if (absoluteUrl.startsWith(site)) {
+      redirect = absoluteUrl.substring(site.length);
+      if (!redirect.startsWith('/')) redirect = '/$redirect';
+    }
+    final encodedToken = Uri.encodeComponent(widget.token);
+    final dest = Uri.encodeComponent(redirect);
+    return '${site}mobile/session-login?token=$encodedToken&redirect=$dest';
+  }
+
+  void _openWeb(BuildContext context, String title, String url) {
+    final bridged = _wrapSessionUrl(url);
+    Navigator.push(context, MaterialPageRoute(builder: (_) => AdminWebViewScreen(title: title, url: bridged)));
+  }
+
+  Map<String, dynamic> _normalize(Map<String, dynamic> raw, int status) {
+    if (raw.containsKey('success')) return raw;
+    if (status >= 200 && status < 300) return {'success': true, 'data': raw};
+    return {'success': false, 'message': (raw['message'] as String?) ?? 'فشل الطلب', 'status': status, 'data': raw};
+  }
+
+  Future<void> _loadStatus() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+    try {
+      final resp = await http.get(_path('cv-verification/'), headers: _headers());
+      Map<String, dynamic> data;
+      try {
+        data = jsonDecode(resp.body) is Map<String, dynamic> ? (jsonDecode(resp.body) as Map<String, dynamic>) : <String, dynamic>{};
+      } catch (_) {
+        data = <String, dynamic>{};
+      }
+      final normalized = _normalize(data, resp.statusCode);
+      if (!mounted) return;
+      if (normalized['success'] == true) {
+        setState(() {
+          statusData = (normalized['data'] as Map<String, dynamic>?) ?? {};
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = (normalized['message'] as String?) ?? 'فشل في تحميل الحالة';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        errorMessage = 'خطأ في الاتصال: $e';
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _submitRequest() async {
+    if (isRequesting) return;
+    setState(() {
+      isRequesting = true;
+      errorMessage = '';
+    });
+    try {
+      final resp = await http.post(_path('cv-verification/request'), headers: _headers());
+      Map<String, dynamic> data;
+      try {
+        data = jsonDecode(resp.body) is Map<String, dynamic> ? (jsonDecode(resp.body) as Map<String, dynamic>) : <String, dynamic>{};
+      } catch (_) {
+        data = <String, dynamic>{};
+      }
+      final normalized = _normalize(data, resp.statusCode);
+      if (!mounted) return;
+      if (normalized['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم إرسال طلب التوثيق بنجاح')));
+        await _loadStatus();
+      } else {
+        setState(() {
+          errorMessage = (normalized['message'] as String?) ?? 'فشل في إرسال الطلب';
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        errorMessage = 'خطأ في الاتصال: $e';
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          isRequesting = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStatus();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
+
+    final data = statusData ?? {};
+    final cvVerified = data['cv_verified'] == true;
+    final hasCv = data['has_cv'] == true;
+    final latest = data['latest_request'];
+    String? latestStatus;
+    String? adminNotes;
+    if (latest is Map) {
+      latestStatus = (latest['status'] as String?);
+      adminNotes = (latest['admin_notes'] as String?);
+    }
+
+    Widget statusWidget() {
+      if (cvVerified) {
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12)),
+          child: const Row(children: [Icon(Icons.verified_rounded, color: Colors.green), SizedBox(width: 8), Expanded(child: Text('السيرة الذاتية موثّقة'))]),
+        );
+      }
+      if (!hasCv) {
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12)),
+          child: const Row(children: [Icon(Icons.upload_file_rounded, color: Colors.orange), SizedBox(width: 8), Expanded(child: Text('يرجى رفع السيرة الذاتية (CV) أولاً'))]),
+        );
+      }
+      if (latestStatus == 'pending') {
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: scheme.primary.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12)),
+          child: Row(children: [Icon(Icons.hourglass_top_rounded, color: scheme.primary), const SizedBox(width: 8), const Expanded(child: Text('طلب التوثيق قيد المراجعة'))]),
+        );
+      }
+      if (latestStatus == 'rejected') {
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(12)),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Row(children: [Icon(Icons.cancel_rounded, color: Colors.red), SizedBox(width: 8), Expanded(child: Text('تم رفض طلب التوثيق'))]),
+            if ((adminNotes ?? '').trim().isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text('ملاحظات الإدارة: $adminNotes', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8))),
+            ],
+          ]),
+        );
+      }
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(color: scheme.surfaceContainerHighest.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(12)),
+        child: const Row(children: [Icon(Icons.info_outline_rounded), SizedBox(width: 8), Expanded(child: Text('لم يتم إرسال طلب توثيق بعد.'))]),
+      );
+    }
+
+    Widget actionWidget() {
+      if (cvVerified) {
+        return const SizedBox.shrink();
+      }
+      if (!hasCv) {
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () => _openWeb(context, 'الملف الشخصي', '${site}jobseeker/profile'),
+            icon: const Icon(Icons.edit_rounded),
+            label: const Text('رفع/تعديل السيرة الذاتية'),
+          ),
+        );
+      }
+      final disabled = (latestStatus == 'pending') || isRequesting;
+      return SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: disabled ? null : _submitRequest,
+          icon: isRequesting
+              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : const Icon(Icons.verified_user_rounded),
+          label: Text(latestStatus == 'rejected' ? 'إعادة إرسال طلب التوثيق' : 'طلب توثيق السيرة الذاتية'),
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('توثيق السيرة الذاتية'),
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+        actions: [
+          IconButton(onPressed: isLoading ? null : _loadStatus, icon: const Icon(Icons.refresh_rounded)),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (errorMessage.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(color: Colors.red[50], borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.red[200]!)),
+                      child: Text(errorMessage, style: TextStyle(color: Colors.red[700])),
+                    ),
+                  Text(
+                    'هذه الميزة متاحة للصيادلة فقط (إذا كان المسمى الوظيفي يحتوي على صيدل أو pharmac).',
+                    style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75)),
+                    textAlign: TextAlign.right,
+                  ),
+                  const SizedBox(height: 12),
+                  statusWidget(),
+                  const SizedBox(height: 16),
+                  actionWidget(),
+                ],
+              ),
+      ),
+    );
+  }
+}
+
+
 // ========================= Job Seeker Dashboard (Mobile) =========================
 class JobSeekerDashboardScreen extends StatelessWidget {
   final String token;
@@ -5886,6 +6266,13 @@ class JobSeekerDashboardScreen extends StatelessWidget {
                         onTap: () => _open(context, 'لوحة الباحث', '${site}jobseeker')),
                       _jsCard(context, title: 'الملف الشخصي', icon: Icons.account_circle_rounded, gradient: const LinearGradient(colors: [Color(0xFF9333EA), Color(0xFF7E22CE)]),
                         onTap: () => _open(context, 'الملف الشخصي', '${site}jobseeker/profile')),
+                      _jsCard(
+                        context,
+                        title: 'توثيق CV',
+                        icon: Icons.verified_user_rounded,
+                        gradient: const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFD97706)]),
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CvVerificationScreen(token: token))),
+                      ),
                       _jsCard(context, title: 'الإشعارات', icon: Icons.notifications_active_rounded, gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
                         onTap: () => _open(context, 'الإشعارات', '${site}notifications')),
                       _jsCard(context, title: 'تصفح الوظائف', icon: Icons.search_rounded, gradient: const LinearGradient(colors: [Color(0xFF0EA5E9), Color(0xFF0369A1)]),

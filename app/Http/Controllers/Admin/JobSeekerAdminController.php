@@ -27,6 +27,13 @@ class JobSeekerAdminController extends Controller
         $profileCompleted = trim((string) $request->get('profile_completed', ''));
         $hasCv = trim((string) $request->get('has_cv', ''));
 
+        $universityName = trim((string) $request->get('university_name', ''));
+        $collegeName = trim((string) $request->get('college_name', ''));
+        $departmentName = trim((string) $request->get('department_name', ''));
+        $graduationYear = trim((string) $request->get('graduation_year', ''));
+        $isFreshGraduate = (string) $request->get('is_fresh_graduate', '');
+        $cvVerified = (string) $request->get('cv_verified', '');
+
         $seekersQ = JobSeeker::query()->with('user');
         if ($q !== '') {
             $seekersQ->where(function($qq) use ($q){
@@ -76,6 +83,25 @@ class JobSeekerAdminController extends Controller
                 $sub->groupBy('user_id');
                 $u->whereIn('id', $sub);
             });
+        }
+
+        if ($universityName !== '' && Schema::hasColumn('job_seekers', 'university_name')) {
+            $seekersQ->where('university_name', 'like', "%$universityName%");
+        }
+        if ($collegeName !== '' && Schema::hasColumn('job_seekers', 'college_name')) {
+            $seekersQ->where('college_name', 'like', "%$collegeName%");
+        }
+        if ($departmentName !== '' && Schema::hasColumn('job_seekers', 'department_name')) {
+            $seekersQ->where('department_name', 'like', "%$departmentName%");
+        }
+        if ($graduationYear !== '' && Schema::hasColumn('job_seekers', 'graduation_year')) {
+            $seekersQ->where('graduation_year', (int) $graduationYear);
+        }
+        if ($isFreshGraduate !== '' && Schema::hasColumn('job_seekers', 'is_fresh_graduate')) {
+            $seekersQ->where('is_fresh_graduate', $isFreshGraduate === '1');
+        }
+        if ($cvVerified !== '' && Schema::hasColumn('job_seekers', 'cv_verified')) {
+            $seekersQ->where('cv_verified', $cvVerified === '1');
         }
 
         $seekers = $seekersQ->orderByDesc('id')->paginate($perPage)->withQueryString();
@@ -129,6 +155,13 @@ class JobSeekerAdminController extends Controller
             'hasCv' => $hasCv,
             'completedCount' => $completedCount,
             'cvCount' => $cvCount,
+
+            'universityName' => $universityName,
+            'collegeName' => $collegeName,
+            'departmentName' => $departmentName,
+            'graduationYear' => $graduationYear,
+            'isFreshGraduate' => $isFreshGraduate,
+            'cvVerified' => $cvVerified,
         ]);
     }
 

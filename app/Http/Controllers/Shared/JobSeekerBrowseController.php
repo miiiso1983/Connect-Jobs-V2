@@ -38,6 +38,19 @@ class JobSeekerBrowseController extends Controller
         if ($hasEducation) { $filters['education_level'] = trim((string)$request->get('education_level','')); }
         if ($hasExperience) { $filters['experience_level'] = trim((string)$request->get('experience_level','')); }
 
+        $hasUniversity = Schema::hasColumn('job_seekers', 'university_name');
+        $hasCollege = Schema::hasColumn('job_seekers', 'college_name');
+        $hasDepartment = Schema::hasColumn('job_seekers', 'department_name');
+        $hasGraduationYear = Schema::hasColumn('job_seekers', 'graduation_year');
+        $hasFreshGraduate = Schema::hasColumn('job_seekers', 'is_fresh_graduate');
+        $hasCvVerified = Schema::hasColumn('job_seekers', 'cv_verified');
+        if ($hasUniversity) { $filters['university_name'] = trim((string)$request->get('university_name','')); }
+        if ($hasCollege) { $filters['college_name'] = trim((string)$request->get('college_name','')); }
+        if ($hasDepartment) { $filters['department_name'] = trim((string)$request->get('department_name','')); }
+        if ($hasGraduationYear) { $filters['graduation_year'] = trim((string)$request->get('graduation_year','')); }
+        if ($hasFreshGraduate) { $filters['is_fresh_graduate'] = (string)$request->get('is_fresh_graduate',''); }
+        if ($hasCvVerified) { $filters['cv_verified'] = (string)$request->get('cv_verified',''); }
+
         $perPage = (int) $request->get('per_page', 20);
         if ($perPage < 5) $perPage = 5; if ($perPage > 200) $perPage = 200;
 
@@ -107,6 +120,25 @@ class JobSeekerBrowseController extends Controller
             $seekersQ->where('experience_level', $filters['experience_level']);
         }
 
+        if ($hasUniversity && ($filters['university_name'] ?? '') !== '') {
+            $seekersQ->where('university_name', 'like', '%'.$filters['university_name'].'%');
+        }
+        if ($hasCollege && ($filters['college_name'] ?? '') !== '') {
+            $seekersQ->where('college_name', 'like', '%'.$filters['college_name'].'%');
+        }
+        if ($hasDepartment && ($filters['department_name'] ?? '') !== '') {
+            $seekersQ->where('department_name', 'like', '%'.$filters['department_name'].'%');
+        }
+        if ($hasGraduationYear && ($filters['graduation_year'] ?? '') !== '') {
+            $seekersQ->where('graduation_year', (int) $filters['graduation_year']);
+        }
+        if ($hasFreshGraduate && ($filters['is_fresh_graduate'] ?? '') !== '') {
+            $seekersQ->where('is_fresh_graduate', ($filters['is_fresh_graduate'] === '1'));
+        }
+        if ($hasCvVerified && ($filters['cv_verified'] ?? '') !== '') {
+            $seekersQ->where('cv_verified', ($filters['cv_verified'] === '1'));
+        }
+
         // Pagination or export
         if ($request->get('export') === 'csv') {
             if ($this->context() !== 'admin') {
@@ -170,6 +202,12 @@ class JobSeekerBrowseController extends Controller
             'experienceLevels' => $experienceLevels,
             'hasEducation' => $hasEducation,
             'hasExperience' => $hasExperience,
+            'hasUniversity' => $hasUniversity,
+            'hasCollege' => $hasCollege,
+            'hasDepartment' => $hasDepartment,
+            'hasGraduationYear' => $hasGraduationYear,
+            'hasFreshGraduate' => $hasFreshGraduate,
+            'hasCvVerified' => $hasCvVerified,
             'perPage' => $perPage,
             'context' => $context,
         ]);

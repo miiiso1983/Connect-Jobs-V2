@@ -120,6 +120,38 @@
                     <option value="0" @selected(($hasCv ?? '')==='0')>لا</option>
                 </select>
             </div>
+	            <div class="md:col-span-2">
+	                <x-input-label for="university_name" value="اسم الجامعة" />
+	                <input type="text" id="university_name" name="university_name" value="{{ $universityName ?? '' }}" class="input input-bordered w-full" />
+	            </div>
+	            <div class="md:col-span-2">
+	                <x-input-label for="college_name" value="اسم الكلية" />
+	                <input type="text" id="college_name" name="college_name" value="{{ $collegeName ?? '' }}" class="input input-bordered w-full" />
+	            </div>
+	            <div class="md:col-span-2">
+	                <x-input-label for="department_name" value="اسم القسم" />
+	                <input type="text" id="department_name" name="department_name" value="{{ $departmentName ?? '' }}" class="input input-bordered w-full" />
+	            </div>
+	            <div>
+	                <x-input-label for="graduation_year" value="سنة التخرج" />
+	                <input type="number" id="graduation_year" name="graduation_year" value="{{ $graduationYear ?? '' }}" class="input input-bordered w-full" placeholder="مثال: 2024" />
+	            </div>
+	            <div>
+	                <x-input-label for="is_fresh_graduate" value="خريج جديد؟" />
+	                <select id="is_fresh_graduate" name="is_fresh_graduate" class="select select-bordered w-full">
+	                    <option value="">—</option>
+	                    <option value="1" @selected(($isFreshGraduate ?? '')==='1')>نعم</option>
+	                    <option value="0" @selected(($isFreshGraduate ?? '')==='0')>لا</option>
+	                </select>
+	            </div>
+	            <div>
+	                <x-input-label for="cv_verified" value="توثيق السيرة الذاتية" />
+	                <select id="cv_verified" name="cv_verified" class="select select-bordered w-full">
+	                    <option value="">—</option>
+	                    <option value="1" @selected(($cvVerified ?? '')==='1')>موثق</option>
+	                    <option value="0" @selected(($cvVerified ?? '')==='0')>غير موثق</option>
+	                </select>
+	            </div>
             <div class="md:col-span-6 flex gap-2">
                 <button class="px-6 py-2 rounded-lg bg-[#0D2660] hover:bg-[#0A1E46] text-white font-medium transition-colors">تطبيق</button>
                 <a href="{{ route('admin.jobseekers.index') }}" class="btn btn-ghost">تفريغ</a>
@@ -161,7 +193,21 @@
                                     <div class="text-gray-500">{{ $s->user->email ?? '—' }}</div>
                                 </div>
                             </td>
-                            <td>{{ $s->full_name ?? '—' }}</td>
+	                            <td>
+	                                <div class="font-medium">{{ $s->full_name ?? '—' }}</div>
+	                                @php($edu = collect([$s->university_name ?? null, $s->college_name ?? null, $s->department_name ?? null])->filter()->implode(' — '))
+	                                @if($edu)
+	                                    <div class="text-xs text-gray-500 mt-1">{{ $edu }}</div>
+	                                @endif
+	                                @if(($s->graduation_year ?? null))
+	                                    <div class="text-xs text-gray-500">سنة التخرج: {{ $s->graduation_year }}</div>
+	                                @endif
+	                                <div class="mt-1 flex flex-wrap gap-1">
+	                                    @if(($s->is_fresh_graduate ?? false))
+	                                        <span class="badge badge-info badge-sm">خريج جديد</span>
+	                                    @endif
+	                                </div>
+	                            </td>
                             <td>{{ $s->province ?? '—' }}</td>
                             <td>{{ $s->job_title ?? '—' }}</td>
                             <td>
@@ -182,7 +228,12 @@
                                 @if($cv===null)
                                     —
                                 @else
-                                    <span class="badge {{ ($cv !== '') ? 'badge-success' : 'badge-ghost' }}">{{ ($cv !== '') ? 'مرفوعة' : 'لا' }}</span>
+	                                    <div class="flex flex-wrap gap-1">
+	                                        <span class="badge {{ ($cv !== '') ? 'badge-success' : 'badge-ghost' }}">{{ ($cv !== '') ? 'مرفوعة' : 'لا' }}</span>
+	                                        @if(($s->cv_verified ?? false))
+	                                            <span class="badge badge-success">موثق</span>
+	                                        @endif
+	                                    </div>
                                 @endif
                             </td>
                             <td>{{ $s->user->created_at ?? '—' }}</td>

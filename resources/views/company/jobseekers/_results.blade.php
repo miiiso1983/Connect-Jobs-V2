@@ -20,6 +20,14 @@
                     <div class="text-sm">
                         <div class="font-semibold">{{ $s->user->name ?? '—' }}</div>
                         <div class="text-gray-500">{{ $s->user->email ?? '—' }}</div>
+	                        <div class="mt-1 flex flex-wrap gap-1">
+	                            @if(($s->cv_verified ?? false))
+	                                <span class="badge badge-success badge-sm">CV موثق</span>
+	                            @endif
+	                            @if(($s->is_fresh_graduate ?? false))
+	                                <span class="badge badge-info badge-sm">خريج جديد</span>
+	                            @endif
+	                        </div>
                     </div>
                 </td>
                 <td>{{ $s->full_name ?? '—' }}</td>

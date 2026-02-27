@@ -4,12 +4,14 @@ namespace App\Http\Controllers\JobSeeker;
 
 use App\Http\Controllers\Controller;
 use App\Models\Job;
+use App\Models\CvVerificationRequest;
 use App\Models\JobSeeker;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 
 class ProfileController extends Controller
@@ -34,8 +36,51 @@ class ProfileController extends Controller
     }
     public function dashboard(): View
     {
-        return view('jobseeker.dashboard');
+		$js = JobSeeker::firstWhere('user_id', Auth::id());
+		$latestCvVerificationRequest = null;
+		$isPharmacist = false;
+		if ($js) {
+			$title = Str::lower((string)($js->job_title ?? ''));
+			$isPharmacist = str_contains($title, 'صيدل') || str_contains($title, 'pharmac');
+			$latestCvVerificationRequest = CvVerificationRequest::where('job_seeker_id', $js->id)
+				->orderByDesc('id')
+				->first();
+		}
+
+		return view('jobseeker.dashboard', compact('js', 'latestCvVerificationRequest', 'isPharmacist'));
     }
+
+	public function requestCvVerification(Request $request): RedirectResponse
+	{
+		$js = JobSeeker::firstWhere('user_id', Auth::id());
+		abort_if(!$js, 404);
+
+		$title = Str::lower((string)($js->job_title ?? ''));
+		$isPharmacist = str_contains($title, 'صيدل') || str_contains($title, 'pharmac');
+		abort_if(!$isPharmacist, 403);
+
+		if ($js->cv_verified) {
+			return back()->with('status', 'السيرة الذاتية موثقة مسبقاً.');
+		}
+		if (empty($js->cv_file)) {
+			return back()->with('status', 'يرجى رفع السيرة الذاتية أولاً ثم إعادة الطلب.');
+		}
+
+		$hasPending = CvVerificationRequest::where('job_seeker_id', $js->id)
+			->where('status', CvVerificationRequest::STATUS_PENDING)
+			->exists();
+		if ($hasPending) {
+			return back()->with('status', 'لديك طلب توثيق قيد المراجعة بالفعل.');
+		}
+
+		CvVerificationRequest::create([
+			'job_seeker_id' => $js->id,
+			'cv_file' => $js->cv_file,
+			'status' => CvVerificationRequest::STATUS_PENDING,
+		]);
+
+		return back()->with('status', 'تم إرسال طلب توثيق السيرة الذاتية، سيتم مراجعته من قبل الإدارة.');
+	}
 
     public function edit(): View
     {
@@ -65,6 +110,12 @@ class ProfileController extends Controller
             'specialities.*' => 'string|max:150',
             'gender' => 'nullable|in:male,female',
             'own_car' => 'nullable|boolean',
+	            // Education
+	            'university_name' => 'nullable|string|max:190',
+	            'college_name' => 'nullable|string|max:190',
+	            'department_name' => 'nullable|string|max:190',
+	            'graduation_year' => 'nullable|integer|min:1950|max:2100',
+	            'is_fresh_graduate' => 'nullable|boolean',
             'summary' => 'nullable|string',
             'qualifications' => 'nullable|string',
             'experiences' => 'nullable|string',
@@ -110,7 +161,10 @@ class ProfileController extends Controller
             }
         }
 
-        $js->update([
+	        $gradYear = $request->input('graduation_year');
+	        $gradYear = ($gradYear === null || $gradYear === '') ? null : (int) $gradYear;
+
+	        $js->update([
             'full_name' => $request->full_name,
             'province' => $request->province,
             'districts' => $request->input('districts', []),
@@ -119,6 +173,12 @@ class ProfileController extends Controller
             'specialities' => $request->input('specialities', []),
             'gender' => $request->gender,
             'own_car' => (bool)$request->own_car,
+	            // Education
+	            'university_name' => $request->input('university_name'),
+	            'college_name' => $request->input('college_name'),
+	            'department_name' => $request->input('department_name'),
+	            'graduation_year' => $gradYear,
+	            'is_fresh_graduate' => $request->boolean('is_fresh_graduate'),
             'summary' => $request->summary,
             'qualifications' => $request->qualifications,
             'experiences' => $request->experiences,
