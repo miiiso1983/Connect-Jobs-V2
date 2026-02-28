@@ -9,6 +9,7 @@ use App\Models\JobSeeker;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -39,25 +40,52 @@ class ProfileController extends Controller
 		$js = JobSeeker::firstWhere('user_id', Auth::id());
 		$latestCvVerificationRequest = null;
 		$isPharmacist = false;
+			$cvVerificationAvailable = Schema::hasTable('cv_verification_requests');
 		if ($js) {
 			$title = Str::lower((string)($js->job_title ?? ''));
 			$isPharmacist = str_contains($title, 'صيدل') || str_contains($title, 'pharmac');
-			$latestCvVerificationRequest = CvVerificationRequest::where('job_seeker_id', $js->id)
-				->orderByDesc('id')
-				->first();
+				if ($isPharmacist && $cvVerificationAvailable) {
+					$latestCvVerificationRequest = CvVerificationRequest::where('job_seeker_id', $js->id)
+						->orderByDesc('id')
+						->first();
+				}
 		}
 
-		return view('jobseeker.dashboard', compact('js', 'latestCvVerificationRequest', 'isPharmacist'));
+			return view('jobseeker.dashboard', compact('js', 'latestCvVerificationRequest', 'isPharmacist', 'cvVerificationAvailable'));
     }
+
+		public function cvVerification(): View
+		{
+			$js = JobSeeker::firstWhere('user_id', Auth::id());
+			abort_if(!$js, 404);
+
+			$title = Str::lower((string)($js->job_title ?? ''));
+			$isPharmacist = str_contains($title, 'صيدل') || str_contains($title, 'pharmac');
+			$cvVerificationAvailable = Schema::hasTable('cv_verification_requests');
+			$latestCvVerificationRequest = null;
+			if ($isPharmacist && $cvVerificationAvailable) {
+				$latestCvVerificationRequest = CvVerificationRequest::where('job_seeker_id', $js->id)
+					->orderByDesc('id')
+					->first();
+			}
+
+			return view('jobseeker.cv-verification', compact('js', 'latestCvVerificationRequest', 'isPharmacist', 'cvVerificationAvailable'));
+		}
 
 	public function requestCvVerification(Request $request): RedirectResponse
 	{
 		$js = JobSeeker::firstWhere('user_id', Auth::id());
 		abort_if(!$js, 404);
+			if (!Schema::hasTable('cv_verification_requests')) {
+				return back()->with('status', 'ميزة التوثيق غير متاحة حالياً. يرجى المحاولة لاحقاً.');
+			}
 
 		$title = Str::lower((string)($js->job_title ?? ''));
 		$isPharmacist = str_contains($title, 'صيدل') || str_contains($title, 'pharmac');
-		abort_if(!$isPharmacist, 403);
+			if (!$isPharmacist) {
+				return redirect()->route('jobseeker.cv_verification.show')
+					->with('status', 'هذه الخدمة متاحة للصيادلة فقط. إذا كنت صيدلانياً، حدّث المسمى الوظيفي من صفحة تعديل الملف الشخصي.');
+			}
 
 		if ($js->cv_verified) {
 			return back()->with('status', 'السيرة الذاتية موثقة مسبقاً.');

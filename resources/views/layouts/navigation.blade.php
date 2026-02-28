@@ -19,6 +19,17 @@
                         {{ __('nav.jobs') }}
                     </x-nav-link>
 
+	                    @if(auth()->check() && (auth()->user()->role ?? null)==='jobseeker')
+	                        @php($navJs = \App\Models\JobSeeker::firstWhere('user_id', auth()->id()))
+	                        @php($navTitle = \Illuminate\Support\Str::lower((string)($navJs->job_title ?? '')))
+	                        @php($navIsPharmacist = str_contains($navTitle, 'صيدل') || str_contains($navTitle, 'pharmac'))
+	                        @if($navIsPharmacist)
+	                            <x-nav-link :href="route('jobseeker.cv_verification.show')" :active="request()->routeIs('jobseeker.cv_verification.*')">
+	                                التوثيق (للصيادلة)
+	                            </x-nav-link>
+	                        @endif
+	                    @endif
+
                     @if(auth()->check() && (auth()->user()->role ?? null)==='company')
                         <x-nav-link :href="route('company.seekers.browse')" :active="request()->routeIs('company.seekers.browse')">
                             قاعدة الباحثين
@@ -158,6 +169,16 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('nav.dashboard') }}
             </x-responsive-nav-link>
+	            @if(auth()->check() && (auth()->user()->role ?? null)==='jobseeker')
+	                @php($navJs = \App\Models\JobSeeker::firstWhere('user_id', auth()->id()))
+	                @php($navTitle = \Illuminate\Support\Str::lower((string)($navJs->job_title ?? '')))
+	                @php($navIsPharmacist = str_contains($navTitle, 'صيدل') || str_contains($navTitle, 'pharmac'))
+	                @if($navIsPharmacist)
+	                    <x-responsive-nav-link :href="route('jobseeker.cv_verification.show')" :active="request()->routeIs('jobseeker.cv_verification.*')">
+	                        التوثيق (للصيادلة)
+	                    </x-responsive-nav-link>
+	                @endif
+	            @endif
         </div>
 
         <!-- Responsive Settings Options -->

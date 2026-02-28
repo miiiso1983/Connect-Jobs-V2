@@ -261,6 +261,8 @@ Route::middleware(['setlocale','auth','role:jobseeker'])->prefix('jobseeker')->n
     Route::get('/profile', [\App\Http\Controllers\JobSeeker\ProfileController::class,'edit'])->name('profile.edit');
     Route::post('/profile', [\App\Http\Controllers\JobSeeker\ProfileController::class,'update'])->name('profile.update');
     Route::get('/profile/pdf', [\App\Http\Controllers\JobSeeker\ProfileController::class,'exportPdf'])->name('profile.pdf');
+	    // Pharmacists CV verification (separate page)
+	    Route::get('/cv-verification', [\App\Http\Controllers\JobSeeker\ProfileController::class,'cvVerification'])->name('cv_verification.show');
 	    Route::post('/cv-verification/request', [\App\Http\Controllers\JobSeeker\ProfileController::class,'requestCvVerification'])->name('cv_verification.request');
 
     Route::get('/apply/{job}', [\App\Http\Controllers\JobSeeker\ApplyController::class,'show'])->name('apply.show');
