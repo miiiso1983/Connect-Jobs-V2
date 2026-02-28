@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class JobSeeker extends Model
 {
@@ -50,6 +51,20 @@ class JobSeeker extends Model
         'is_fresh_graduate' => 'boolean',
         'graduation_year' => 'integer',
     ];
+
+	public function isPharmacist(): bool
+	{
+		$parts = [
+			(string) ($this->job_title ?? ''),
+			(string) ($this->speciality ?? ''),
+			is_array($this->specialities ?? null) ? implode(' ', $this->specialities) : (string) ($this->specialities ?? ''),
+			(string) ($this->college_name ?? ''),
+			(string) ($this->department_name ?? ''),
+			(string) ($this->qualifications ?? ''),
+		];
+		$haystack = Str::lower(trim(implode(' ', array_filter($parts))));
+		return str_contains($haystack, 'صيدل') || str_contains($haystack, 'pharmac');
+	}
 
     public function user(){ return $this->belongsTo(User::class); }
     public function applications(){ return $this->hasMany(Application::class); }

@@ -47,41 +47,50 @@
             </div>
         </div>
 
-	        @if(($isPharmacist ?? false))
-	            @php
-	                $latest = $latestCvVerificationRequest ?? null;
-	                $latestStatus = $latest->status ?? null;
-	                $hasCv = !empty($js->cv_file ?? null);
-	                $isVerified = (bool)($js->cv_verified ?? false);
-	                $available = (bool)($cvVerificationAvailable ?? true);
-	            @endphp
+	        @php
+	            $latest = $latestCvVerificationRequest ?? null;
+	            $latestStatus = $latest->status ?? null;
+	            $hasCv = !empty($js->cv_file ?? null);
+	            $isVerified = (bool)($js->cv_verified ?? false);
+	            $available = (bool)($cvVerificationAvailable ?? true);
+	        @endphp
 
-	            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
-	                <div class="flex items-center justify-between gap-3">
-	                    <div>
-	                        <div class="text-lg font-bold text-gray-800 dark:text-white">التوثيق (للصيادلة)</div>
-	                        <div class="text-sm text-gray-600 dark:text-gray-300">صفحة مستقلة لإرسال طلب التوثيق ومتابعة الحالة.</div>
-	                    </div>
-	                    <a href="{{ route('jobseeker.cv_verification.show') }}" class="btn bg-[#0D2660] hover:bg-[#0a1d4d] text-white border-none">فتح</a>
+	        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+	            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+	                <div>
+	                    <div class="text-lg font-bold text-gray-800 dark:text-white">التوثيق (للصيادلة)</div>
+	                    <div class="text-sm text-gray-600 dark:text-gray-300">صفحة مستقلة لإرسال طلب توثيق CV ومتابعة الحالة (للصيادلة فقط).</div>
 	                </div>
-
-	                <div class="mt-4 flex flex-wrap gap-2">
-	                    <span class="badge badge-outline">Pharmacist</span>
-	                    @if(!$available)
-	                        <span class="badge badge-warning">غير متاح حالياً</span>
-	                    @elseif($isVerified)
-	                        <span class="badge badge-success">موثّق</span>
-	                    @elseif($latestStatus === \App\Models\CvVerificationRequest::STATUS_PENDING)
-	                        <span class="badge badge-info">قيد المراجعة</span>
-	                    @elseif($latestStatus === \App\Models\CvVerificationRequest::STATUS_REJECTED)
-	                        <span class="badge badge-warning">مرفوض</span>
-	                    @else
-	                        <span class="badge badge-ghost">غير مُرسل</span>
+	                <div class="flex flex-wrap gap-2">
+	                    <a href="{{ route('jobseeker.cv_verification.show') }}" class="btn bg-[#0D2660] hover:bg-[#0a1d4d] text-white border-none">فتح</a>
+	                    @if(!($isPharmacist ?? false))
+	                        <a href="{{ route('jobseeker.profile.edit') }}" class="btn">تعديل المسمى الوظيفي</a>
 	                    @endif
-	                    <span class="badge badge-ghost">CV: {{ $hasCv ? 'مرفوعة' : 'غير مرفوعة' }}</span>
 	                </div>
 	            </div>
-	        @endif
+
+	            <div class="mt-4 flex flex-wrap gap-2">
+	                @if(!($isPharmacist ?? false))
+	                    <span class="badge badge-warning">للصيادلة فقط</span>
+	                @else
+	                    <span class="badge badge-outline">Pharmacist</span>
+	                @endif
+
+	                @if(!$available)
+	                    <span class="badge badge-warning">غير متاح حالياً</span>
+	                @elseif(($isPharmacist ?? false) && $isVerified)
+	                    <span class="badge badge-success">موثّق</span>
+	                @elseif(($isPharmacist ?? false) && $latestStatus === \App\Models\CvVerificationRequest::STATUS_PENDING)
+	                    <span class="badge badge-info">قيد المراجعة</span>
+	                @elseif(($isPharmacist ?? false) && $latestStatus === \App\Models\CvVerificationRequest::STATUS_REJECTED)
+	                    <span class="badge badge-warning">مرفوض</span>
+	                @elseif(($isPharmacist ?? false))
+	                    <span class="badge badge-ghost">غير مُرسل</span>
+	                @endif
+
+	                <span class="badge badge-ghost">CV: {{ $hasCv ? 'مرفوعة' : 'غير مرفوعة' }}</span>
+	            </div>
+	        </div>
     </div>
 </x-app-layout>
 

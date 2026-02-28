@@ -17,7 +17,7 @@
             <div class="card bg-white dark:bg-gray-800 shadow">
                 <div class="card-body p-6">
                     <div class="alert alert-warning">
-                        <span>هذه الصفحة مخصصة لتوثيق السيرة الذاتية للصيادلة فقط. إذا كنت صيدلانياً، حدّث المسمى الوظيفي إلى (صيدل...) أو (pharmac...) ثم أعد المحاولة.</span>
+	                        <span>هذه الصفحة مخصصة لتوثيق السيرة الذاتية للصيادلة فقط. إذا كنت صيدلانياً، حدّث بيانات ملفك (مثل: المسمى الوظيفي/التخصص/الكلية/القسم) لتتضمن (صيدل...) أو (pharmac...) ثم أعد المحاولة.</span>
                     </div>
                     <div class="mt-4">
                         <a href="{{ route('jobseeker.profile.edit') }}" class="btn bg-[#0D2660] hover:bg-[#0a1d4d] text-white border-none">تعديل الملف الشخصي</a>

@@ -42,8 +42,7 @@ class ProfileController extends Controller
 		$isPharmacist = false;
 			$cvVerificationAvailable = Schema::hasTable('cv_verification_requests');
 		if ($js) {
-			$title = Str::lower((string)($js->job_title ?? ''));
-			$isPharmacist = str_contains($title, 'صيدل') || str_contains($title, 'pharmac');
+				$isPharmacist = $js->isPharmacist();
 				if ($isPharmacist && $cvVerificationAvailable) {
 					$latestCvVerificationRequest = CvVerificationRequest::where('job_seeker_id', $js->id)
 						->orderByDesc('id')
@@ -59,8 +58,7 @@ class ProfileController extends Controller
 			$js = JobSeeker::firstWhere('user_id', Auth::id());
 			abort_if(!$js, 404);
 
-			$title = Str::lower((string)($js->job_title ?? ''));
-			$isPharmacist = str_contains($title, 'صيدل') || str_contains($title, 'pharmac');
+				$isPharmacist = $js->isPharmacist();
 			$cvVerificationAvailable = Schema::hasTable('cv_verification_requests');
 			$latestCvVerificationRequest = null;
 			if ($isPharmacist && $cvVerificationAvailable) {
@@ -79,12 +77,10 @@ class ProfileController extends Controller
 			if (!Schema::hasTable('cv_verification_requests')) {
 				return back()->with('status', 'ميزة التوثيق غير متاحة حالياً. يرجى المحاولة لاحقاً.');
 			}
-
-		$title = Str::lower((string)($js->job_title ?? ''));
-		$isPharmacist = str_contains($title, 'صيدل') || str_contains($title, 'pharmac');
+			$isPharmacist = $js->isPharmacist();
 			if (!$isPharmacist) {
 				return redirect()->route('jobseeker.cv_verification.show')
-					->with('status', 'هذه الخدمة متاحة للصيادلة فقط. إذا كنت صيدلانياً، حدّث المسمى الوظيفي من صفحة تعديل الملف الشخصي.');
+						->with('status', 'هذه الخدمة متاحة للصيادلة فقط. إذا كنت صيدلانياً، حدّث بيانات ملفك (مثل: المسمى الوظيفي/التخصص/الكلية/القسم) ثم أعد المحاولة.');
 			}
 
 		if ($js->cv_verified) {
