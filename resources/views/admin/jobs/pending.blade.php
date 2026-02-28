@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+	        <div class="rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] text-white p-6">
             <h2 class="text-xl font-bold">وظائف بانتظار الموافقة</h2>
-            <p class="text-[#E7C66A] text-sm mt-1">مراجعة والموافقة على الوظائف المقدمة من الشركات</p>
+	            <p class="text-[#38BDF8] text-sm mt-1">مراجعة والموافقة على الوظائف المقدمة من الشركات</p>
         </div>
     </x-slot>
 
@@ -25,8 +25,8 @@
         <!-- Filters / Sorting -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
             <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
-                <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
-                    <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+	                <div class="w-10 h-10 rounded-lg bg-[#5B21B6] flex items-center justify-center">
+	                    <svg class="w-5 h-5 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">خيارات الفلترة والترتيب</h3>
             </div>
@@ -58,7 +58,7 @@
                 </div>
                 <div class="md:col-span-6 flex gap-2 justify-end">
                     <a href="{{ route('admin.jobs.pending') }}" class="btn btn-ghost">إفراغ</a>
-                    <button class="px-6 py-2 rounded-lg bg-[#0D2660] hover:bg-[#0A1E46] text-white font-medium transition-colors">تطبيق</button>
+	                    <button class="px-6 py-2 rounded-lg bg-[#5B21B6] hover:bg-[#4C1D95] text-white font-medium transition-colors">تطبيق</button>
                 </div>
             </form>
         </div>
@@ -66,11 +66,11 @@
         {{-- Jobs Table --}}
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
             <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
-                <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
-                    <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+	                <div class="w-10 h-10 rounded-lg bg-[#38BDF8] flex items-center justify-center">
+	                    <svg class="w-5 h-5 text-[#4C1D95]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">قائمة الوظائف</h3>
-                <span class="bg-[#0D2660] text-white text-xs font-bold px-3 py-1 rounded-full">{{ $jobs->count() }} وظيفة</span>
+	                <span class="bg-[#5B21B6] text-white text-xs font-bold px-3 py-1 rounded-full">{{ $jobs->count() }} وظيفة</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">

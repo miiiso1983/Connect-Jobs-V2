@@ -6,9 +6,9 @@
   <style>
     body{font-family:Arial,Helvetica,sans-serif;background:#f6f9fc;margin:0;padding:24px}
     .wrapper{max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.08)}
-    .header{background:linear-gradient(135deg,#0D2660,#102E66);padding:24px;color:#fff;text-align:center}
+	    .header{background:linear-gradient(135deg,#5B21B6,#6D28D9);padding:24px;color:#fff;text-align:center}
     .content{padding:24px;color:#334155;line-height:1.8}
-    .btn{display:inline-block;background:#0D2660;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none}
+	    .btn{display:inline-block;background:#5B21B6;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none}
     .muted{color:#64748b;font-size:13px}
   </style>
 </head>

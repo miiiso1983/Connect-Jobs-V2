@@ -5,15 +5,24 @@ class AppTheme {
   // BRAND COLORS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // Primary Colors
-  static const Color primaryNavy = Color(0xFF0D2660);
-  static const Color primaryNavyLight = Color(0xFF1A3A80);
-  static const Color primaryNavyDark = Color(0xFF081840);
+  // Primary Colors (NEW brand: Purple)
+  static const Color primaryPurple = Color(0xFF5B21B6);
+  static const Color primaryPurpleLight = Color(0xFF6D28D9);
+  static const Color primaryPurpleDark = Color(0xFF4C1D95);
 
-  // Secondary Colors (Gold)
-  static const Color secondaryGold = Color(0xFFE7C66A);
-  static const Color secondaryGoldLight = Color(0xFFF0D88A);
-  static const Color secondaryGoldDark = Color(0xFFD4B050);
+  // Secondary Colors (NEW brand: Light Blue)
+  static const Color secondaryBlue = Color(0xFF38BDF8);
+  static const Color secondaryBlueLight = Color(0xFF7DD3FC);
+  static const Color secondaryBlueDark = Color(0xFF0EA5E9);
+
+  // Backward-compatible aliases (avoid touching dozens of screens at once)
+  static const Color primaryNavy = primaryPurple;
+  static const Color primaryNavyLight = primaryPurpleLight;
+  static const Color primaryNavyDark = primaryPurpleDark;
+
+  static const Color secondaryGold = secondaryBlue;
+  static const Color secondaryGoldLight = secondaryBlueLight;
+  static const Color secondaryGoldDark = secondaryBlueDark;
 
   // Accent Colors
   static const Color accentTeal = Color(0xFF0D9488);
@@ -35,10 +44,10 @@ class AppTheme {
       HSLColor.fromAHSL(1.0, h.toDouble(), sPct.toDouble() / 100.0, lPct.toDouble() / 100.0).toColor();
 
   // Brand tokens from www.connect-job.com (light theme ':root[data-theme=brand]')
-  static final Color primary = hsl(222, 76, 21); // navy
-  static const Color onPrimary = Colors.white;   // pc
-  static final Color secondary = hsl(39, 57, 59); // gold
-  static final Color tertiary = hsl(44, 72, 66); // accent
+  static final Color primary = hsl(263, 69, 42); // purple
+  static const Color onPrimary = Colors.white; // pc
+  static final Color secondary = hsl(198, 93, 60); // light blue
+  static final Color tertiary = hsl(199, 95, 74); // very light blue
 
   static final Color background = hsl(0, 0, 100);      // b1
   static final Color surface = hsl(220, 20, 98);       // b2
@@ -186,8 +195,8 @@ class AppTheme {
     final scheme = ColorScheme.fromSeed(
       brightness: Brightness.light,
       seedColor: primary,
-      primary: primaryNavy,
-      secondary: secondaryGold,
+      primary: primaryPurple,
+      secondary: secondaryBlue,
       tertiary: tertiary,
       surface: surfaceWhite,
       error: accentRed,
@@ -198,11 +207,11 @@ class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: backgroundLight,
       appBarTheme: AppBarTheme(
-        backgroundColor: primaryNavy,
+        backgroundColor: primaryPurple,
         foregroundColor: onPrimary,
         elevation: 0,
         centerTitle: true,
-        shadowColor: primaryNavy.withValues(alpha: 0.3),
+        shadowColor: primaryPurple.withValues(alpha: 0.3),
       ),
       cardTheme: CardThemeData(
         elevation: 0,
@@ -213,7 +222,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryNavy,
+          backgroundColor: primaryPurple,
           foregroundColor: onPrimary,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -228,8 +237,8 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: primaryNavy,
-          side: const BorderSide(color: primaryNavy, width: 1.5),
+          foregroundColor: primaryPurple,
+          side: const BorderSide(color: primaryPurple, width: 1.5),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusMedium),
@@ -242,7 +251,7 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: primaryNavy,
+          foregroundColor: primaryPurple,
           textStyle: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 14,
@@ -251,7 +260,7 @@ class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: primaryNavy,
+          backgroundColor: primaryPurple,
           foregroundColor: onPrimary,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
@@ -273,7 +282,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMedium),
-          borderSide: const BorderSide(color: primaryNavy, width: 2),
+          borderSide: const BorderSide(color: primaryPurple, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMedium),
@@ -291,13 +300,13 @@ class AppTheme {
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: secondaryGold,
-        foregroundColor: primaryNavy,
+        backgroundColor: secondaryBlue,
+        foregroundColor: Colors.white,
         elevation: 4,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: surfaceWhite,
-        selectedItemColor: primaryNavy,
+        selectedItemColor: primaryPurple,
         unselectedItemColor: textMuted,
         type: BottomNavigationBarType.fixed,
         elevation: 8,

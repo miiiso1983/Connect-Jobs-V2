@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+	        <div class="rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] text-white p-6">
             <h2 class="text-xl font-bold">إضافة مستخدم إداري</h2>
-            <p class="text-[#E7C66A] text-sm mt-1">إنشاء أدمن جديد وتحديد الصلاحيات</p>
+	            <p class="text-[#38BDF8] text-sm mt-1">إنشاء أدمن جديد وتحديد الصلاحيات</p>
         </div>
     </x-slot>
 

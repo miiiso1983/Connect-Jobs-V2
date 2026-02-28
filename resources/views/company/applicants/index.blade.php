@@ -1,17 +1,17 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+	    <x-slot name="header">
+	        <div class="rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] text-white p-6">
             <h2 class="text-xl font-bold">فلترة المتقدمين</h2>
-            <p class="text-[#E7C66A] text-sm mt-1">ابحث عن أفضل المرشحين باستخدام الفلاتر المتقدمة</p>
+	            <p class="text-[#38BDF8] text-sm mt-1">ابحث عن أفضل المرشحين باستخدام الفلاتر المتقدمة</p>
         </div>
     </x-slot>
 
     <div class="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
         <!-- Filter Form -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
-                <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
-                    <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+	            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
+	                <div class="w-10 h-10 rounded-lg bg-[#5B21B6] flex items-center justify-center">
+	                    <svg class="w-5 h-5 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">خيارات الفلترة</h3>
             </div>
@@ -222,13 +222,13 @@
 
         <!-- Results Table -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
-                <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
-                    <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+	            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
+	                <div class="w-10 h-10 rounded-lg bg-[#38BDF8] flex items-center justify-center">
+	                    <svg class="w-5 h-5 text-[#4C1D95]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">نتائج البحث</h3>
                 @if(count($applicants) > 0)
-                    <span class="bg-[#0D2660] text-white text-xs font-bold px-3 py-1 rounded-full">{{ count($applicants) }} متقدم</span>
+	                    <span class="bg-[#5B21B6] text-white text-xs font-bold px-3 py-1 rounded-full">{{ count($applicants) }} متقدم</span>
                 @endif
             </div>
             <div class="p-0">

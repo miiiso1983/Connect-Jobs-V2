@@ -1,8 +1,8 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+	    <x-slot name="header">
+	        <div class="rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] text-white p-6">
             <h2 class="text-xl font-bold">وظائف الشركة</h2>
-            <p class="text-[#E7C66A] text-sm mt-1">إدارة إعلانات الوظائف ومتابعة حالاتها</p>
+	            <p class="text-[#38BDF8] text-sm mt-1">إدارة إعلانات الوظائف ومتابعة حالاتها</p>
         </div>
     </x-slot>
 
@@ -15,12 +15,12 @@
         @endif
 
         {{-- Action Buttons --}}
-        <div class="flex flex-wrap gap-3">
-            <a href="{{ route('company.jobs.create') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#0D2660] to-[#1a3a7a] text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+	        <div class="flex flex-wrap gap-3">
+	            <a href="{{ route('company.jobs.create') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#5B21B6] to-[#6D28D9] text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                 وظيفة جديدة
             </a>
-            <a href="{{ route('company.applicants.index') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white dark:bg-gray-800 text-[#0D2660] dark:text-white border-2 border-[#0D2660]/20 font-medium shadow hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:border-[#E7C66A]">
+	            <a href="{{ route('company.applicants.index') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white dark:bg-gray-800 text-[#5B21B6] dark:text-white border-2 border-[#5B21B6]/20 font-medium shadow hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:border-[#38BDF8]">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
                 فلترة المتقدمين
             </a>
@@ -28,12 +28,12 @@
 
         {{-- Jobs Table --}}
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
-                <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
-                    <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+	            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
+	                <div class="w-10 h-10 rounded-lg bg-[#5B21B6] flex items-center justify-center">
+	                    <svg class="w-5 h-5 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">قائمة الوظائف</h3>
-                <span class="bg-[#E7C66A] text-[#0D2660] text-xs font-bold px-3 py-1 rounded-full">{{ $jobs->count() }} وظيفة</span>
+	                <span class="bg-[#38BDF8] text-[#4C1D95] text-xs font-bold px-3 py-1 rounded-full">{{ $jobs->count() }} وظيفة</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full">
@@ -53,13 +53,13 @@
                         @forelse ($jobs as $j)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                                 <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-400">{{ $j->id }}</td>
-                                <td class="px-4 py-4">
-                                    <a href="{{ route('company.jobs.edit',$j) }}" class="font-medium text-[#0D2660] dark:text-[#E7C66A] hover:underline">{{ $j->title }}</a>
-                                </td>
+	                                <td class="px-4 py-4">
+	                                    <a href="{{ route('company.jobs.edit',$j) }}" class="font-medium text-[#5B21B6] dark:text-[#38BDF8] hover:underline">{{ $j->title }}</a>
+	                                </td>
                                 <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-400">{{ $j->province }}</td>
-                                <td class="px-4 py-4">
-                                    @if($j->jd_file)
-                                        <a href="{{ Storage::url($j->jd_file) }}" class="inline-flex items-center gap-1 text-sm text-[#0D2660] dark:text-[#E7C66A] hover:underline" target="_blank">
+	                                <td class="px-4 py-4">
+	                                    @if($j->jd_file)
+	                                        <a href="{{ Storage::url($j->jd_file) }}" class="inline-flex items-center gap-1 text-sm text-[#5B21B6] dark:text-[#38BDF8] hover:underline" target="_blank">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                             عرض
                                         </a>
@@ -81,17 +81,17 @@
                                         {{ $j->status === 'open' ? 'مفتوحة' : 'مغلقة' }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $j->approved_by_admin ? 'bg-[#E7C66A]/20 text-[#0D2660] dark:text-[#E7C66A]' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' }}">
+	                                <td class="px-4 py-4">
+	                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $j->approved_by_admin ? 'bg-[#38BDF8]/20 text-[#4C1D95] dark:text-[#38BDF8]' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' }}">
                                         {{ $j->approved_by_admin ? 'معتمدة' : 'بانتظار' }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-4">
-                                    <div class="flex flex-wrap gap-2">
-                                        <a href="{{ route('company.jobs.show',$j) }}" class="p-2 rounded-lg text-gray-600 hover:text-[#0D2660] hover:bg-gray-100 dark:text-gray-400 dark:hover:text-[#E7C66A] dark:hover:bg-gray-700 transition-colors" title="تفاصيل">
+	                                <td class="px-4 py-4">
+	                                    <div class="flex flex-wrap gap-2">
+	                                        <a href="{{ route('company.jobs.show',$j) }}" class="p-2 rounded-lg text-gray-600 hover:text-[#5B21B6] hover:bg-gray-100 dark:text-gray-400 dark:hover:text-[#38BDF8] dark:hover:bg-gray-700 transition-colors" title="تفاصيل">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         </a>
-                                        <a href="{{ route('company.jobs.edit',$j) }}" class="p-2 rounded-lg text-gray-600 hover:text-[#0D2660] hover:bg-gray-100 dark:text-gray-400 dark:hover:text-[#E7C66A] dark:hover:bg-gray-700 transition-colors" title="تعديل">
+	                                        <a href="{{ route('company.jobs.edit',$j) }}" class="p-2 rounded-lg text-gray-600 hover:text-[#5B21B6] hover:bg-gray-100 dark:text-gray-400 dark:hover:text-[#38BDF8] dark:hover:bg-gray-700 transition-colors" title="تعديل">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                         </a>
                                         <form method="POST" action="{{ route('company.jobs.destroy',$j) }}" x-data="{open:false}">
@@ -114,7 +114,7 @@
                                         </div>
                                         <h4 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-1">لا توجد وظائف</h4>
                                         <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">ابدأ بإضافة وظيفة جديدة</p>
-                                        <a href="{{ route('company.jobs.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0D2660] text-white text-sm font-medium hover:bg-[#0D2660]/90 transition-colors">
+	                                        <a href="{{ route('company.jobs.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5B21B6] text-white text-sm font-medium hover:bg-[#4C1D95] transition-colors">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                                             إضافة وظيفة
                                         </a>

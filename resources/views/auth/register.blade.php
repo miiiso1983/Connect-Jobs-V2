@@ -1,27 +1,27 @@
 <x-guest-layout>
     <div class="grid md:grid-cols-2 gap-6 items-stretch">
         {{-- Left Side - Branding --}}
-        <div class="hidden md:flex rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] p-8 text-white shadow-2xl">
+	        <div class="hidden md:flex rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] p-8 text-white shadow-2xl">
             <div class="my-auto space-y-6">
                 <x-application-logo class="h-14 w-auto" />
                 <h2 class="text-3xl font-bold">ابدأ رحلتك المهنية</h2>
-                <p class="text-[#E7C66A] text-lg">أنشئ حسابك واكتشف فرص العمل المناسبة لك</p>
+	                <p class="text-[#38BDF8] text-lg">أنشئ حسابك واكتشف فرص العمل المناسبة لك</p>
                 <ul class="text-white/90 text-sm space-y-3">
                     <li class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-[#E7C66A]/20 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+	                        <div class="w-8 h-8 rounded-full bg-[#38BDF8]/20 flex items-center justify-center">
+	                            <svg class="w-4 h-4 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         </div>
                         <span>آلاف الوظائف في انتظارك</span>
                     </li>
                     <li class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-[#E7C66A]/20 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+	                        <div class="w-8 h-8 rounded-full bg-[#38BDF8]/20 flex items-center justify-center">
+	                            <svg class="w-4 h-4 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         </div>
                         <span>شركات موثوقة ومعتمدة</span>
                     </li>
                     <li class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-[#E7C66A]/20 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+	                        <div class="w-8 h-8 rounded-full bg-[#38BDF8]/20 flex items-center justify-center">
+	                            <svg class="w-4 h-4 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                         </div>
                         <span>تقديم سريع وسهل</span>
                     </li>
@@ -76,7 +76,7 @@
                     <!-- Role Selection -->
                     <div class="form-control mt-4">
                         <x-input-label for="role" :value="__('Register as')" />
-                        <select id="role" name="role" class="select select-bordered w-full mt-1 focus:border-[#0D2660] focus:ring-[#0D2660]" required>
+	                        <select id="role" name="role" class="select select-bordered w-full mt-1 focus:border-[#5B21B6] focus:ring-[#5B21B6]" required>
                             <option value="jobseeker" {{ old('role')==='jobseeker' ? 'selected' : '' }}>{{ __('Job Seeker') }}</option>
                             <option value="company" {{ old('role')==='company' ? 'selected' : '' }}>{{ __('Company') }}</option>
                         </select>
@@ -117,14 +117,14 @@
                     </script>
 
                     <div class="mt-6">
-                        <button type="submit" class="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-[#0D2660] to-[#102E66] hover:from-[#0A1E46] hover:to-[#0D2660] text-white font-bold transition-all duration-300 shadow-lg hover:shadow-xl">
+	                        <button type="submit" class="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-[#5B21B6] to-[#6D28D9] hover:from-[#4C1D95] hover:to-[#5B21B6] text-white font-bold transition-all duration-300 shadow-lg hover:shadow-xl">
                             {{ __('Register') }}
                         </button>
                     </div>
 
                     <div class="mt-4 text-center text-sm">
                         <span class="text-gray-600 dark:text-gray-400">لديك حساب بالفعل؟</span>
-                        <a class="text-[#0D2660] dark:text-[#E7C66A] hover:underline font-medium mr-1" href="{{ route('login') }}">تسجيل الدخول</a>
+	                        <a class="text-[#5B21B6] dark:text-[#38BDF8] hover:underline font-medium mr-1" href="{{ route('login') }}">تسجيل الدخول</a>
                     </div>
                 </form>
             </div>

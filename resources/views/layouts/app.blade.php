@@ -36,24 +36,24 @@
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <style>
             :root[data-theme='brand']{
-                --p: 222 76% 21%; /* primary (navy) */
+	                --p: 263 69% 42%; /* primary (purple) #5B21B6 */
                 --pc: 0 0% 100%;   /* primary content (white) */
-                --s: 39 57% 59%;   /* secondary (gold) */
-                --sc: 222 76% 21%; /* secondary content (navy) */
-                --a: 44 72% 66%;   /* accent (gold light) */
-                --ac: 222 76% 21%;
+	                --s: 198 93% 60%;   /* secondary (light blue) #38BDF8 */
+	                --sc: 264 67% 35%;  /* secondary content (purple dark) #4C1D95 */
+	                --a: 199 89% 48%;   /* accent (blue) #0EA5E9 */
+	                --ac: 0 0% 100%;    /* accent content (white) */
                 --b1: 0 0% 100%;   /* base-100 */
                 --b2: 220 20% 98%;
                 --b3: 220 14% 96%;
                 --bc: 222 43% 20%;  /* base-content */
             }
             :root[data-theme='brand-dark']{
-                --p: 222 76% 21%;  /* primary (navy) */
+	                --p: 263 70% 50%;  /* primary (purple light) #6D28D9 */
                 --pc: 0 0% 100%;   /* white */
-                --s: 39 57% 59%;   /* secondary (gold) */
-                --sc: 222 76% 21%; /* navy */
-                --a: 44 72% 66%;
-                --ac: 220 34% 16%;
+	                --s: 198 93% 60%;   /* secondary (light blue) #38BDF8 */
+	                --sc: 264 67% 35%;  /* purple dark */
+	                --a: 199 89% 48%;   /* accent (blue) #0EA5E9 */
+	                --ac: 0 0% 100%;    /* white */
                 --b1: 220 34% 16%;
                 --b2: 220 34% 12%;
                 --b3: 220 34% 10%;

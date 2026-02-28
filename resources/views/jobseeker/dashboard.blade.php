@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+	        <div class="rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] text-white p-6">
             <h2 class="text-xl font-bold">لوحة الباحث عن عمل</h2>
-            <p class="text-[#E7C66A] text-sm mt-1">إدارة البروفايل • السيرة الذاتية • توثيق الصيادلة</p>
+	            <p class="text-[#38BDF8] text-sm mt-1">إدارة البروفايل • السيرة الذاتية • توثيق الصيادلة</p>
         </div>
     </x-slot>
 
@@ -20,7 +20,7 @@
                         <div class="text-lg font-bold text-gray-800 dark:text-white">الملف الشخصي</div>
                         <div class="text-sm text-gray-600 dark:text-gray-300">أكمل بياناتك لزيادة فرص المطابقة.</div>
                     </div>
-                    <a href="{{ route('jobseeker.profile.edit') }}" class="btn bg-[#0D2660] hover:bg-[#0a1d4d] text-white border-none">تعديل</a>
+	                    <a href="{{ route('jobseeker.profile.edit') }}" class="btn bg-[#5B21B6] hover:bg-[#4C1D95] text-white border-none">تعديل</a>
                 </div>
                 <div class="mt-4 flex flex-wrap gap-2">
                     <span class="badge {{ ($js->profile_completed ?? false) ? 'badge-success' : 'badge-warning' }} badge-outline">
@@ -62,7 +62,7 @@
 	                    <div class="text-sm text-gray-600 dark:text-gray-300">صفحة مستقلة لإرسال طلب توثيق CV ومتابعة الحالة (للصيادلة فقط).</div>
 	                </div>
 	                <div class="flex flex-wrap gap-2">
-	                    <a href="{{ route('jobseeker.cv_verification.show') }}" class="btn bg-[#0D2660] hover:bg-[#0a1d4d] text-white border-none">فتح</a>
+					    <a href="{{ route('jobseeker.cv_verification.show') }}" class="btn bg-[#5B21B6] hover:bg-[#4C1D95] text-white border-none">فتح</a>
 	                    @if(!($isPharmacist ?? false))
 	                        <a href="{{ route('jobseeker.profile.edit') }}" class="btn">تعديل المسمى الوظيفي</a>
 	                    @endif

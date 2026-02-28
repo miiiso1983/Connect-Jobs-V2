@@ -5263,7 +5263,7 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                             context,
                             title: 'إدارة الوظائف',
                             icon: Icons.work_outline,
-                            gradient: const LinearGradient(colors: [Color(0xFF0D2660), Color(0xFF102E66)]),
+                            gradient: const LinearGradient(colors: [AppTheme.primaryPurple, AppTheme.primaryPurpleLight]),
                             onTap: () {
                               final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
                               _openCompany(context, 'إدارة الوظائف', '${site}company/jobs');
@@ -5273,7 +5273,7 @@ class _CompanyDashboardScreenState extends State<CompanyDashboardScreen> {
                             context,
                             title: 'وظيفة جديدة',
                             icon: Icons.add_box_outlined,
-                            gradient: const LinearGradient(colors: [Color(0xFFE7C66A), Color(0xFFC5A74F)]),
+                            gradient: const LinearGradient(colors: [AppTheme.secondaryBlue, AppTheme.secondaryBlueDark]),
                             onTap: () {
                               final site = AppConfig.baseUrl.replaceFirst('api/v1/', '');
                               _openCompany(context, 'وظيفة جديدة', '${site}company/jobs/create');

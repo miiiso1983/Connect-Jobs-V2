@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFF5B21B6),
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(

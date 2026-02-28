@@ -6,7 +6,7 @@
 </head>
 <body style="font-family:Tahoma,Arial,sans-serif;background:#f7f7f9;padding:24px;">
   <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:10px;padding:24px;border:1px solid #e5e7eb;">
-    <h2 style="margin-top:0;color:#0D2660">الملخص الأسبوعي - Connect Job</h2>
+	    <h2 style="margin-top:0;color:#5B21B6">الملخص الأسبوعي - Connect Job</h2>
     <p style="color:#374151;margin:8px 0;">منذ: {{ $stats['since']->timezone(config('app.timezone'))?->format('Y-m-d') }}</p>
 
     <ul style="list-style:none;padding:0;margin:16px 0;color:#111827;">
@@ -17,7 +17,7 @@
     </ul>
 
     @if($topJobs->count())
-      <h3 style="color:#0D2660;margin-top:24px;">أحدث الوظائف</h3>
+	      <h3 style="color:#5B21B6;margin-top:24px;">أحدث الوظائف</h3>
       <ol style="padding-right:18px;color:#374151;">
         @foreach($topJobs as $job)
           <li>

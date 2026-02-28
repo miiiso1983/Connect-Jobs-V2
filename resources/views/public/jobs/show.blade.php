@@ -9,9 +9,9 @@
     @endif
 
     <x-slot name="header">
-        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+	        <div class="rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] text-white p-6">
             <h1 class="text-2xl font-bold">{{ $job->title }}</h1>
-            <div class="mt-1 text-[#E7C66A] text-sm">{{ $job->province }}</div>
+	            <div class="mt-1 text-[#38BDF8] text-sm">{{ $job->province }}</div>
             @if($job->company)
                 <div class="mt-2 flex items-center gap-2 text-sm">
                     @php
@@ -45,8 +45,8 @@
                 {{-- Job Details Card --}}
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                     <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
-                        <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
-                            <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+	                        <div class="w-10 h-10 rounded-lg bg-[#5B21B6] flex items-center justify-center">
+	                            <svg class="w-5 h-5 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </div>
                         <h3 class="text-lg font-bold text-gray-800 dark:text-white">تفاصيل الوظيفة</h3>
                     </div>
@@ -62,15 +62,15 @@
                             </div>
                         @endif
                         @if($job->jd_file)
-                            <div class="flex items-center gap-3 p-4 rounded-lg bg-[#0D2660]/5 dark:bg-[#0D2660]/20">
-                                <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+	                            <div class="flex items-center gap-3 p-4 rounded-lg bg-[#5B21B6]/5 dark:bg-[#5B21B6]/20">
+	                                <div class="w-10 h-10 rounded-lg bg-[#38BDF8] flex items-center justify-center">
+	                                    <svg class="w-5 h-5 text-[#4C1D95]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 </div>
                                 <div class="flex-1">
                                     <div class="text-sm font-bold text-gray-800 dark:text-white">الوصف الوظيفي المفصل</div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400">ملف PDF</div>
                                 </div>
-                                <a href="{{ Storage::url($job->jd_file) }}" target="_blank" class="px-4 py-2 rounded-lg bg-[#0D2660] text-white text-sm font-medium hover:bg-[#0A1E46] transition">
+	                                <a href="{{ Storage::url($job->jd_file) }}" target="_blank" class="px-4 py-2 rounded-lg bg-[#5B21B6] text-white text-sm font-medium hover:bg-[#4C1D95] transition">
                                     تحميل
                                 </a>
                             </div>
@@ -84,26 +84,26 @@
                 {{-- Quick Info Card --}}
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                     <div class="flex items-center gap-3 p-4 border-b border-gray-200 dark:border-gray-700">
-                        <div class="w-8 h-8 rounded-lg bg-[#E7C66A] flex items-center justify-center">
-                            <svg class="w-4 h-4 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+	                        <div class="w-8 h-8 rounded-lg bg-[#38BDF8] flex items-center justify-center">
+	                            <svg class="w-4 h-4 text-[#4C1D95]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <h4 class="font-bold text-gray-800 dark:text-white">معلومات سريعة</h4>
                     </div>
                     <div class="p-4 space-y-3">
                         <div class="flex items-center gap-3 text-sm">
-                            <svg class="w-5 h-5 text-[#0D2660] dark:text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+	                            <svg class="w-5 h-5 text-[#5B21B6] dark:text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
                             <span class="text-gray-600 dark:text-gray-400">المحافظة:</span>
                             <span class="font-medium text-gray-800 dark:text-white">{{ $job->province }}</span>
                         </div>
                         @if($job->company)
                             <div class="flex items-center gap-3 text-sm">
-                                <svg class="w-5 h-5 text-[#0D2660] dark:text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+	                                <svg class="w-5 h-5 text-[#5B21B6] dark:text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                                 <span class="text-gray-600 dark:text-gray-400">الشركة:</span>
                                 <span class="font-medium text-gray-800 dark:text-white">{{ $job->company->company_name }}</span>
                             </div>
                         @endif
                         <div class="flex items-center gap-3 text-sm">
-                            <svg class="w-5 h-5 text-[#0D2660] dark:text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+	                            <svg class="w-5 h-5 text-[#5B21B6] dark:text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             <span class="text-gray-600 dark:text-gray-400">تاريخ النشر:</span>
                             <span class="font-medium text-gray-800 dark:text-white">{{ $job->created_at?->format('Y/m/d') ?? '-' }}</span>
                         </div>
@@ -111,9 +111,9 @@
                 </div>
 
                 {{-- Apply Card --}}
-                <div class="bg-gradient-to-br from-[#0D2660] to-[#0A1E46] rounded-xl shadow-lg p-6 text-center text-white">
-                    <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-[#E7C66A]/20 flex items-center justify-center">
-                        <svg class="w-7 h-7 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+	                <div class="bg-gradient-to-br from-[#5B21B6] to-[#4C1D95] rounded-xl shadow-lg p-6 text-center text-white">
+	                    <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-[#38BDF8]/20 flex items-center justify-center">
+	                        <svg class="w-7 h-7 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <h4 class="font-bold text-lg mb-2">هل أنت مهتم؟</h4>
                     <p class="text-white/80 text-sm mb-4">قدم الآن وابدأ رحلتك المهنية</p>
@@ -121,7 +121,7 @@
                         @if(auth()->user()->role==='jobseeker')
                             <form method="POST" action="{{ route('jobseeker.apply',$job) }}">
                                 @csrf
-                                <button type="submit" class="w-full py-3 rounded-lg bg-[#E7C66A] text-[#0D2660] font-bold hover:bg-[#D2A85A] transition">
+	                                <button type="submit" class="w-full py-3 rounded-lg bg-[#38BDF8] text-[#4C1D95] font-bold hover:bg-[#7DD3FC] transition">
                                     تقديم الآن
                                 </button>
                             </form>
@@ -129,7 +129,7 @@
                             <p class="text-white/70 text-sm">سجّل دخول كباحث عن عمل للتقديم</p>
                         @endif
                     @else
-                        <a href="{{ route('login') }}" class="block w-full py-3 rounded-lg bg-[#E7C66A] text-[#0D2660] font-bold hover:bg-[#D2A85A] transition">
+	                        <a href="{{ route('login') }}" class="block w-full py-3 rounded-lg bg-[#38BDF8] text-[#4C1D95] font-bold hover:bg-[#7DD3FC] transition">
                             سجّل للدخول للتقديم
                         </a>
                     @endif

@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+	        <div class="rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] text-white p-6">
             <h2 class="text-xl font-bold">الملف الشخصي</h2>
-            <p class="text-[#E7C66A] text-sm mt-1">أكمل بياناتك لزيادة فرصك في الحصول على الوظيفة المناسبة</p>
+	            <p class="text-[#38BDF8] text-sm mt-1">أكمل بياناتك لزيادة فرصك في الحصول على الوظيفة المناسبة</p>
         </div>
     </x-slot>
 
@@ -18,12 +18,12 @@
             @csrf
 
             {{-- Profile Header Card --}}
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-                <div class="bg-gradient-to-r from-[#0D2660] to-[#1a3a7a] p-6">
+	            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+	                <div class="bg-gradient-to-r from-[#5B21B6] to-[#6D28D9] p-6">
                     <div class="flex flex-col md:flex-row items-center gap-6">
                         {{-- Profile Image --}}
                         <div class="relative group">
-                            <div class="w-28 h-28 rounded-full ring-4 ring-[#E7C66A] ring-offset-4 ring-offset-[#0D2660] overflow-hidden bg-white">
+	                            <div class="w-28 h-28 rounded-full ring-4 ring-[#38BDF8] ring-offset-4 ring-offset-[#5B21B6] overflow-hidden bg-white">
                                 @if(!empty($js->profile_image))
                                     @php
                                         $imgPath = $js->profile_image;
@@ -50,7 +50,7 @@
                         {{-- User Info --}}
                         <div class="text-center md:text-right flex-1">
                             <h3 class="text-2xl font-bold text-white">{{ $js->full_name ?? auth()->user()->name ?? 'الباحث عن عمل' }}</h3>
-                            <p class="text-[#E7C66A] mt-1">{{ $js->job_title ?? 'لم يتم تحديد المسمى الوظيفي' }}</p>
+	                            <p class="text-[#38BDF8] mt-1">{{ $js->job_title ?? 'لم يتم تحديد المسمى الوظيفي' }}</p>
                             <div class="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
                                 @if($js->profile_completed ?? false)
                                     <span class="badge badge-success gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> الملف مكتمل</span>
@@ -71,16 +71,16 @@
 
             {{-- Basic Information Section --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
-                        <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+	                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+	                    <div class="w-10 h-10 rounded-lg bg-[#5B21B6] flex items-center justify-center">
+	                        <svg class="w-5 h-5 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     </div>
                     <h4 class="text-lg font-bold text-gray-800 dark:text-white">المعلومات الأساسية</h4>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <x-input-label for="full_name" value="الاسم الكامل" class="text-gray-700 dark:text-gray-300 font-medium" />
-                        <x-text-input id="full_name" name="full_name" class="block mt-2 w-full border-gray-300 dark:border-gray-600 focus:border-[#0D2660] focus:ring-[#0D2660]" value="{{ old('full_name', $js->full_name ?? '') }}" placeholder="أدخل اسمك الكامل" />
+	                        <x-text-input id="full_name" name="full_name" class="block mt-2 w-full border-gray-300 dark:border-gray-600 focus:border-[#5B21B6] focus:ring-[#5B21B6]" value="{{ old('full_name', $js->full_name ?? '') }}" placeholder="أدخل اسمك الكامل" />
                     </div>
                     <div x-data="districtPicker()" x-init="init('{{ old('province', $js->province ?? '') }}', @js(old('districts', $js->districts ?? [])))" class="md:col-span-2">
                         <x-input-label for="province" value="المحافظة" class="text-gray-700 dark:text-gray-300 font-medium" />
@@ -104,9 +104,9 @@
                                 </template>
                             </div>
                             <div class="mt-3 flex flex-wrap gap-2" x-show="selected.length">
-                                <template x-for="s in selected" :key="s">
-                                    <span class="px-3 py-1 rounded-full bg-[#0D2660] text-white text-xs font-medium" x-text="s"></span>
-                                </template>
+	                                <template x-for="s in selected" :key="s">
+	                                    <span class="px-3 py-1 rounded-full bg-[#5B21B6] text-white text-xs font-medium" x-text="s"></span>
+	                                </template>
                             </div>
                         </div>
                     </div>
@@ -139,9 +139,9 @@
 
             {{-- Specializations Section --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
-                        <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+	                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+	                    <div class="w-10 h-10 rounded-lg bg-[#38BDF8] flex items-center justify-center">
+	                        <svg class="w-5 h-5 text-[#4C1D95]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
                     </div>
                     <h4 class="text-lg font-bold text-gray-800 dark:text-white">التخصصات</h4>
                 </div>
@@ -160,9 +160,9 @@
                             </template>
                         </div>
                         <div class="mt-3 flex flex-wrap gap-2" x-show="selected.length">
-                            <template x-for="s in selected" :key="s">
-                                <span class="px-3 py-1 rounded-full bg-[#E7C66A] text-[#0D2660] text-xs font-medium" x-text="s"></span>
-                            </template>
+	                            <template x-for="s in selected" :key="s">
+	                                <span class="px-3 py-1 rounded-full bg-[#38BDF8] text-[#4C1D95] text-xs font-medium" x-text="s"></span>
+	                            </template>
                         </div>
                     </div>
                     <div>
@@ -175,9 +175,9 @@
 
 	            {{-- Education Section --}}
 	            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-	                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-	                    <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
-	                        <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.5c0 4.418-4.03 8-9 8s-9-3.582-9-8c0-.64.06-1.267.176-1.875L12 14z"/></svg>
+		            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+		                <div class="w-10 h-10 rounded-lg bg-[#5B21B6] flex items-center justify-center">
+		                    <svg class="w-5 h-5 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.5c0 4.418-4.03 8-9 8s-9-3.582-9-8c0-.64.06-1.267.176-1.875L12 14z"/></svg>
 	                    </div>
 	                    <h4 class="text-lg font-bold text-gray-800 dark:text-white">المؤهل الدراسي</h4>
 	                </div>
@@ -215,9 +215,9 @@
 
             {{-- About Section --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
-                        <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+	                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+	                    <div class="w-10 h-10 rounded-lg bg-[#5B21B6] flex items-center justify-center">
+	                        <svg class="w-5 h-5 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </div>
                     <h4 class="text-lg font-bold text-gray-800 dark:text-white">نبذة عني</h4>
                 </div>
@@ -249,9 +249,9 @@
 
             {{-- CV Upload Section --}}
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                    <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
-                        <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+	                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+	                    <div class="w-10 h-10 rounded-lg bg-[#38BDF8] flex items-center justify-center">
+	                        <svg class="w-5 h-5 text-[#4C1D95]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                     </div>
                     <h4 class="text-lg font-bold text-gray-800 dark:text-white">السيرة الذاتية</h4>
                 </div>
@@ -272,7 +272,7 @@
                             <div class="mt-3 flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                                 <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span class="text-sm text-green-700 dark:text-green-400">لديك سيرة ذاتية مرفوعة:</span>
-                                <a href="{{ Storage::url($js->cv_file) }}" class="text-sm font-medium text-[#0D2660] dark:text-[#E7C66A] hover:underline" target="_blank">عرض الملف</a>
+							<a href="{{ Storage::url($js->cv_file) }}" class="text-sm font-medium text-[#5B21B6] dark:text-[#38BDF8] hover:underline" target="_blank">عرض الملف</a>
                             </div>
                         @endif
                     </div>
@@ -283,13 +283,13 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
-                        <button type="submit" class="btn bg-[#0D2660] hover:bg-[#0a1d4d] text-white border-none px-8">
+	                        <button type="submit" class="btn bg-[#5B21B6] hover:bg-[#4C1D95] text-white border-none px-8">
                             <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                             حفظ التغييرات
                         </button>
                         <a href="{{ route('jobseeker.dashboard') }}" class="btn btn-ghost">إلغاء</a>
                     </div>
-                    <a href="{{ route('jobseeker.profile.pdf') }}" target="_blank" class="btn bg-[#E7C66A] hover:bg-[#d4b55a] text-[#0D2660] border-none gap-2">
+	                    <a href="{{ route('jobseeker.profile.pdf') }}" target="_blank" class="btn bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#4C1D95] border-none gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"/></svg>
                         تصدير كـ PDF
                     </a>

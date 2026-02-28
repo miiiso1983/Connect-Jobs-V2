@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+	        <div class="rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] text-white p-6">
             <h2 class="text-xl font-bold">التوثيق (للصيادلة)</h2>
-            <p class="text-[#E7C66A] text-sm mt-1">حالة الطلب • إرسال طلب التوثيق • متابعة المراجعة</p>
+	            <p class="text-[#38BDF8] text-sm mt-1">حالة الطلب • إرسال طلب التوثيق • متابعة المراجعة</p>
         </div>
     </x-slot>
 
@@ -20,7 +20,7 @@
 	                        <span>هذه الصفحة مخصصة لتوثيق السيرة الذاتية للصيادلة فقط. إذا كنت صيدلانياً، حدّث بيانات ملفك (مثل: المسمى الوظيفي/التخصص/الكلية/القسم) لتتضمن (صيدل...) أو (pharmac...) ثم أعد المحاولة.</span>
                     </div>
                     <div class="mt-4">
-                        <a href="{{ route('jobseeker.profile.edit') }}" class="btn bg-[#0D2660] hover:bg-[#0a1d4d] text-white border-none">تعديل الملف الشخصي</a>
+	                        <a href="{{ route('jobseeker.profile.edit') }}" class="btn bg-[#5B21B6] hover:bg-[#4C1D95] text-white border-none">تعديل الملف الشخصي</a>
                     </div>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                 <div class="card-body p-6">
                     <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                         <div class="flex items-start gap-3">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0D2660] to-[#0A1E46] flex items-center justify-center text-white">
+	                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#5B21B6] to-[#4C1D95] flex items-center justify-center text-white">
                                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -123,7 +123,7 @@
 							@if(!$isVerified && $hasCv && $hasEducation && $latestStatus !== \App\Models\CvVerificationRequest::STATUS_PENDING)
                                 <form method="POST" action="{{ route('jobseeker.cv_verification.request') }}">
                                     @csrf
-                                    <button type="submit" class="btn bg-[#0D2660] hover:bg-[#0a1d4d] text-white border-none">
+	                                    <button type="submit" class="btn bg-[#5B21B6] hover:bg-[#4C1D95] text-white border-none">
                                         {{ $latestStatus === \App\Models\CvVerificationRequest::STATUS_REJECTED ? 'إعادة إرسال طلب التوثيق' : 'طلب توثيق السيرة الذاتية' }}
                                     </button>
                                 </form>

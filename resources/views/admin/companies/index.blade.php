@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="rounded-xl bg-gradient-to-br from-[#0D2660] via-[#102E66] to-[#0A1E46] text-white p-6">
+	        <div class="rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] text-white p-6">
             <h2 class="text-xl font-bold">إدارة الشركات</h2>
-            <p class="text-[#E7C66A] text-sm mt-1">عرض وإدارة جميع الشركات المسجلة في النظام</p>
+	            <p class="text-[#38BDF8] text-sm mt-1">عرض وإدارة جميع الشركات المسجلة في النظام</p>
         </div>
     </x-slot>
 
@@ -17,14 +17,14 @@
         {{-- KPIs --}}
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                <div class="w-10 h-10 rounded-lg bg-[#0D2660] flex items-center justify-center">
-                    <svg class="w-5 h-5 text-[#E7C66A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+	                <div class="w-10 h-10 rounded-lg bg-[#5B21B6] flex items-center justify-center">
+	                    <svg class="w-5 h-5 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">إحصائيات الشركات</h3>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="text-center p-4 rounded-lg bg-gradient-to-br from-[#0D2660]/5 to-[#0D2660]/10 dark:from-[#0D2660]/20 dark:to-[#0D2660]/30">
-                    <div class="text-3xl font-bold text-[#0D2660] dark:text-[#E7C66A]">{{ $companies->count() }}</div>
+	                <div class="text-center p-4 rounded-lg bg-gradient-to-br from-[#5B21B6]/5 to-[#5B21B6]/10 dark:from-[#5B21B6]/20 dark:to-[#5B21B6]/30">
+	                    <div class="text-3xl font-bold text-[#5B21B6] dark:text-[#38BDF8]">{{ $companies->count() }}</div>
                     <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">إجمالي الشركات</div>
                 </div>
                 <div class="text-center p-4 rounded-lg bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 dark:from-emerald-500/20 dark:to-emerald-500/30">
@@ -45,11 +45,11 @@
         {{-- Companies Table --}}
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
             <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
-                <div class="w-10 h-10 rounded-lg bg-[#E7C66A] flex items-center justify-center">
-                    <svg class="w-5 h-5 text-[#0D2660]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+	                <div class="w-10 h-10 rounded-lg bg-[#38BDF8] flex items-center justify-center">
+	                    <svg class="w-5 h-5 text-[#4C1D95]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">قائمة الشركات</h3>
-                <span class="bg-[#0D2660] text-white text-xs font-bold px-3 py-1 rounded-full">{{ $companies->count() }} شركة</span>
+	                <span class="bg-[#5B21B6] text-white text-xs font-bold px-3 py-1 rounded-full">{{ $companies->count() }} شركة</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
