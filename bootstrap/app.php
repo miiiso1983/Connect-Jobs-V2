@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Route middleware aliases
         $middleware->alias([
             'role' => App\Http\Middleware\RoleMiddleware::class,
+	            'admin.permission' => App\Http\Middleware\AdminPermissionMiddleware::class,
             'company.approved' => App\Http\Middleware\EnsureCompanyIsApproved::class,
             'setlocale' => App\Http\Middleware\SetLocale::class, // locale from session
             'jwt' => App\Http\Middleware\JwtAuth::class,

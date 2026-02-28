@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -112,5 +113,28 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject
     public function pushNotifications()
     {
         return $this->hasMany(\App\Models\PushNotification::class);
+    }
+
+    public function adminPermission(): HasOne
+    {
+        return $this->hasOne(AdminPermission::class);
+    }
+
+    public function isMasterAdmin(): bool
+    {
+        return strtolower((string) ($this->email ?? '')) === 'mustafa@teamiapps.com';
+    }
+
+    public function hasAdminPermission(string $key): bool
+    {
+        if (($this->role ?? null) !== 'admin') {
+            return false;
+        }
+
+        if ($this->isMasterAdmin()) {
+            return true;
+        }
+
+        return (bool) ($this->adminPermission?->allows($key) ?? false);
     }
 }

@@ -149,67 +149,88 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
     Route::get('/', [\App\Http\Controllers\Admin\AdminDashboardController::class, '__invoke'])->name('dashboard');
 
 	    // CV Verification requests
-	    Route::get('/cv-verifications', [\App\Http\Controllers\Admin\CvVerificationController::class, 'index'])->name('cv_verifications.index');
-	    Route::put('/cv-verifications/{cvVerificationRequest}/approve', [\App\Http\Controllers\Admin\CvVerificationController::class, 'approve'])->name('cv_verifications.approve');
-	    Route::put('/cv-verifications/{cvVerificationRequest}/reject', [\App\Http\Controllers\Admin\CvVerificationController::class, 'reject'])->name('cv_verifications.reject');
+	    Route::middleware(['admin.permission:verifications'])->group(function(){
+	        Route::get('/cv-verifications', [\App\Http\Controllers\Admin\CvVerificationController::class, 'index'])->name('cv_verifications.index');
+	        Route::put('/cv-verifications/{cvVerificationRequest}/approve', [\App\Http\Controllers\Admin\CvVerificationController::class, 'approve'])->name('cv_verifications.approve');
+	        Route::put('/cv-verifications/{cvVerificationRequest}/reject', [\App\Http\Controllers\Admin\CvVerificationController::class, 'reject'])->name('cv_verifications.reject');
+	    });
+
+	    // Admin users management
+	    Route::middleware(['admin.permission:admin_users'])->prefix('admin-users')->name('admin_users.')->group(function(){
+	        Route::get('/', [\App\Http\Controllers\Admin\AdminUsersController::class, 'index'])->name('index');
+	        Route::get('/create', [\App\Http\Controllers\Admin\AdminUsersController::class, 'create'])->name('create');
+	        Route::post('/', [\App\Http\Controllers\Admin\AdminUsersController::class, 'store'])->name('store');
+	        Route::get('/{user}/edit', [\App\Http\Controllers\Admin\AdminUsersController::class, 'edit'])->name('edit');
+	        Route::put('/{user}', [\App\Http\Controllers\Admin\AdminUsersController::class, 'update'])->name('update');
+	        Route::delete('/{user}', [\App\Http\Controllers\Admin\AdminUsersController::class, 'destroy'])->name('destroy');
+	    });
 
     // Companies management
-    Route::get('/companies', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'index'])->name('companies.index');
-    Route::get('/companies/{company}', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'show'])->name('companies.show');
-    Route::post('/companies/{company}/approve', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'approve'])->name('companies.approve');
-    Route::put('/companies/{company}/subscription', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'updateSubscription'])->name('companies.subscription');
-    Route::put('/companies/{company}/user/toggle', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'toggleUser'])->name('companies.user.toggle');
-    Route::post('/companies/{company}/email', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'emailUser'])->name('companies.user.email');
+    Route::middleware(['admin.permission:companies'])->group(function(){
+        Route::get('/companies', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'index'])->name('companies.index');
+        Route::get('/companies/{company}', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'show'])->name('companies.show');
+        Route::post('/companies/{company}/approve', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'approve'])->name('companies.approve');
+        Route::put('/companies/{company}/subscription', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'updateSubscription'])->name('companies.subscription');
+        Route::put('/companies/{company}/user/toggle', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'toggleUser'])->name('companies.user.toggle');
+        Route::post('/companies/{company}/email', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'emailUser'])->name('companies.user.email');
 
-    // Delete company (destructive)
-    Route::delete('/companies/{company}', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'destroy'])->name('companies.destroy');
+        // Delete company (destructive)
+        Route::delete('/companies/{company}', [\App\Http\Controllers\Admin\CompanyAdminController::class, 'destroy'])->name('companies.destroy');
+    });
 
 
     // Jobseekers management
-    Route::get('/jobseekers', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'index'])->name('jobseekers.index');
-    Route::get('/jobseekers/{jobSeeker}', [\App\Http\Controllers\Admin\JobSeekerDetailController::class, 'show'])->name('jobseekers.show');
-    Route::put('/jobseekers/{user}/toggle', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'toggle'])->name('jobseekers.toggle');
-    Route::delete('/jobseekers/{user}', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'destroy'])->name('jobseekers.destroy');
+    Route::middleware(['admin.permission:jobseekers'])->group(function(){
+        Route::get('/jobseekers', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'index'])->name('jobseekers.index');
+        Route::get('/jobseekers/{jobSeeker}', [\App\Http\Controllers\Admin\JobSeekerDetailController::class, 'show'])->name('jobseekers.show');
+        Route::put('/jobseekers/{user}/toggle', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'toggle'])->name('jobseekers.toggle');
+        Route::delete('/jobseekers/{user}', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'destroy'])->name('jobseekers.destroy');
 
-    // Admin browse all job seekers (shared)
-    Route::get('/seekers', [\App\Http\Controllers\Shared\JobSeekerBrowseController::class, 'index'])->name('seekers.browse');
-    // Admin view individual job seeker profile
-    Route::get('/seekers/{jobSeeker}', \App\Http\Controllers\Company\SeekerShowController::class)->name('seekers.show');
+        // Admin browse all job seekers (shared)
+        Route::get('/seekers', [\App\Http\Controllers\Shared\JobSeekerBrowseController::class, 'index'])->name('seekers.browse');
+        // Admin view individual job seeker profile
+        Route::get('/seekers/{jobSeeker}', \App\Http\Controllers\Company\SeekerShowController::class)->name('seekers.show');
+    });
 
     // Jobs approvals
-    Route::get('/jobs/pending', [\App\Http\Controllers\Admin\JobAdminController::class, 'pending'])->name('jobs.pending');
-    Route::post('/jobs/{job}/approve', [\App\Http\Controllers\Admin\JobAdminController::class, 'approve'])->name('jobs.approve');
-    Route::post('/jobs/{job}/reject', [\App\Http\Controllers\Admin\JobAdminController::class, 'reject'])->name('jobs.reject');
+    Route::middleware(['admin.permission:jobs'])->group(function(){
+        Route::get('/jobs/pending', [\App\Http\Controllers\Admin\JobAdminController::class, 'pending'])->name('jobs.pending');
+        Route::post('/jobs/{job}/approve', [\App\Http\Controllers\Admin\JobAdminController::class, 'approve'])->name('jobs.approve');
+        Route::post('/jobs/{job}/reject', [\App\Http\Controllers\Admin\JobAdminController::class, 'reject'])->name('jobs.reject');
+
+        // Jobs destructive actions
+        Route::delete('/jobs/{job}', [\App\Http\Controllers\Admin\JobAdminController::class, 'destroy'])->name('jobs.destroy');
+    });
 
     // Master settings CRUD
-    Route::get('/settings', [\App\Http\Controllers\Admin\MasterSettingController::class, 'index'])->name('settings.index');
-    Route::post('/settings', [\App\Http\Controllers\Admin\MasterSettingController::class, 'store'])->name('settings.store');
-    Route::put('/settings/{setting}', [\App\Http\Controllers\Admin\MasterSettingController::class, 'update'])->name('settings.update');
-    Route::delete('/settings/{setting}', [\App\Http\Controllers\Admin\MasterSettingController::class, 'destroy'])->name('settings.destroy');
-    Route::post('/settings/bulk', [\App\Http\Controllers\Admin\MasterSettingController::class, 'bulkStore'])->name('settings.bulk');
+    Route::middleware(['admin.permission:settings'])->group(function(){
+        Route::get('/settings', [\App\Http\Controllers\Admin\MasterSettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [\App\Http\Controllers\Admin\MasterSettingController::class, 'store'])->name('settings.store');
+        Route::put('/settings/{setting}', [\App\Http\Controllers\Admin\MasterSettingController::class, 'update'])->name('settings.update');
+        Route::delete('/settings/{setting}', [\App\Http\Controllers\Admin\MasterSettingController::class, 'destroy'])->name('settings.destroy');
+        Route::post('/settings/bulk', [\App\Http\Controllers\Admin\MasterSettingController::class, 'bulkStore'])->name('settings.bulk');
         Route::get('/settings/export', [\App\Http\Controllers\Admin\MasterSettingController::class, 'export'])->name('settings.export');
-    // Email templates CRUD
-    Route::post('/email-templates', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'store'])->name('email-templates.store');
-    Route::put('/email-templates/{template}', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'update'])->name('email-templates.update');
-    Route::delete('/email-templates/{template}', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'destroy'])->name('email-templates.destroy');
-
-    // Districts admin
-    Route::get('/districts', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'index'])->name('districts.index');
-    Route::post('/districts', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'store'])->name('districts.store');
-    Route::post('/districts/bulk', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'bulkStore'])->name('districts.bulk');
-
-    Route::delete('/districts/{district}', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'destroy'])->name('districts.destroy');
-    Route::get('/districts/export', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'export'])->name('districts.export');
-    Route::post('/districts/import', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'import'])->name('districts.import');
-
         Route::post('/settings/import', [\App\Http\Controllers\Admin\MasterSettingController::class, 'import'])->name('settings.import');
 
+        // Email templates CRUD
+        Route::post('/email-templates', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'store'])->name('email-templates.store');
+        Route::put('/email-templates/{template}', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'update'])->name('email-templates.update');
+        Route::delete('/email-templates/{template}', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'destroy'])->name('email-templates.destroy');
+    });
 
-    // Jobs destructive actions
-    Route::delete('/jobs/{job}', [\App\Http\Controllers\Admin\JobAdminController::class, 'destroy'])->name('jobs.destroy');
+    // Districts admin
+    Route::middleware(['admin.permission:districts'])->group(function(){
+        Route::get('/districts', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'index'])->name('districts.index');
+        Route::post('/districts', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'store'])->name('districts.store');
+        Route::post('/districts/bulk', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'bulkStore'])->name('districts.bulk');
+
+        Route::delete('/districts/{district}', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'destroy'])->name('districts.destroy');
+        Route::get('/districts/export', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'export'])->name('districts.export');
+        Route::post('/districts/import', [\App\Http\Controllers\Admin\DistrictAdminController::class, 'import'])->name('districts.import');
+    });
 
 
-    // Users enable/disable
+    // Users enable/disable (generic)
     Route::put('/users/{user}/toggle', [\App\Http\Controllers\Admin\UserAdminController::class, 'toggleStatus'])->name('users.toggle');
 });
 

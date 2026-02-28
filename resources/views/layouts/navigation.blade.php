@@ -33,21 +33,45 @@
                     @endif
 
                     @if(auth()->check() && (auth()->user()->role ?? null)==='admin')
-                        <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
-                            الشركات
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin.jobseekers.index')" :active="request()->routeIs('admin.jobseekers.*')">
-                            الباحثون
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin.seekers.browse')" :active="request()->routeIs('admin.seekers.browse')">
-                            قاعدة الباحثين
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin.settings.index')" :active="request()->routeIs('admin.settings.*')">
-                            القوائم المنسدلة
-                        </x-nav-link>
-                        <x-nav-link :href="route('admin.districts.index')" :active="request()->routeIs('admin.districts.*')">
-                            إدارة المناطق
-                        </x-nav-link>
+	                        @php($u = auth()->user())
+	                        @if($u?->hasAdminPermission('companies'))
+	                            <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+	                                الشركات
+	                            </x-nav-link>
+	                        @endif
+	                        @if($u?->hasAdminPermission('jobseekers'))
+	                            <x-nav-link :href="route('admin.jobseekers.index')" :active="request()->routeIs('admin.jobseekers.*')">
+	                                الباحثون
+	                            </x-nav-link>
+	                            <x-nav-link :href="route('admin.seekers.browse')" :active="request()->routeIs('admin.seekers.*')">
+	                                قاعدة الباحثين
+	                            </x-nav-link>
+	                        @endif
+	                        @if($u?->hasAdminPermission('verifications'))
+	                            <x-nav-link :href="route('admin.cv_verifications.index')" :active="request()->routeIs('admin.cv_verifications.*')">
+	                                طلبات التوثيق
+	                            </x-nav-link>
+	                        @endif
+	                        @if($u?->hasAdminPermission('jobs'))
+	                            <x-nav-link :href="route('admin.jobs.pending')" :active="request()->routeIs('admin.jobs.*')">
+	                                الوظائف
+	                            </x-nav-link>
+	                        @endif
+	                        @if($u?->hasAdminPermission('settings'))
+	                            <x-nav-link :href="route('admin.settings.index')" :active="request()->routeIs('admin.settings.*')">
+	                                القوائم المنسدلة
+	                            </x-nav-link>
+	                        @endif
+	                        @if($u?->hasAdminPermission('districts'))
+	                            <x-nav-link :href="route('admin.districts.index')" :active="request()->routeIs('admin.districts.*')">
+	                                إدارة المناطق
+	                            </x-nav-link>
+	                        @endif
+	                        @if($u?->hasAdminPermission('admin_users'))
+	                            <x-nav-link :href="route('admin.admin_users.index')" :active="request()->routeIs('admin.admin_users.*')">
+	                                إدارة المديرين
+	                            </x-nav-link>
+	                        @endif
                     @endif
                     @php($unread = auth()->check() ? auth()->user()->unreadNotifications()->count() : 0)
                     <x-dropdown align="right" width="80">
