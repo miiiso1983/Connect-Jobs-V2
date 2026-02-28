@@ -33,6 +33,7 @@
                 $latest = $latestCvVerificationRequest ?? null;
                 $latestStatus = $latest->status ?? null;
                 $hasCv = !empty($js->cv_file ?? null);
+				$hasEducation = !empty($js->university_name ?? null) && !empty($js->college_name ?? null) && !empty($js->graduation_year ?? null);
                 $isVerified = (bool)($js->cv_verified ?? false);
                 if (!$hasCv) {
                     $step = 1;
@@ -102,6 +103,12 @@
                         @else
                             <div class="alert"><span>لم يتم إرسال طلب توثيق بعد. يمكنك الإرسال الآن.</span></div>
                         @endif
+
+							@if(!$isVerified && $hasCv && !$hasEducation)
+								<div class="alert alert-warning">
+									<span>قبل إرسال الطلب، يرجى إكمال معلومات الدراسة: اسم الجامعة، اسم الكلية، سنة التخرج.</span>
+								</div>
+							@endif
                     </div>
 
                     <div class="mt-5 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
@@ -113,7 +120,7 @@
                         </div>
 
                         <div>
-                            @if(!$isVerified && $hasCv && $latestStatus !== \App\Models\CvVerificationRequest::STATUS_PENDING)
+							@if(!$isVerified && $hasCv && $hasEducation && $latestStatus !== \App\Models\CvVerificationRequest::STATUS_PENDING)
                                 <form method="POST" action="{{ route('jobseeker.cv_verification.request') }}">
                                     @csrf
                                     <button type="submit" class="btn bg-[#0D2660] hover:bg-[#0a1d4d] text-white border-none">

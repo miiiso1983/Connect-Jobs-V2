@@ -90,6 +90,22 @@ class ProfileController extends Controller
 			return back()->with('status', 'يرجى رفع السيرة الذاتية أولاً ثم إعادة الطلب.');
 		}
 
+			$missing = [];
+			if (empty($js->university_name)) {
+				$missing[] = 'اسم الجامعة';
+			}
+			if (empty($js->college_name)) {
+				$missing[] = 'اسم الكلية';
+			}
+			$gradYear = $js->graduation_year ?? null;
+			if (empty($gradYear) || !is_numeric($gradYear) || (int) $gradYear < 1950 || (int) $gradYear > 2100) {
+				$missing[] = 'سنة التخرج';
+			}
+			if (!empty($missing)) {
+				return redirect()->route('jobseeker.cv_verification.show')
+					->with('status', 'يرجى إكمال معلومات الدراسة قبل إرسال طلب التوثيق: ' . implode('، ', $missing) . '.');
+			}
+
 		$hasPending = CvVerificationRequest::where('job_seeker_id', $js->id)
 			->where('status', CvVerificationRequest::STATUS_PENDING)
 			->exists();

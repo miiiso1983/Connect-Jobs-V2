@@ -58,12 +58,14 @@ class JobSeeker extends Model
 			(string) ($this->job_title ?? ''),
 			(string) ($this->speciality ?? ''),
 			is_array($this->specialities ?? null) ? implode(' ', $this->specialities) : (string) ($this->specialities ?? ''),
+			(string) ($this->university_name ?? ''),
 			(string) ($this->college_name ?? ''),
 			(string) ($this->department_name ?? ''),
 			(string) ($this->qualifications ?? ''),
 		];
 		$haystack = Str::lower(trim(implode(' ', array_filter($parts))));
-		return str_contains($haystack, 'صيدل') || str_contains($haystack, 'pharmac');
+		// NOTE: "pharm" matches "pharmacy", "pharmacist", etc.
+		return str_contains($haystack, 'صيدل') || str_contains($haystack, 'pharm');
 	}
 
     public function user(){ return $this->belongsTo(User::class); }

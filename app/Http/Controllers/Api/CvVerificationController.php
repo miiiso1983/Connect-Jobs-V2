@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\CvVerificationRequest;
 use App\Models\JobSeeker;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class CvVerificationController extends Controller
 {
@@ -52,15 +51,32 @@ class CvVerificationController extends Controller
             return response()->json(['success' => false, 'message' => 'CV already verified'], 400);
         }
 
-        $title = Str::lower((string) ($jobSeeker->job_title ?? ''));
-        $isPharmacist = str_contains($title, 'صيدل') || str_contains($title, 'pharmac');
-        if (! $isPharmacist) {
+		if (! $jobSeeker->isPharmacist()) {
             return response()->json(['success' => false, 'message' => 'CV verification is available for pharmacists only'], 403);
         }
 
         if (empty($jobSeeker->cv_file)) {
             return response()->json(['success' => false, 'message' => 'Please upload your CV first'], 422);
         }
+
+		$missingFields = [];
+		if (empty($jobSeeker->university_name)) {
+			$missingFields[] = 'university_name';
+		}
+		if (empty($jobSeeker->college_name)) {
+			$missingFields[] = 'college_name';
+		}
+		$gradYear = $jobSeeker->graduation_year ?? null;
+		if (empty($gradYear) || !is_numeric($gradYear) || (int) $gradYear < 1950 || (int) $gradYear > 2100) {
+			$missingFields[] = 'graduation_year';
+		}
+		if (!empty($missingFields)) {
+			return response()->json([
+				'success' => false,
+				'message' => 'Please complete your education info (university, college, graduation year) before requesting verification',
+				'missing_fields' => $missingFields,
+			], 422);
+		}
 
         $hasPending = CvVerificationRequest::where('job_seeker_id', $jobSeeker->id)
             ->where('status', CvVerificationRequest::STATUS_PENDING)
