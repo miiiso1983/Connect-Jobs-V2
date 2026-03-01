@@ -71,15 +71,17 @@ dev_dependencies:
 flutter_native_splash:
   color: "#F8FAFF"
   color_dark: "#0F172A"
-  image: web/icons/Icon-192.png
+  # Use the same icon-only asset used throughout the app
+  image: assets/splash.png
   android_12:
-    image: web/icons/Icon-192.png
+    image: assets/splash.png
     icon_background_color: "#FFFFFF"
 
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "web/icons/Icon-512.png"
+  # IMPORTANT: generate app icons from the icon-only source (not the web PWA icon)
+  image_path: "assets/splash.png"
   remove_alpha_ios: true
   min_sdk_android: 21
 
@@ -99,6 +101,7 @@ flutter:
     - web/icons/Icon-192.png
     - web/icons/Icon-512.png
     - web/favicon.png
+    - assets/splash.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

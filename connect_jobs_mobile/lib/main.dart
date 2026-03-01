@@ -285,65 +285,28 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Logo with gradient background
-                      Container(
-                        width: 110,
-                        height: 110,
-                        decoration: BoxDecoration(
-                          gradient: AppTheme.primaryGradient,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primaryNavy.withValues(alpha: 0.3),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Image.network(
-                            '${AppConfig.baseUrl.replaceFirst('api/v1/', '')}images/brand/logo.png',
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => const Icon(
-                              Icons.work_rounded,
-                              size: 50,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppTheme.spacingL),
-
-                      // App Title
-                      const Text(
-                        'Connect Jobs',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primaryNavy,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: AppTheme.spacingXS),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppTheme.secondaryGold.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusRound),
-                        ),
-                        child: const Text(
-                          'منصة التوظيف الطبي',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppTheme.primaryNavy,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppTheme.spacingXL),
+	                      // Brand icon (icon-only). Use local asset to avoid network/fallback icons.
+	                      Container(
+	                        width: 120,
+	                        height: 120,
+	                        decoration: BoxDecoration(
+	                          shape: BoxShape.circle,
+	                          boxShadow: [
+	                            BoxShadow(
+	                              color: AppTheme.primaryNavy.withValues(alpha: 0.25),
+	                              blurRadius: 22,
+	                              offset: const Offset(0, 10),
+	                            ),
+	                          ],
+	                        ),
+	                        child: ClipOval(
+	                          child: Image.asset(
+	                            'assets/splash.png',
+	                            fit: BoxFit.cover,
+	                          ),
+	                        ),
+	                      ),
+	                      const SizedBox(height: AppTheme.spacingXL),
 
                       // Login Form Card
                       Container(

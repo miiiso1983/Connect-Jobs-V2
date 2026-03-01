@@ -16,12 +16,19 @@ class AuthService {
   Uri _loginUri() => Uri.parse('${AppConfig.baseUrl}${AppConfig.authLoginPath}');
 
   Future<http.Response> _post(Uri uri, Map<String, dynamic> payload) {
+		final headers = <String, String>{
+			'Content-Type': 'application/json',
+			'Accept': 'application/json',
+			// Some WAF/bot-protection setups treat API requests better with this header.
+			'X-Requested-With': 'XMLHttpRequest',
+		};
+		// On Web, setting User-Agent is forbidden by browsers.
+		if (!kIsWeb) {
+			headers['User-Agent'] = 'ConnectJobsMobile';
+		}
     return _client.post(
       uri,
-      headers: const {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
+			headers: headers,
       body: jsonEncode(payload),
     );
   }
@@ -57,7 +64,14 @@ class AuthService {
     if (resp.statusCode == 404) {
       msg = 'المسار غير موجود لمسار تسجيل الدخول. يرجى تأكيد إعدادات الـ API.';
     } else {
-      msg = (data['message'] as String?) ?? 'فشل تسجيل الدخول';
+			final fromJson = (data['message'] as String?);
+			final raw = resp.body.trim();
+			// If the response isn't JSON (common with WAF blocks), surface it.
+			final fromRaw = raw.isNotEmpty && fromJson == null ? raw : null;
+			final combined = fromJson ?? fromRaw;
+			msg = (combined != null && combined.isNotEmpty)
+					? (combined.length > 300 ? combined.substring(0, 300) : combined)
+					: 'فشل تسجيل الدخول';
     }
     return <String, dynamic>{'success': false, 'message': msg};
   }
