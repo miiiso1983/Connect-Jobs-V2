@@ -774,21 +774,6 @@ class _JobsScreenState extends State<JobsScreen> {
     _loadJobs();
   }
 
-  Future<void> _refreshJobs() async {
-    // Clear cache for current filters then reload
-    try {
-      await JobsCache.instance.clearForParams(
-        search: _searchController.text.isNotEmpty ? _searchController.text : null,
-        province: _selectedProvince,
-        speciality: _selectedSpeciality,
-        sortBy: _sortBy,
-        sortOrder: _sortOrder,
-        page: null,
-      );
-    } catch (_) {}
-    await _loadJobs();
-  }
-
   Future<void> _loadJobs() async {
     setState(() {
       isLoading = true;
