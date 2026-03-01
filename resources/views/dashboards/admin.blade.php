@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-	        <div class="rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] text-white p-6">
+		        <div class="rounded-xl bg-gradient-to-br from-[#4A00B8] via-[#5A00E1] to-[#3C0094] text-white p-6">
             <h2 class="text-xl font-bold">لوحة تحكم الأدمن</h2>
 	            <p class="text-[#38BDF8] text-sm mt-1">إدارة الموافقات ومراجعة الوظائف والشركات</p>
         </div>
@@ -10,7 +10,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             {{-- Quick Actions --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-	                <a href="{{ route('admin.pending.companies', [], false) ?? '#' }}" class="group relative overflow-hidden p-6 rounded-xl bg-gradient-to-br from-[#5B21B6] to-[#6D28D9] text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+		        <a href="{{ route('admin.pending.companies', [], false) ?? '#' }}" class="group relative overflow-hidden p-6 rounded-xl bg-gradient-to-br from-[#4A00B8] to-[#5A00E1] text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                     <div class="absolute top-0 left-0 w-full h-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <div class="relative">
                         <div class="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center mb-4">
@@ -55,11 +55,11 @@
                     </div>
                 </a>
 
-	                <a href="{{ route('admin.companies.index') ?? '#' }}" class="group relative overflow-hidden p-6 rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#0EA5E9] text-[#4C1D95] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+		        <a href="{{ route('admin.companies.index') ?? '#' }}" class="group relative overflow-hidden p-6 rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#0EA5E9] text-[#3C0094] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                     <div class="absolute top-0 left-0 w-full h-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <div class="relative">
-	                        <div class="w-12 h-12 rounded-lg bg-[#5B21B6]/10 flex items-center justify-center mb-4">
-	                            <svg class="w-6 h-6 text-[#5B21B6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>
+		                <div class="w-12 h-12 rounded-lg bg-[#4A00B8]/10 flex items-center justify-center mb-4">
+		                    <svg class="w-6 h-6 text-[#4A00B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>
                         </div>
                         <div class="text-sm opacity-80">الشركات</div>
                         <div class="mt-1 text-xl font-bold">جميع الشركات</div>
@@ -73,10 +73,10 @@
 
             {{-- Secondary Actions --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-	                <a href="{{ route('admin.jobs.index') ?? '#' }}" class="group relative overflow-hidden p-6 rounded-xl bg-white dark:bg-gray-800 border-2 border-[#5B21B6]/20 text-[#5B21B6] dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-[#38BDF8]">
+		        <a href="{{ route('admin.jobs.index') ?? '#' }}" class="group relative overflow-hidden p-6 rounded-xl bg-white dark:bg-gray-800 border-2 border-[#4A00B8]/20 text-[#4A00B8] dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-[#38BDF8]">
                     <div class="relative">
-	                        <div class="w-12 h-12 rounded-lg bg-[#5B21B6]/10 dark:bg-[#38BDF8]/10 flex items-center justify-center mb-4">
-	                            <svg class="w-6 h-6 text-[#5B21B6] dark:text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+		                <div class="w-12 h-12 rounded-lg bg-[#4A00B8]/10 dark:bg-[#38BDF8]/10 flex items-center justify-center mb-4">
+		                    <svg class="w-6 h-6 text-[#4A00B8] dark:text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                         </div>
                         <div class="text-sm opacity-70">الوظائف</div>
                         <div class="mt-1 text-xl font-bold">جميع الوظائف</div>
@@ -87,10 +87,10 @@
                     </div>
                 </a>
 
-	                <a href="{{ route('admin.districts.index') ?? '#' }}" class="group relative overflow-hidden p-6 rounded-xl bg-white dark:bg-gray-800 border-2 border-[#5B21B6]/20 text-[#5B21B6] dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-[#38BDF8]">
+		        <a href="{{ route('admin.districts.index') ?? '#' }}" class="group relative overflow-hidden p-6 rounded-xl bg-white dark:bg-gray-800 border-2 border-[#4A00B8]/20 text-[#4A00B8] dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-[#38BDF8]">
                     <div class="relative">
-	                        <div class="w-12 h-12 rounded-lg bg-[#5B21B6]/10 dark:bg-[#38BDF8]/10 flex items-center justify-center mb-4">
-	                            <svg class="w-6 h-6 text-[#5B21B6] dark:text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+		                <div class="w-12 h-12 rounded-lg bg-[#4A00B8]/10 dark:bg-[#38BDF8]/10 flex items-center justify-center mb-4">
+		                    <svg class="w-6 h-6 text-[#4A00B8] dark:text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         </div>
                         <div class="text-sm opacity-70">المناطق</div>
                         <div class="mt-1 text-xl font-bold">إدارة المناطق</div>
@@ -101,10 +101,10 @@
                     </div>
                 </a>
 
-	                <a href="{{ route('admin.settings.index') ?? '#' }}" class="group relative overflow-hidden p-6 rounded-xl bg-white dark:bg-gray-800 border-2 border-[#5B21B6]/20 text-[#5B21B6] dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-[#38BDF8]">
+		        <a href="{{ route('admin.settings.index') ?? '#' }}" class="group relative overflow-hidden p-6 rounded-xl bg-white dark:bg-gray-800 border-2 border-[#4A00B8]/20 text-[#4A00B8] dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-[#38BDF8]">
                     <div class="relative">
-	                        <div class="w-12 h-12 rounded-lg bg-[#5B21B6]/10 dark:bg-[#38BDF8]/10 flex items-center justify-center mb-4">
-	                            <svg class="w-6 h-6 text-[#5B21B6] dark:text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+		                <div class="w-12 h-12 rounded-lg bg-[#4A00B8]/10 dark:bg-[#38BDF8]/10 flex items-center justify-center mb-4">
+		                    <svg class="w-6 h-6 text-[#4A00B8] dark:text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         </div>
                         <div class="text-sm opacity-70">الإعدادات</div>
                         <div class="mt-1 text-xl font-bold">إعدادات النظام</div>
@@ -120,7 +120,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <div class="flex items-center gap-3 mb-4">
 	                    <div class="w-10 h-10 rounded-lg bg-[#38BDF8] flex items-center justify-center">
-	                        <svg class="w-5 h-5 text-[#4C1D95]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+		                <svg class="w-5 h-5 text-[#3C0094]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <h3 class="text-lg font-bold text-gray-800 dark:text-white">مرحباً بك في لوحة التحكم</h3>
                 </div>

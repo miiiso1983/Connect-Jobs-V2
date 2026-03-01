@@ -19,6 +19,9 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+	        <!-- Ensure Feature tests use the session-based web guard (not JWT api guard). -->
+	        <env name="AUTH_GUARD" value="web"/>
+	        <env name="AUTH_PASSWORD_BROKER" value="users"/>
         <env name="APP_KEY" value="base64:ZHVtbXl0ZXN0a2V5MTIzNDU2Nzg5MDEyMzQ1Njc4OTA="/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>

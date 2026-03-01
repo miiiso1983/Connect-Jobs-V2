@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="grid md:grid-cols-2 gap-6 items-stretch">
         {{-- Left Side - Branding --}}
-	        <div class="hidden md:flex rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] p-8 text-white shadow-2xl">
+	        <div class="hidden md:flex rounded-xl bg-gradient-to-br from-[#4A00B8] via-[#5A00E1] to-[#3C0094] p-8 text-white shadow-2xl">
             <div class="my-auto space-y-6">
                 <x-application-logo class="h-14 w-auto" />
                 <h2 class="text-3xl font-bold">ابدأ رحلتك المهنية</h2>
@@ -76,7 +76,7 @@
                     <!-- Role Selection -->
                     <div class="form-control mt-4">
                         <x-input-label for="role" :value="__('Register as')" />
-	                        <select id="role" name="role" class="select select-bordered w-full mt-1 focus:border-[#5B21B6] focus:ring-[#5B21B6]" required>
+	                        <select id="role" name="role" class="select select-bordered w-full mt-1 focus:border-[#4A00B8] focus:ring-[#4A00B8]" required>
                             <option value="jobseeker" {{ old('role')==='jobseeker' ? 'selected' : '' }}>{{ __('Job Seeker') }}</option>
                             <option value="company" {{ old('role')==='company' ? 'selected' : '' }}>{{ __('Company') }}</option>
                         </select>
@@ -117,14 +117,14 @@
                     </script>
 
                     <div class="mt-6">
-	                        <button type="submit" class="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-[#5B21B6] to-[#6D28D9] hover:from-[#4C1D95] hover:to-[#5B21B6] text-white font-bold transition-all duration-300 shadow-lg hover:shadow-xl">
+	                        <button type="submit" class="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-[#4A00B8] to-[#5A00E1] hover:from-[#3C0094] hover:to-[#4A00B8] text-white font-bold transition-all duration-300 shadow-lg hover:shadow-xl">
                             {{ __('Register') }}
                         </button>
                     </div>
 
                     <div class="mt-4 text-center text-sm">
                         <span class="text-gray-600 dark:text-gray-400">لديك حساب بالفعل؟</span>
-	                        <a class="text-[#5B21B6] dark:text-[#38BDF8] hover:underline font-medium mr-1" href="{{ route('login') }}">تسجيل الدخول</a>
+	                        <a class="text-[#4A00B8] dark:text-[#38BDF8] hover:underline font-medium mr-1" href="{{ route('login') }}">تسجيل الدخول</a>
                     </div>
                 </form>
             </div>

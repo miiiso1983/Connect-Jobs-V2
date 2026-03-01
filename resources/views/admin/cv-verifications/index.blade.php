@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-	        <div class="rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] text-white p-6">
+		        <div class="rounded-xl bg-gradient-to-br from-[#4A00B8] via-[#5A00E1] to-[#3C0094] text-white p-6">
             <h2 class="text-xl font-bold">طلبات توثيق السيرة الذاتية</h2>
 	            <p class="text-[#38BDF8] text-sm mt-1">مراجعة طلبات توثيق CV (للصيادلة)</p>
         </div>
@@ -24,8 +24,8 @@
                     @endforeach
                 </select>
             </div>
-            <div class="md:col-span-2 flex gap-2 items-end">
-	                <button class="btn bg-[#5B21B6] hover:bg-[#4C1D95] text-white border-none">تطبيق</button>
+	            <div class="md:col-span-2 flex gap-2 items-end">
+		                <button class="btn bg-[#4A00B8] hover:bg-[#3C0094] text-white border-none">تطبيق</button>
                 <a href="{{ route('admin.cv_verifications.index') }}" class="btn btn-ghost">تفريغ</a>
             </div>
         </form>

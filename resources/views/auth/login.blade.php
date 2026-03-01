@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="grid md:grid-cols-2 gap-6 items-stretch">
         {{-- Left Side - Branding --}}
-	        <div class="hidden md:flex rounded-xl bg-gradient-to-br from-[#5B21B6] via-[#6D28D9] to-[#4C1D95] p-8 text-white shadow-2xl">
+		        <div class="hidden md:flex rounded-xl bg-gradient-to-br from-[#4A00B8] via-[#5A00E1] to-[#3C0094] p-8 text-white shadow-2xl">
             <div class="my-auto space-y-6">
                 <x-application-logo class="h-14 w-auto" />
                 <h2 class="text-3xl font-bold">مرحباً بعودتك</h2>
@@ -61,22 +61,22 @@
 
                     <div class="form-control mt-4">
                         <label for="remember_me" class="label cursor-pointer justify-start gap-2">
-	                            <input id="remember_me" type="checkbox" class="checkbox checkbox-sm border-[#5B21B6] checked:bg-[#5B21B6]" name="remember">
+		                            <input id="remember_me" type="checkbox" class="checkbox checkbox-sm border-[#4A00B8] checked:bg-[#4A00B8]" name="remember">
                             <span class="label-text text-gray-700 dark:text-gray-300">{{ __('Remember me') }}</span>
                         </label>
                     </div>
 
                     <div class="mt-6">
-	                        <button type="submit" class="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-[#5B21B6] to-[#6D28D9] hover:from-[#4C1D95] hover:to-[#5B21B6] text-white font-bold transition-all duration-300 shadow-lg hover:shadow-xl">
+		                        <button type="submit" class="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-[#4A00B8] to-[#5A00E1] hover:from-[#3C0094] hover:to-[#4A00B8] text-white font-bold transition-all duration-300 shadow-lg hover:shadow-xl">
                             {{ __('Log in') }}
                         </button>
                     </div>
 
                     <div class="mt-4 flex items-center justify-between text-sm">
                         @if (Route::has('password.request'))
-	                            <a class="text-[#5B21B6] dark:text-[#38BDF8] hover:underline" href="{{ route('password.request') }}">{{ __('Forgot your password?') }}</a>
+		                            <a class="text-[#4A00B8] dark:text-[#38BDF8] hover:underline" href="{{ route('password.request') }}">{{ __('Forgot your password?') }}</a>
                         @endif
-	                        <a class="text-gray-600 dark:text-gray-400 hover:text-[#5B21B6] dark:hover:text-[#38BDF8]" href="{{ route('register') }}">حساب جديد</a>
+							<a class="text-gray-600 dark:text-gray-400 hover:text-[#4A00B8] dark:hover:text-[#38BDF8]" href="{{ route('register') }}">حساب جديد</a>
                     </div>
                 </form>
             </div>

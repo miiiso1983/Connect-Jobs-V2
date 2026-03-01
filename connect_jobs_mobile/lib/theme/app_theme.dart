@@ -6,9 +6,9 @@ class AppTheme {
   // ═══════════════════════════════════════════════════════════════════════════
 
   // Primary Colors (NEW brand: Purple)
-  static const Color primaryPurple = Color(0xFF5B21B6);
-  static const Color primaryPurpleLight = Color(0xFF6D28D9);
-  static const Color primaryPurpleDark = Color(0xFF4C1D95);
+  static const Color primaryPurple = Color(0xFF4A00B8);
+  static const Color primaryPurpleLight = Color(0xFF5A00E1);
+  static const Color primaryPurpleDark = Color(0xFF3C0094);
 
   // Secondary Colors (NEW brand: Light Blue)
   static const Color secondaryBlue = Color(0xFF38BDF8);
@@ -44,7 +44,7 @@ class AppTheme {
       HSLColor.fromAHSL(1.0, h.toDouble(), sPct.toDouble() / 100.0, lPct.toDouble() / 100.0).toColor();
 
   // Brand tokens from www.connect-job.com (light theme ':root[data-theme=brand]')
-  static final Color primary = hsl(263, 69, 42); // purple
+  static final Color primary = hsl(264, 100, 36); // purple (#4A00B8)
   static const Color onPrimary = Colors.white; // pc
   static final Color secondary = hsl(198, 93, 60); // light blue
   static final Color tertiary = hsl(199, 95, 74); // very light blue

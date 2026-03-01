@@ -17,9 +17,9 @@ export default {
             },
 	            colors: {
 	                brand: {
-	                    primary: '#5B21B6',
-	                    primaryLight: '#6D28D9',
-	                    primaryDark: '#4C1D95',
+		                    primary: '#4A00B8',
+		                    primaryLight: '#5A00E1',
+		                    primaryDark: '#3C0094',
 	                    secondary: '#38BDF8',
 	                    secondaryDark: '#0EA5E9',
 	                    secondaryLight: '#7DD3FC',
@@ -32,7 +32,7 @@ export default {
 	        themes: [
 	            {
 	                brand: {
-	                    primary: '#5B21B6',
+		                    primary: '#4A00B8',
 	                    secondary: '#38BDF8',
 	                    accent: '#0EA5E9',
 	                    neutral: '#111827',
@@ -47,7 +47,7 @@ export default {
 	            },
 	            {
 	                'brand-dark': {
-	                    primary: '#6D28D9',
+		                    primary: '#5A00E1',
 	                    secondary: '#38BDF8',
 	                    accent: '#0EA5E9',
 	                    neutral: '#0B1220',

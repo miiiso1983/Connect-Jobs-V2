@@ -1,10 +1,10 @@
 @extends('emails.layouts.base')
 
 @section('content')
-	  <h3 style="margin-top:0;color:#5B21B6">إشعار رفض وظيفة</h3>
+		  <h3 style="margin-top:0;color:#4A00B8">إشعار رفض وظيفة</h3>
   <p>تمت مراجعة إعلان الوظيفة التالية وتم رفضه من قبل فريق الإشراف:</p>
 	  <div style="margin:12px 0;padding:12px;border:1px solid #e5e7eb;border-radius:12px">
-	    <div style="font-weight:600;color:#5B21B6">{{ $job->title }}</div>
+		    <div style="font-weight:600;color:#4A00B8">{{ $job->title }}</div>
     <div style="font-size:12px;color:#6b7280">{{ optional($job->company)->company_name }} · {{ $job->province }}</div>
     @if(!empty($reason))
       <p style="margin:8px 0 0 0;color:#b91c1c"><strong>سبب الرفض:</strong> {{ $reason }}</p>

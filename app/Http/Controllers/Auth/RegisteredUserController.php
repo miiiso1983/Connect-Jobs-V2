@@ -108,6 +108,8 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+        // Match normal login behavior so the authenticated session persists reliably.
+        $request->session()->regenerate();
 
         if ($role === 'jobseeker') {
             return redirect()->route('verify.code.show')->with('status','أرسلنا لك صفحة التفعيل، اختر القناة وأرسل الرمز.');

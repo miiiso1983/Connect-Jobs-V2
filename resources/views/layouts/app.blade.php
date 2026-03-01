@@ -35,11 +35,11 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <style>
-            :root[data-theme='brand']{
-	                --p: 263 69% 42%; /* primary (purple) #5B21B6 */
+	            :root[data-theme='brand']{
+	                --p: 264 100% 36%; /* primary (purple) #4A00B8 */
                 --pc: 0 0% 100%;   /* primary content (white) */
 	                --s: 198 93% 60%;   /* secondary (light blue) #38BDF8 */
-	                --sc: 264 67% 35%;  /* secondary content (purple dark) #4C1D95 */
+	                --sc: 264 100% 29%;  /* secondary content (purple dark) #3C0094 */
 	                --a: 199 89% 48%;   /* accent (blue) #0EA5E9 */
 	                --ac: 0 0% 100%;    /* accent content (white) */
                 --b1: 0 0% 100%;   /* base-100 */
@@ -48,10 +48,10 @@
                 --bc: 222 43% 20%;  /* base-content */
             }
             :root[data-theme='brand-dark']{
-	                --p: 263 70% 50%;  /* primary (purple light) #6D28D9 */
+	                --p: 264 100% 44%;  /* primary (purple light) #5A00E1 */
                 --pc: 0 0% 100%;   /* white */
 	                --s: 198 93% 60%;   /* secondary (light blue) #38BDF8 */
-	                --sc: 264 67% 35%;  /* purple dark */
+	                --sc: 264 100% 29%;  /* purple dark */
 	                --a: 199 89% 48%;   /* accent (blue) #0EA5E9 */
 	                --ac: 0 0% 100%;    /* white */
                 --b1: 220 34% 16%;
