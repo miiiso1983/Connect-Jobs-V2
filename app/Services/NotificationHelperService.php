@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\CompanyRegistrationRequestMail;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\JobSeeker;
@@ -9,6 +10,9 @@ use App\Models\Job;
 use App\Models\Application;
 use App\Models\PushNotification;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class NotificationHelperService
 {
@@ -29,7 +33,7 @@ class NotificationHelperService
 
         $title = 'تسجيل شركة جديدة';
         $body = "تم تسجيل شركة جديدة: {$companyName} في {$registrationTime}";
-        
+
         $data = [
             'type' => PushNotification::TYPE_ADMIN_NEW_COMPANY,
             'company_id' => (string) $company->id,
@@ -39,14 +43,46 @@ class NotificationHelperService
         ];
 
         $results = $this->fcmService->sendToAdmins(
-            $title, 
-            $body, 
-            $data, 
+            $title,
+            $body,
+            $data,
             PushNotification::TYPE_ADMIN_NEW_COMPANY
         );
 
         // Return true if at least one admin was notified
         return in_array(true, $results, true);
+    }
+
+    /**
+     * Queue email notifications when a new company registers.
+     */
+    public function queueCompanyRegistrationEmails(User $companyUser, Company $company): bool
+    {
+        $queued = 0;
+
+        foreach ($this->companyRegistrationNotificationEmails() as $email) {
+            try {
+                Mail::to($email)->queue(new CompanyRegistrationRequestMail($company, $companyUser));
+
+                DB::table('email_logs')->insert([
+                    'mailable' => CompanyRegistrationRequestMail::class,
+                    'to_email' => $email,
+                    'to_name' => 'Company Registration Admin',
+                    'payload' => json_encode([
+                        'company_id' => $company->id,
+                        'user_id' => $companyUser->id,
+                    ]),
+                    'status' => 'queued',
+                    'queued_at' => now(),
+                ]);
+
+                $queued++;
+            } catch (\Throwable $e) {
+                Log::error("CompanyRegistration mail failed for {$email}: {$e->getMessage()}");
+            }
+        }
+
+        return $queued > 0;
     }
 
     /**
@@ -69,7 +105,7 @@ class NotificationHelperService
 
         $title = 'طلب توظيف جديد';
         $body = "تقدم {$jobSeekerName} لوظيفة {$jobTitle} في {$applicationTime}";
-        
+
         $data = [
             'type' => PushNotification::TYPE_COMPANY_NEW_APPLICATION,
             'application_id' => (string) $application->id,
@@ -81,10 +117,10 @@ class NotificationHelperService
         ];
 
         return $this->fcmService->sendToUser(
-            $companyUser, 
-            $title, 
-            $body, 
-            $data, 
+            $companyUser,
+            $title,
+            $body,
+            $data,
             PushNotification::TYPE_COMPANY_NEW_APPLICATION
         );
     }
@@ -95,22 +131,22 @@ class NotificationHelperService
     public function notifyJobSeekerCvDownloaded(JobSeeker $jobSeeker, Company $company, ?Job $job = null): bool
     {
         $jobSeekerUser = $jobSeeker->user;
-        
+
         if (!$jobSeekerUser) {
             return false;
         }
 
         $companyName = $company->company_name ?? $company->user->name ?? 'شركة';
         $downloadTime = Carbon::now()->format('Y/m/d H:i');
-        
+
         $title = 'تم تحميل سيرتك الذاتية';
-        
+
         if ($job) {
             $body = "قامت شركة {$companyName} بتحميل سيرتك الذاتية لوظيفة {$job->title} في {$downloadTime}";
         } else {
             $body = "قامت شركة {$companyName} بتحميل سيرتك الذاتية في {$downloadTime}";
         }
-        
+
         $data = [
             'type' => PushNotification::TYPE_JOBSEEKER_CV_DOWNLOADED,
             'company_id' => (string) $company->id,
@@ -125,10 +161,10 @@ class NotificationHelperService
         }
 
         return $this->fcmService->sendToUser(
-            $jobSeekerUser, 
-            $title, 
-            $body, 
-            $data, 
+            $jobSeekerUser,
+            $title,
+            $body,
+            $data,
             PushNotification::TYPE_JOBSEEKER_CV_DOWNLOADED
         );
     }
@@ -178,5 +214,22 @@ class NotificationHelperService
                     ];
                 }),
         ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function companyRegistrationNotificationEmails(): array
+    {
+        $emails = config('mail.company_registration_notification_emails', []);
+
+        if (! is_array($emails)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(array_map(
+            static fn (mixed $email): string => trim((string) $email),
+            $emails
+        ), static fn (string $email): bool => $email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL) !== false)));
     }
 }

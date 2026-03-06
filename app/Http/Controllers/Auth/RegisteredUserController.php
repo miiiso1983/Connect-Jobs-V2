@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\NotificationHelperService;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -63,18 +63,9 @@ class RegisteredUserController extends Controller
                 'subscription_plan' => 'free',
                 'status' => 'inactive',
             ]);
-            // Notify master admin via email (queued) and log
+            // Notify admins via email
             try {
-                $adminEmail = env('MASTER_ADMIN_EMAIL', 'mustafa@teamiapps.com');
-                Mail::to($adminEmail)->queue(new \App\Mail\CompanyRegistrationRequestMail($company, $user));
-                \DB::table('email_logs')->insert([
-                    'mailable' => \App\Mail\CompanyRegistrationRequestMail::class,
-                    'to_email' => $adminEmail,
-                    'to_name' => 'Master Admin',
-                    'payload' => json_encode(['company_id' => $company->id, 'user_id' => $user->id]),
-                    'status' => 'queued',
-                    'queued_at' => now(),
-                ]);
+                app(NotificationHelperService::class)->queueCompanyRegistrationEmails($user, $company);
             } catch (\Throwable $e) { \Log::error('CompanyRegistration mail failed: '.$e->getMessage()); }
         } else {
             $seeker = \App\Models\JobSeeker::firstOrCreate(['user_id' => $user->id], [

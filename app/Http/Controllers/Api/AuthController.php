@@ -51,45 +51,49 @@ class AuthController extends Controller
         }
 
         try {
+            $role = (string) $request->input('role');
+
             // Create user
             $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => $request->role,
-                'status' => $request->role === 'company' ? 'pending' : 'active',
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => Hash::make((string) $request->input('password')),
+                'role' => $role,
+                'status' => $role === 'company' ? 'inactive' : 'active',
             ]);
 
             // Create role-specific profile
-            if ($request->role === 'company') {
+            if ($role === 'company') {
                 $company = Company::create([
                     'user_id' => $user->id,
-                    'company_name' => $request->company_name,
-                    'scientific_office_name' => $request->scientific_office_name,
-                    'company_job_title' => $request->company_job_title,
-                    'mobile_number' => $request->mobile_number,
-                    'province' => $request->province,
-                    'industry' => $request->industry,
-                    'status' => 'pending',
+                    'company_name' => $request->input('company_name'),
+                    'scientific_office_name' => $request->input('scientific_office_name'),
+                    'company_job_title' => $request->input('company_job_title'),
+                    'mobile_number' => $request->input('mobile_number'),
+                    'province' => $request->input('province', 'N/A'),
+                    'industry' => $request->input('industry', 'N/A'),
+                    'subscription_plan' => 'free',
+                    'status' => 'inactive',
                 ]);
 
                 // Send notification to admins about new company registration
                 try {
                     $notificationService = app(NotificationHelperService::class);
                     $notificationService->notifyAdminsNewCompanyRegistration($user, $company);
-                } catch (\Exception $e) {
+                    $notificationService->queueCompanyRegistrationEmails($user, $company);
+                } catch (\Throwable $e) {
                     // Log error but don't fail registration
                     \Log::error('Failed to send admin notification for new company registration: ' . $e->getMessage());
                 }
-            } elseif ($request->role === 'jobseeker') {
+            } elseif ($role === 'jobseeker') {
                 JobSeeker::create([
                     'user_id' => $user->id,
-                    'full_name' => $request->full_name,
-                    'job_title' => $request->job_title,
-                    'speciality' => $request->speciality,
-                    'province' => $request->province,
-                    'gender' => $request->gender,
-                    'own_car' => $request->own_car ?? false,
+                    'full_name' => $request->input('full_name'),
+                    'job_title' => $request->input('job_title'),
+                    'speciality' => $request->input('speciality'),
+                    'province' => $request->input('province'),
+                    'gender' => $request->input('gender'),
+                    'own_car' => $request->boolean('own_car'),
                     'profile_completed' => false,
                 ]);
             }
@@ -101,7 +105,7 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'User registered successfully',
                 'data' => [
-                    'user' => new UserResource($user->load($request->role === 'company' ? 'company' : 'jobSeeker')),
+                    'user' => new UserResource($user->load($role === 'company' ? 'company' : 'jobSeeker')),
                     'token' => $token,
                     'token_type' => 'bearer',
                     'expires_in' => config('jwt.ttl') * 60

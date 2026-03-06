@@ -115,4 +115,9 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'company_registration_notification_emails' => array_values(array_filter(array_map(
+        static fn (string $email): string => trim($email),
+        explode(',', (string) env('COMPANY_REGISTRATION_NOTIFICATION_EMAILS', 'danea@connect-job.com,mustafa.maxcon@outlook.com'))
+    ))),
+
 ];

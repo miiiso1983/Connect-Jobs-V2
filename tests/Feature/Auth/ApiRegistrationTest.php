@@ -7,32 +7,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
-class RegistrationTest extends TestCase
+class ApiRegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_registration_screen_can_be_rendered(): void
-    {
-        $response = $this->get('/register');
-
-        $response->assertStatus(200);
-    }
-
-    public function test_new_users_can_register(): void
-    {
-        $response = $this->post('/register', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-            'role' => 'jobseeker',
-        ]);
-
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('verify.code.show', absolute: false));
-    }
-
-    public function test_new_companies_queue_notification_emails_for_admin_recipients(): void
+    public function test_company_api_registration_queues_notification_emails_for_admin_recipients(): void
     {
         Mail::fake();
 
@@ -41,19 +20,21 @@ class RegistrationTest extends TestCase
             'mustafa.maxcon@outlook.com',
         ]);
 
-        $response = $this->post('/register', [
-            'name' => 'Test Company',
-            'email' => 'company@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+        $response = $this->postJson('/api/v1/auth/register', [
+            'name' => 'API Company Owner',
+            'email' => 'api-company@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
             'role' => 'company',
+            'company_name' => 'API Company',
             'scientific_office_name' => 'Office',
             'company_job_title' => 'Manager',
             'mobile_number' => '07700000000',
+            'province' => 'Baghdad',
+            'industry' => 'Healthcare',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertCreated()->assertJsonPath('success', true);
 
         Mail::assertQueued(CompanyRegistrationRequestMail::class, 2);
         Mail::assertQueued(CompanyRegistrationRequestMail::class, fn (CompanyRegistrationRequestMail $mail) => $mail->hasTo('danea@connect-job.com'));

@@ -20,7 +20,7 @@ class FcmNotificationService
     {
         try {
             $factory = (new Factory);
-            
+
             // Use service account credentials if available
             $credentialsPath = config('services.firebase.credentials');
             if ($credentialsPath && file_exists($credentialsPath)) {
@@ -32,7 +32,7 @@ class FcmNotificationService
                     $factory = $factory->withProjectId($projectId);
                 }
             }
-            
+
             $this->messaging = $factory->createMessaging();
         } catch (\Exception $e) {
             Log::error('Failed to initialize Firebase messaging: ' . $e->getMessage());
@@ -52,7 +52,7 @@ class FcmNotificationService
 
         // Get active FCM tokens for the user
         $fcmTokens = $user->activeFcmTokens()->pluck('fcm_token')->toArray();
-        
+
         if (empty($fcmTokens)) {
             Log::info("No active FCM tokens found for user {$user->id}");
             return false;
@@ -77,14 +77,14 @@ class FcmNotificationService
                     $message = $this->createMessage($token, $title, $body, $data);
                     $this->messaging->send($message);
                     $sentTokens[] = $token;
-                    
+
                     // Update last_used_at for successful tokens
                     UserFcmToken::where('fcm_token', $token)->update(['last_used_at' => now()]);
-                    
+
                 } catch (\Exception $e) {
                     Log::warning("Failed to send notification to token {$token}: " . $e->getMessage());
                     $failedTokens[] = $token;
-                    
+
                     // Deactivate invalid tokens
                     if ($this->isInvalidTokenError($e)) {
                         UserFcmToken::where('fcm_token', $token)->update(['is_active' => false]);
@@ -111,16 +111,16 @@ class FcmNotificationService
     /**
      * Send notification to multiple users
      */
-    public function sendToUsers(array $users, string $title, string $body, array $data = [], string $type = null): array
+    public function sendToUsers(iterable $users, string $title, string $body, array $data = [], string $type = null): array
     {
         $results = [];
-        
+
         foreach ($users as $user) {
             if ($user instanceof User) {
                 $results[$user->id] = $this->sendToUser($user, $title, $body, $data, $type);
             }
         }
-        
+
         return $results;
     }
 
@@ -133,7 +133,7 @@ class FcmNotificationService
                      ->where('status', 'active')
                      ->whereHas('activeFcmTokens')
                      ->get();
-        
+
         return $this->sendToUsers($admins, $title, $body, $data, $type);
     }
 
@@ -143,7 +143,7 @@ class FcmNotificationService
     private function createMessage(string $token, string $title, string $body, array $data = []): CloudMessage
     {
         $notification = Notification::create($title, $body);
-        
+
         $message = CloudMessage::withTarget('token', $token)
             ->withNotification($notification);
 
