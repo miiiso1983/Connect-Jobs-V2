@@ -17,12 +17,13 @@ class CompanyRegistrationRequestMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('طلب تسجيل شركة جديد')
+        return $this->subject('إشعار إداري: طلب تسجيل شركة جديدة')
             ->view('emails.company-registration-request')
             ->with([
                 'company' => $this->company,
                 'user' => $this->user,
                 'approveUrl' => route('admin.companies.index'),
+                'submittedAt' => now(),
             ]);
     }
 }
