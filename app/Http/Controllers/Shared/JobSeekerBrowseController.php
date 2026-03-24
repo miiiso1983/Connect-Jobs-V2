@@ -153,7 +153,7 @@ class JobSeekerBrowseController extends Controller
                 $out = fopen('php://output', 'w');
                 // UTF-8 BOM for Excel
                 fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF));
-                fputcsv($out, ['ID','Full Name','Email','Province','Job Title','Specialities','Districts','Gender','Own Car','Created At']);
+                fputcsv($out, ['ID','Full Name','Email','Mobile Number','Province','Job Title','Specialities','Districts','Gender','Own Car','Created At']);
                 $seekersQ->orderByDesc('id')->chunk(500, function($chunk) use ($out){
                     foreach ($chunk as $s) {
                         $spec = implode(', ', (array)($s->specialities ?? []));
@@ -162,6 +162,7 @@ class JobSeekerBrowseController extends Controller
                             $s->id,
                             (string)($s->full_name ?? ''),
                             (string)($s->user->email ?? ''),
+                            (string)($s->user->whatsapp_number ?? ''),
                             (string)($s->province ?? ''),
                             (string)($s->job_title ?? ''),
                             $spec,

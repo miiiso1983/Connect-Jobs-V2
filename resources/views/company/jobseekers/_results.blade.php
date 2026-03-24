@@ -20,6 +20,9 @@
                     <div class="text-sm">
                         <div class="font-semibold">{{ $s->user->name ?? '—' }}</div>
                         <div class="text-gray-500">{{ $s->user->email ?? '—' }}</div>
+	                        @if($context==='admin')
+	                            <div class="text-gray-500">رقم الموبايل: {{ $s->user->whatsapp_number ?? '—' }}</div>
+	                        @endif
 	                        <div class="mt-1 flex flex-wrap gap-1">
 	                            @if(($s->cv_verified ?? false))
 	                                <span class="badge badge-success badge-sm">CV موثق</span>

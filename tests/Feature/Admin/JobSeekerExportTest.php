@@ -82,6 +82,63 @@ class JobSeekerExportTest extends TestCase
         $response->assertSee('07801234567');
     }
 
+    public function test_admin_seekers_browse_shows_mobile_number_in_user_information(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+        AdminPermission::create(['user_id' => $admin->id, 'manage_jobseekers' => true]);
+
+        $user = User::factory()->create([
+            'role' => 'jobseeker',
+            'status' => 'active',
+            'name' => 'Shared Browse User',
+            'email' => 'shared-browse@example.com',
+        ]);
+        $user->whatsapp_number = '07901234567';
+        $user->save();
+
+        JobSeeker::create([
+            'user_id' => $user->id,
+            'full_name' => 'Shared Browse User',
+            'province' => 'Baghdad',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.seekers.browse', [], false));
+
+        $response->assertOk();
+        $response->assertSee('07901234567');
+    }
+
+    public function test_admin_seekers_browse_csv_export_includes_mobile_number(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+        AdminPermission::create(['user_id' => $admin->id, 'manage_jobseekers' => true]);
+
+        $user = User::factory()->create([
+            'role' => 'jobseeker',
+            'status' => 'active',
+            'name' => 'Shared Export User',
+            'email' => 'shared-export@example.com',
+        ]);
+        $user->whatsapp_number = '07501234567';
+        $user->save();
+
+        JobSeeker::create([
+            'user_id' => $user->id,
+            'full_name' => 'Shared Export User',
+            'province' => 'Baghdad',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.seekers.browse', ['export' => 'csv'], false));
+
+        $response->assertOk();
+        $response->assertStreamed();
+
+        $content = $response->streamedContent();
+
+        $this->assertStringContainsString('Mobile Number', $content);
+        $this->assertStringContainsString('07501234567', $content);
+    }
+
     public function test_export_respects_selected_filters(): void
     {
         $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
