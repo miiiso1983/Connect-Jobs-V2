@@ -30,6 +30,8 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $whatsappPattern = '/^(?:\+964|964|0)?7[0-9]{9}$/';
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
@@ -38,6 +40,10 @@ class RegisteredUserController extends Controller
             'scientific_office_name' => ['nullable','string','max:150'],
             'company_job_title' => ['nullable','string','max:150'],
             'mobile_number' => ['nullable','string','max:30'],
+            'whatsapp_number' => ['required_if:role,jobseeker', 'nullable', 'string', 'max:30', 'regex:'.$whatsappPattern],
+        ], [
+            'whatsapp_number.required_if' => 'رقم الموبايل مطلوب للباحث عن عمل.',
+            'whatsapp_number.regex' => 'صيغة رقم الموبايل غير صحيحة. استخدم 07xxxxxxxxx أو +9647xxxxxxxxx.',
         ]);
 
         $role = $request->input('role');
@@ -50,6 +56,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'role' => $role,
             'status' => $status,
+            'whatsapp_number' => $role === 'jobseeker' ? $request->input('whatsapp_number') : null,
         ]);
         // Post-create: create related profile record
         if ($role === 'company') {

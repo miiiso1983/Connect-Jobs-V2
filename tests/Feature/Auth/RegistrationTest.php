@@ -26,10 +26,30 @@ class RegistrationTest extends TestCase
             'password' => 'password',
             'password_confirmation' => 'password',
             'role' => 'jobseeker',
+            'whatsapp_number' => '07701234567',
         ]);
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('verify.code.show', absolute: false));
+        $this->assertDatabaseHas('users', [
+            'email' => 'test@example.com',
+            'whatsapp_number' => '07701234567',
+        ]);
+    }
+
+    public function test_jobseeker_registration_requires_mobile_number(): void
+    {
+        $response = $this->from('/register')->post('/register', [
+            'name' => 'Test User',
+            'email' => 'missing-mobile@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'role' => 'jobseeker',
+        ]);
+
+        $response->assertRedirect('/register');
+        $response->assertSessionHasErrors('whatsapp_number');
+        $this->assertGuest();
     }
 
     public function test_new_companies_queue_notification_emails_for_admin_recipients(): void

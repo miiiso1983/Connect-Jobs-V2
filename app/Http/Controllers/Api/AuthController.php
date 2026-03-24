@@ -22,6 +22,13 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        if ($request->input('role') === 'jobseeker' && ! $request->filled('whatsapp_number')) {
+            $fallbackMobile = $request->input('phone', $request->input('mobile_number'));
+            if (is_string($fallbackMobile) && $fallbackMobile !== '') {
+                $request->merge(['whatsapp_number' => $fallbackMobile]);
+            }
+        }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -36,10 +43,14 @@ class AuthController extends Controller
             'industry' => 'nullable|string|max:255',
             // Job seeker specific fields
             'full_name' => 'required_if:role,jobseeker|string|max:255',
+            'whatsapp_number' => ['required_if:role,jobseeker', 'nullable', 'string', 'max:30', 'regex:/^(?:\+964|964|0)?7[0-9]{9}$/'],
             'job_title' => 'nullable|string|max:255',
             'speciality' => 'nullable|string|max:255',
             'gender' => 'nullable|in:male,female',
             'own_car' => 'nullable|boolean',
+        ], [
+            'whatsapp_number.required_if' => 'Mobile number is required for job seekers.',
+            'whatsapp_number.regex' => 'Mobile number format is invalid. Use 07xxxxxxxxx or +9647xxxxxxxxx.',
         ]);
 
         if ($validator->fails()) {
@@ -60,6 +71,7 @@ class AuthController extends Controller
                 'password' => Hash::make((string) $request->input('password')),
                 'role' => $role,
                 'status' => $role === 'company' ? 'inactive' : 'active',
+                'whatsapp_number' => $role === 'jobseeker' ? $request->input('whatsapp_number') : null,
             ]);
 
             // Create role-specific profile
@@ -91,7 +103,7 @@ class AuthController extends Controller
                     'full_name' => $request->input('full_name'),
                     'job_title' => $request->input('job_title'),
                     'speciality' => $request->input('speciality'),
-                    'province' => $request->input('province'),
+                    'province' => $request->input('province', 'N/A'),
                     'gender' => $request->input('gender'),
                     'own_car' => $request->boolean('own_car'),
                     'profile_completed' => false,

@@ -11,6 +11,59 @@ class ApiRegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_jobseeker_api_registration_requires_mobile_number(): void
+    {
+        $response = $this->postJson('/api/v1/auth/register', [
+            'name' => 'API Jobseeker',
+            'full_name' => 'API Jobseeker',
+            'email' => 'api-jobseeker-missing@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'jobseeker',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors('whatsapp_number');
+    }
+
+    public function test_jobseeker_api_registration_stores_mobile_number(): void
+    {
+        $response = $this->postJson('/api/v1/auth/register', [
+            'name' => 'API Jobseeker',
+            'full_name' => 'API Jobseeker',
+            'email' => 'api-jobseeker@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'jobseeker',
+            'whatsapp_number' => '07801234567',
+        ]);
+
+        $response->assertCreated()->assertJsonPath('success', true);
+        $this->assertDatabaseHas('users', [
+            'email' => 'api-jobseeker@example.com',
+            'whatsapp_number' => '07801234567',
+        ]);
+    }
+
+    public function test_jobseeker_api_registration_accepts_phone_alias_for_mobile_number(): void
+    {
+        $response = $this->postJson('/api/v1/auth/register', [
+            'name' => 'API Alias User',
+            'full_name' => 'API Alias User',
+            'email' => 'api-alias@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'jobseeker',
+            'phone' => '07901234567',
+        ]);
+
+        $response->assertCreated()->assertJsonPath('success', true);
+        $this->assertDatabaseHas('users', [
+            'email' => 'api-alias@example.com',
+            'whatsapp_number' => '07901234567',
+        ]);
+    }
+
     public function test_company_api_registration_queues_notification_emails_for_admin_recipients(): void
     {
         Mail::fake();

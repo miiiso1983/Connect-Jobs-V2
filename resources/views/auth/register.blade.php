@@ -84,6 +84,17 @@
                         <x-input-error :messages="$errors->get('role')" class="mt-2" />
                     </div>
 
+                    <!-- Job Seeker Extra Fields -->
+                    <div id="jobseeker-extra" class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+                        <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">معلومات الباحث عن عمل</h4>
+                        <div class="form-control">
+                            <x-input-label for="whatsapp_number" value="رقم الموبايل *" />
+                            <x-text-input id="whatsapp_number" type="text" name="whatsapp_number" :value="old('whatsapp_number')" placeholder="07xxxxxxxxx" autocomplete="tel" inputmode="tel" dir="ltr" class="mt-1" />
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">مطلوب للباحث عن عمل للتسجيل والمتابعة.</p>
+                            <x-input-error :messages="$errors->get('whatsapp_number')" class="mt-2" />
+                        </div>
+                    </div>
+
                     <!-- Company Extra Fields -->
                     <div id="company-extra" class="mt-4 hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
                         <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">معلومات الشركة</h4>
@@ -109,8 +120,15 @@
                     <script>
                         document.addEventListener('DOMContentLoaded', function(){
                             const roleSel = document.getElementById('role');
+                            const jobSeekerExtra = document.getElementById('jobseeker-extra');
                             const extra = document.getElementById('company-extra');
-                            function toggleExtra(){ extra.classList.toggle('hidden', roleSel.value !== 'company'); }
+                            const whatsappInput = document.getElementById('whatsapp_number');
+                            function toggleExtra(){
+                                const isCompany = roleSel.value === 'company';
+                                extra.classList.toggle('hidden', !isCompany);
+                                jobSeekerExtra.classList.toggle('hidden', isCompany);
+                                whatsappInput.required = !isCompany;
+                            }
                             roleSel.addEventListener('change', toggleExtra);
                             toggleExtra();
                         });
