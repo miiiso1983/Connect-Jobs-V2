@@ -3502,6 +3502,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     final List<String> subsList = _toStringList(jobSeeker['specialities']);
+    final String whatsappNumber = (profileData!['whatsapp_number'] ?? widget.user['whatsapp_number'] ?? '').toString().trim();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -3581,6 +3582,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Icons.contact_phone_rounded,
           [
             _buildProfileInfoRow(Icons.email_rounded, 'البريد الإلكتروني', profileData!['email'] ?? 'غير محدد'),
+            _buildProfileInfoRow(Icons.phone_rounded, 'رقم الموبايل', whatsappNumber.isNotEmpty ? whatsappNumber : 'غير محدد'),
             _buildProfileInfoRow(Icons.person_rounded, 'الاسم الكامل', jobSeeker['full_name'] ?? 'غير محدد'),
           ],
         ),

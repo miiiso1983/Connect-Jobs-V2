@@ -18,17 +18,18 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'whatsapp_number' => $this->whatsapp_number,
             'role' => $this->role,
             'status' => $this->status,
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            
+
             // Include role-specific profile data
-            'company' => $this->when($this->role === 'company' && $this->relationLoaded('company'), 
+            'company' => $this->when($this->role === 'company' && $this->relationLoaded('company'),
                 new CompanyResource($this->company)
             ),
-            'job_seeker' => $this->when($this->role === 'jobseeker' && $this->relationLoaded('jobSeeker'), 
+            'job_seeker' => $this->when($this->role === 'jobseeker' && $this->relationLoaded('jobSeeker'),
                 new JobSeekerResource($this->jobSeeker)
             ),
         ];
