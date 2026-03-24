@@ -52,11 +52,16 @@
 
         {{-- Filters --}}
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-            <div class="flex items-center gap-3 p-6 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex flex-col gap-3 p-6 border-b border-gray-200 dark:border-gray-700 md:flex-row md:items-center md:justify-between">
+                <div class="flex items-center gap-3">
 		                <div class="w-10 h-10 rounded-lg bg-[#4A00B8] flex items-center justify-center">
 	                    <svg class="w-5 h-5 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">خيارات الفلترة</h3>
+                </div>
+                <a href="{{ route('admin.jobseekers.export', request()->except('page')) }}" class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors">
+                    تصدير Excel (CSV)
+                </a>
             </div>
             <form method="GET" class="p-6 grid grid-cols-1 md:grid-cols-6 gap-3">
             <div class="md:col-span-2">
