@@ -173,8 +173,126 @@ class ConnectJobsApp extends StatelessWidget {
       theme: AppTheme.light.copyWith(
         textTheme: AppTheme.light.textTheme.apply(fontFamily: 'Arial'),
       ),
-      home: const LoginScreen(),
+      home: const _AuthGate(),
       debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+/// Checks for a saved auth session on startup.
+/// If a valid token is found, navigates directly to the appropriate dashboard.
+/// Otherwise shows the login screen.
+class _AuthGate extends StatefulWidget {
+  const _AuthGate();
+
+  @override
+  State<_AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<_AuthGate> {
+  @override
+  void initState() {
+    super.initState();
+    _tryAutoLogin();
+  }
+
+  Future<void> _tryAutoLogin() async {
+    try {
+      final session = await AuthService.loadSession();
+      if (session == null) {
+        _goToLogin();
+        return;
+      }
+
+      final String token = session['token'] as String;
+      final Map<String, dynamic> savedUser = session['user'] as Map<String, dynamic>;
+
+      // Validate token with the server
+      final auth = AuthService();
+      final meResponse = await auth.validateToken(token);
+
+      if (!mounted) return;
+
+      if (meResponse['success'] == true) {
+        // Token is valid – use fresh user data from server
+        final Map<String, dynamic> freshUser =
+            (meResponse['data']?['user'] is Map<String, dynamic>)
+                ? meResponse['data']['user'] as Map<String, dynamic>
+                : savedUser;
+
+        // Update saved session with fresh data
+        await AuthService.saveSession(token: token, user: freshUser);
+
+        // Register FCM token in background
+        try {
+          auth.registerFCMTokenAfterLogin(token).then((_) {}, onError: (e) {
+            debugPrint('Auto-login FCM register failed: $e');
+          });
+        } catch (_) {}
+
+        final String role = (freshUser['role'] as String?) ?? '';
+        Widget home;
+        if (role == 'admin') {
+          home = AdminDashboardScreen(token: token, user: freshUser);
+        } else if (role == 'company') {
+          home = CompanyDashboardScreen(token: token, user: freshUser);
+        } else {
+          home = JobSeekerDashboardScreen(token: token, user: freshUser);
+        }
+
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => home),
+        );
+      } else {
+        // Token expired/invalid – clear and go to login
+        await AuthService.clearSession();
+        _goToLogin();
+      }
+    } catch (_) {
+      // Any error – fall back to login
+      await AuthService.clearSession();
+      _goToLogin();
+    }
+  }
+
+  void _goToLogin() {
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Splash screen while checking auth
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: AppTheme.backgroundGradient,
+        ),
+        child: const Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.work_rounded, size: 64, color: Colors.white),
+              SizedBox(height: 16),
+              Text(
+                'Connect Jobs',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 24),
+              CircularProgressIndicator(color: Colors.white),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -223,6 +341,11 @@ class _LoginScreenState extends State<LoginScreen> {
         final String token = (data['data']?['token'] as String?) ?? '';
         final Map<String, dynamic> user = (data['data']?['user'] as Map<String, dynamic>?) ?? {};
         final String role = (user['role'] as String?) ?? '';
+
+        // Save session for auto-login on next app start
+        if (token.isNotEmpty) {
+          await AuthService.saveSession(token: token, user: user);
+        }
 
         // Register FCM token with backend after successful login
         if (token.isNotEmpty) {
@@ -898,6 +1021,9 @@ class _JobsScreenState extends State<JobsScreen> {
   Future<void> _logout() async {
     if (_isLoggingOut) return;
     setState(() => _isLoggingOut = true);
+
+    // Clear saved session so auto-login won't trigger next time
+    await AuthService.clearSession();
 
 	  // Navigate immediately, then unregister FCM in background.
 	  // Use pushAndRemoveUntil to fully reset navigation stack (avoids occasional black screen on iOS).
@@ -3864,6 +3990,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       if (!context.mounted) return;
 
                       if (result['success'] == true) {
+                        // Clear saved session
+                        await AuthService.clearSession();
+                        if (!context.mounted) return;
                         Navigator.pop(dialogContext);
                         // Navigate to login screen
                         Navigator.pushAndRemoveUntil(

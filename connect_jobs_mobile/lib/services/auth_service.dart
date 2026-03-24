@@ -287,6 +287,74 @@ class AuthService {
     }
   }
 
+  /// Validate an existing token by calling /auth/me.
+  /// Returns the full response map with user data if valid,
+  /// or {'success': false} if the token is expired/invalid.
+  Future<Map<String, dynamic>> validateToken(String authToken) async {
+    try {
+      final uri = Uri.parse('${AppConfig.baseUrl}auth/me');
+      final resp = await _client.get(
+        uri,
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $authToken',
+          if (!kIsWeb) 'User-Agent': 'ConnectJobsMobile',
+        },
+      );
+
+      if (resp.statusCode == 200) {
+        final decoded = jsonDecode(resp.body);
+        if (decoded is Map<String, dynamic> && decoded['success'] == true) {
+          return decoded;
+        }
+      }
+      return {'success': false};
+    } catch (_) {
+      return {'success': false};
+    }
+  }
+
+  /// Save auth session (token + user) to Hive for auto-login.
+  static Future<void> saveSession({
+    required String token,
+    required Map<String, dynamic> user,
+  }) async {
+    final box = await Hive.openBox('auth');
+    await box.put('token', token);
+    await box.put('user', jsonEncode(user));
+    await box.close();
+  }
+
+  /// Load saved auth session from Hive.
+  /// Returns null if no session is saved.
+  static Future<Map<String, dynamic>?> loadSession() async {
+    try {
+      final box = await Hive.openBox('auth');
+      final token = box.get('token') as String?;
+      final userJson = box.get('user') as String?;
+      await box.close();
+
+      if (token == null || token.isEmpty || userJson == null) return null;
+
+      final user = jsonDecode(userJson);
+      if (user is! Map<String, dynamic>) return null;
+
+      return {'token': token, 'user': user};
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Clear saved auth session from Hive (on logout / account deletion).
+  static Future<void> clearSession() async {
+    try {
+      final box = await Hive.openBox('auth');
+      await box.delete('token');
+      await box.delete('user');
+      await box.close();
+    } catch (_) {}
+  }
+
   void close() {
     _client.close();
     _notificationService.close();
