@@ -23,6 +23,8 @@ class JobSeekerExportTest extends TestCase
             'name' => 'Ali Export',
             'email' => 'ali@example.com',
         ]);
+        $user->whatsapp_number = '07701234567';
+        $user->save();
 
         JobSeeker::create([
             'user_id' => $user->id,
@@ -50,7 +52,34 @@ class JobSeekerExportTest extends TestCase
         $this->assertTrue(str_starts_with($content, "\xEF\xBB\xBF"));
         $this->assertStringContainsString('Ali Ahmad', $content);
         $this->assertStringContainsString('ali@example.com', $content);
+        $this->assertStringContainsString('07701234567', $content);
         $this->assertStringContainsString('Baghdad', $content);
+    }
+
+    public function test_jobseekers_index_shows_mobile_number_in_user_information(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'active']);
+        AdminPermission::create(['user_id' => $admin->id, 'manage_jobseekers' => true]);
+
+        $user = User::factory()->create([
+            'role' => 'jobseeker',
+            'status' => 'active',
+            'name' => 'Mobile View User',
+            'email' => 'mobile-view@example.com',
+        ]);
+        $user->whatsapp_number = '07801234567';
+        $user->save();
+
+        JobSeeker::create([
+            'user_id' => $user->id,
+            'full_name' => 'Mobile View User',
+            'province' => 'Baghdad',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.jobseekers.index', [], false));
+
+        $response->assertOk();
+        $response->assertSee('07801234567');
     }
 
     public function test_export_respects_selected_filters(): void

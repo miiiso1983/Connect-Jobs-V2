@@ -196,6 +196,7 @@
                                 <div class="text-sm">
                                     <div class="font-semibold">{{ $s->user->name ?? '—' }}</div>
                                     <div class="text-gray-500">{{ $s->user->email ?? '—' }}</div>
+                                    <div class="text-gray-500">رقم الموبايل: {{ $s->user->whatsapp_number ?? '—' }}</div>
                                 </div>
                             </td>
 	                            <td>
@@ -260,8 +261,8 @@
                         </tr>
 
 
-                    @empty
-                        <tr><td colspan="10" class="text-center py-8 text-gray-500 dark:text-gray-400">لا نتائج.</td></tr>
+	                    @empty
+	                        <tr><td colspan="10" class="text-center py-8 text-gray-500 dark:text-gray-400">لا نتائج.</td></tr>
                     @endforelse
                 </tbody>
                 </table>
