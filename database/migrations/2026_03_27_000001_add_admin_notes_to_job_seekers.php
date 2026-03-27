@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('job_seekers', function (Blueprint $table) {
             if (! Schema::hasColumn('job_seekers', 'admin_notes')) {
-                $table->text('admin_notes')->nullable()->after('is_fresh_graduate');
+                $table->text('admin_notes')->nullable();
             }
         });
     }

@@ -296,7 +296,7 @@ class JobSeekerAdminController extends Controller
             'admin_notes' => 'nullable|string|max:5000',
         ]);
 
-        $jobSeeker = JobSeeker::findOrFail($id);
+        $jobSeeker = JobSeeker::find($id) ?? JobSeeker::where('user_id', $id)->firstOrFail();
         $jobSeeker->update(['admin_notes' => $request->input('admin_notes')]);
 
         return back()->with('status', 'تم حفظ الملاحظات بنجاح.');
