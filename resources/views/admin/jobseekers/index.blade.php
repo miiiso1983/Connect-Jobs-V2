@@ -249,7 +249,6 @@
                             <td>
                                 <form method="POST" action="{{ route('admin.jobseekers.notes', $s->id) }}" class="flex items-start gap-1">
                                     @csrf
-                                    @method('PUT')
                                     <textarea name="admin_notes" rows="2" class="w-40 text-xs rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700 resize-y" placeholder="أضف ملاحظة...">{{ $s->admin_notes ?? '' }}</textarea>
                                     <button type="submit" class="btn btn-xs btn-ghost mt-1" title="حفظ الملاحظة">💾</button>
                                 </form>

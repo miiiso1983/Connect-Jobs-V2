@@ -186,7 +186,7 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
         Route::get('/jobseekers/{jobSeeker}', [\App\Http\Controllers\Admin\JobSeekerDetailController::class, 'show'])->name('jobseekers.show');
         Route::put('/jobseekers/{user}/toggle', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'toggle'])->name('jobseekers.toggle');
         Route::delete('/jobseekers/{user}', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'destroy'])->name('jobseekers.destroy');
-        Route::put('/jobseekers/{id}/notes', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'updateNotes'])->name('jobseekers.notes');
+        Route::post('/jobseekers/{id}/notes', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'updateNotes'])->name('jobseekers.notes');
 
         // Admin browse all job seekers (shared)
         Route::get('/seekers', [\App\Http\Controllers\Shared\JobSeekerBrowseController::class, 'index'])->name('seekers.browse');
