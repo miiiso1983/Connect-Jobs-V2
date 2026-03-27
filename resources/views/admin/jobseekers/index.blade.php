@@ -247,7 +247,7 @@
                             @php($ts = $lastSeenTs[$s->user_id] ?? null)
                             <td>{{ $ts ? \Carbon\Carbon::createFromTimestamp($ts)->toDateTimeString() : '—' }}</td>
                             <td>
-                                <form method="POST" action="{{ route('admin.jobseekers.notes', $s) }}" class="flex items-start gap-1">
+                                <form method="POST" action="{{ route('admin.jobseekers.notes', $s->id) }}" class="flex items-start gap-1">
                                     @csrf
                                     @method('PUT')
                                     <textarea name="admin_notes" rows="2" class="w-40 text-xs rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700 resize-y" placeholder="أضف ملاحظة...">{{ $s->admin_notes ?? '' }}</textarea>

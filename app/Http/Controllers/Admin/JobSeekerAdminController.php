@@ -290,12 +290,13 @@ class JobSeekerAdminController extends Controller
     /**
      * Update admin notes for a job seeker
      */
-    public function updateNotes(Request $request, JobSeeker $jobSeeker): RedirectResponse
+    public function updateNotes(Request $request, $id): RedirectResponse
     {
         $request->validate([
             'admin_notes' => 'nullable|string|max:5000',
         ]);
 
+        $jobSeeker = JobSeeker::findOrFail($id);
         $jobSeeker->update(['admin_notes' => $request->input('admin_notes')]);
 
         return back()->with('status', 'تم حفظ الملاحظات بنجاح.');
