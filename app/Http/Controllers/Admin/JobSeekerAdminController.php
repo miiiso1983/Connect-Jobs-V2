@@ -287,6 +287,20 @@ class JobSeekerAdminController extends Controller
         return $hasSessions ??= Schema::hasTable('sessions');
     }
 
+    /**
+     * Update admin notes for a job seeker
+     */
+    public function updateNotes(Request $request, JobSeeker $jobSeeker): RedirectResponse
+    {
+        $request->validate([
+            'admin_notes' => 'nullable|string|max:5000',
+        ]);
+
+        $jobSeeker->update(['admin_notes' => $request->input('admin_notes')]);
+
+        return back()->with('status', 'تم حفظ الملاحظات بنجاح.');
+    }
+
     public function toggle(User $user): RedirectResponse
     {
         abort_unless($user->role === 'jobseeker', 404);

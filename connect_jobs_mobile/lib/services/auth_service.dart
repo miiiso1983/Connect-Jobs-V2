@@ -178,6 +178,11 @@ class AuthService {
     return {'success': raw['success'] == true, 'data': raw['data'], 'message': raw['message']};
   }
 
+  /// Send a password reset link to the given email address
+  Future<Map<String, dynamic>> forgotPassword({required String email}) async {
+    return _postJson(AppConfig.forgotPasswordPath, {'email': email});
+  }
+
   /// Register FCM token with backend after successful login
   Future<Map<String, dynamic>> registerFCMTokenAfterLogin(String authToken) async {
     try {

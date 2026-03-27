@@ -186,6 +186,7 @@
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">السيرة الذاتية</th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">أُنشئ</th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">آخر ظهور</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ملاحظات الإدارة</th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">إجراءات</th>
                         </tr>
                     </thead>
@@ -245,6 +246,14 @@
                             <td>{{ $s->user->created_at ?? '—' }}</td>
                             @php($ts = $lastSeenTs[$s->user_id] ?? null)
                             <td>{{ $ts ? \Carbon\Carbon::createFromTimestamp($ts)->toDateTimeString() : '—' }}</td>
+                            <td>
+                                <form method="POST" action="{{ route('admin.jobseekers.notes', $s) }}" class="flex items-start gap-1">
+                                    @csrf
+                                    @method('PUT')
+                                    <textarea name="admin_notes" rows="2" class="w-40 text-xs rounded border-gray-300 dark:bg-gray-800 dark:border-gray-700 resize-y" placeholder="أضف ملاحظة...">{{ $s->admin_notes ?? '' }}</textarea>
+                                    <button type="submit" class="btn btn-xs btn-ghost mt-1" title="حفظ الملاحظة">💾</button>
+                                </form>
+                            </td>
                             <td class="whitespace-nowrap">
                                 <a href="{{ route('admin.seekers.show', $s) }}" class="btn btn-xs btn-primary">عرض الملف</a>
                                 <form method="POST" action="{{ route('admin.jobseekers.toggle', $s->user) }}" class="inline">
@@ -262,7 +271,7 @@
 
 
 	                    @empty
-	                        <tr><td colspan="10" class="text-center py-8 text-gray-500 dark:text-gray-400">لا نتائج.</td></tr>
+	                        <tr><td colspan="11" class="text-center py-8 text-gray-500 dark:text-gray-400">لا نتائج.</td></tr>
                     @endforelse
                 </tbody>
                 </table>

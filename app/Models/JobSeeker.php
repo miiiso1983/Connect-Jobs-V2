@@ -40,6 +40,9 @@ class JobSeeker extends Model
         'department_name',
         'graduation_year',
         'is_fresh_graduate',
+
+        // Admin
+        'admin_notes',
     ];
 
     protected $casts = [

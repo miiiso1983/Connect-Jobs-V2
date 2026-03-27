@@ -96,6 +96,18 @@ class MasterSettingController extends Controller
         return back()->with('status','تم الحذف.');
     }
 
+    /**
+     * Dedicated specialities management page
+     */
+    public function specialities(): View
+    {
+        $specialities = MasterSetting::where('setting_type', 'speciality')
+            ->orderBy('value')
+            ->get();
+
+        return view('admin.settings.specialities', compact('specialities'));
+    }
+
     public function export(Request $request)
     {
         $type = $request->query('type');

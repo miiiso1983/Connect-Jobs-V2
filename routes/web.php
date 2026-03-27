@@ -186,6 +186,7 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
         Route::get('/jobseekers/{jobSeeker}', [\App\Http\Controllers\Admin\JobSeekerDetailController::class, 'show'])->name('jobseekers.show');
         Route::put('/jobseekers/{user}/toggle', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'toggle'])->name('jobseekers.toggle');
         Route::delete('/jobseekers/{user}', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'destroy'])->name('jobseekers.destroy');
+        Route::put('/jobseekers/{jobSeeker}/notes', [\App\Http\Controllers\Admin\JobSeekerAdminController::class, 'updateNotes'])->name('jobseekers.notes');
 
         // Admin browse all job seekers (shared)
         Route::get('/seekers', [\App\Http\Controllers\Shared\JobSeekerBrowseController::class, 'index'])->name('seekers.browse');
@@ -212,6 +213,9 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
         Route::post('/settings/bulk', [\App\Http\Controllers\Admin\MasterSettingController::class, 'bulkStore'])->name('settings.bulk');
         Route::get('/settings/export', [\App\Http\Controllers\Admin\MasterSettingController::class, 'export'])->name('settings.export');
         Route::post('/settings/import', [\App\Http\Controllers\Admin\MasterSettingController::class, 'import'])->name('settings.import');
+
+        // Dedicated specialities management page
+        Route::get('/specialities', [\App\Http\Controllers\Admin\MasterSettingController::class, 'specialities'])->name('specialities.index');
 
         // Email templates CRUD
         Route::post('/email-templates', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'store'])->name('email-templates.store');

@@ -387,6 +387,102 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  void _showForgotPasswordDialog() {
+    final emailCtrl = TextEditingController(text: _emailController.text);
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        bool sending = false;
+        String? resultMsg;
+        bool success = false;
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Row(
+                children: [
+                  Icon(Icons.lock_reset_rounded, color: AppTheme.primaryNavy),
+                  SizedBox(width: 8),
+                  Text('نسيت كلمة المرور؟', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور',
+                    style: TextStyle(fontSize: 14, color: AppTheme.textSecondary),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: emailCtrl,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: 'البريد الإلكتروني',
+                      prefixIcon: const Icon(Icons.email_outlined),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  if (resultMsg != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: success ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(success ? Icons.check_circle : Icons.error_outline, color: success ? Colors.green : Colors.red, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(resultMsg!, style: TextStyle(fontSize: 13, color: success ? Colors.green.shade800 : Colors.red.shade800))),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('إلغاء'),
+                ),
+                ElevatedButton(
+                  onPressed: sending
+                      ? null
+                      : () async {
+                          if (emailCtrl.text.trim().isEmpty) return;
+                          setDialogState(() { sending = true; resultMsg = null; });
+                          try {
+                            final res = await AuthService().forgotPassword(email: emailCtrl.text.trim());
+                            setDialogState(() {
+                              sending = false;
+                              success = res['success'] == true;
+                              resultMsg = res['message'] as String? ?? (success ? 'تم الإرسال بنجاح' : 'حدث خطأ');
+                            });
+                          } catch (e) {
+                            setDialogState(() {
+                              sending = false;
+                              success = false;
+                              resultMsg = 'خطأ في الاتصال';
+                            });
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryNavy,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: sending
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Text('إرسال', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -482,7 +578,29 @@ class _LoginScreenState extends State<LoginScreen> {
                                 obscureText: _obscure,
                                 onToggleObscure: () => setState(() => _obscure = !_obscure),
                               ),
-                              const SizedBox(height: AppTheme.spacingL),
+                              const SizedBox(height: 8),
+
+                              // Forgot Password Link
+                              Align(
+                                alignment: AlignmentDirectional.centerStart,
+                                child: TextButton(
+                                  onPressed: _showForgotPasswordDialog,
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(0, 32),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: const Text(
+                                    'نسيت كلمة المرور؟',
+                                    style: TextStyle(
+                                      color: AppTheme.primaryNavy,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: AppTheme.spacingM),
 
                               // Error Message
                               if (_errorMessage.isNotEmpty)

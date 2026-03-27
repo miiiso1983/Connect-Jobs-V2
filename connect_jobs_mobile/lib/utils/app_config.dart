@@ -15,5 +15,6 @@ class AppConfig {
   static const String registerCompanyPath = 'auth/register';
   static const String registerFcmTokenPath = 'auth/register-fcm-token';
   static const String unregisterFcmTokenPath = 'auth/unregister-fcm-token';
+  static const String forgotPasswordPath = 'auth/forgot-password';
 }
 
