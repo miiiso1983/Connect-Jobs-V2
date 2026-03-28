@@ -8,6 +8,7 @@ use App\Models\JobSeeker;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
 class ProfileViewedMail extends Mailable implements ShouldQueue
@@ -19,6 +20,17 @@ class ProfileViewedMail extends Mailable implements ShouldQueue
         public ?Job $job,
         public string $companyName,
     ){}
+
+    public function headers(): Headers
+    {
+        return new Headers(
+            text: [
+                'List-Unsubscribe' => '<mailto:info@connect-job.com?subject=unsubscribe>',
+                'X-Mailer' => 'Connect Jobs Mailer',
+                'Reply-To' => 'info@connect-job.com',
+            ],
+        );
+    }
 
     public function build()
     {
