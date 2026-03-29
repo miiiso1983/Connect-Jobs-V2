@@ -294,7 +294,8 @@ class AuthService {
 
   /// Validate an existing token by calling /auth/me.
   /// Returns the full response map with user data if valid,
-  /// or {'success': false} if the token is expired/invalid.
+  /// {'success': false, 'reason': 'unauthorized'} if token is expired/invalid (401),
+  /// or {'success': false, 'reason': 'network'} on network/connection errors.
   Future<Map<String, dynamic>> validateToken(String authToken) async {
     try {
       final uri = Uri.parse('${AppConfig.baseUrl}auth/me');
@@ -313,9 +314,15 @@ class AuthService {
           return decoded;
         }
       }
-      return {'success': false};
+      // 401 = token expired/invalid — should clear session
+      if (resp.statusCode == 401) {
+        return {'success': false, 'reason': 'unauthorized'};
+      }
+      // Other HTTP errors (500, 503, etc.) — treat as temporary, don't clear session
+      return {'success': false, 'reason': 'server_error'};
     } catch (_) {
-      return {'success': false};
+      // Network error (no internet, timeout, DNS failure, etc.) — don't clear session
+      return {'success': false, 'reason': 'network'};
     }
   }
 

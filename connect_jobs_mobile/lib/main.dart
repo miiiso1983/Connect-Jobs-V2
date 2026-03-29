@@ -230,31 +230,50 @@ class _AuthGateState extends State<_AuthGate> {
           });
         } catch (_) {}
 
-        final String role = (freshUser['role'] as String?) ?? '';
-        Widget home;
-        if (role == 'admin') {
-          home = AdminDashboardScreen(token: token, user: freshUser);
-        } else if (role == 'company') {
-          home = CompanyDashboardScreen(token: token, user: freshUser);
-        } else {
-          home = JobSeekerDashboardScreen(token: token, user: freshUser);
-        }
-
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => home),
-        );
+        _navigateToDashboard(token, freshUser);
       } else {
-        // Token expired/invalid – clear and go to login
-        await AuthService.clearSession();
-        _goToLogin();
+        final reason = meResponse['reason'] as String?;
+        if (reason == 'unauthorized') {
+          // Token explicitly rejected by server (401) – clear and go to login
+          await AuthService.clearSession();
+          _goToLogin();
+        } else {
+          // Network error or server error – keep session, use saved user data
+          debugPrint('Auto-login: server unreachable ($reason), using saved session');
+          _navigateToDashboard(token, savedUser);
+        }
       }
     } catch (_) {
-      // Any error – fall back to login
-      await AuthService.clearSession();
+      // If we have a saved session, try to use it even on error
+      try {
+        final session = await AuthService.loadSession();
+        if (session != null) {
+          final String token = session['token'] as String;
+          final Map<String, dynamic> savedUser = session['user'] as Map<String, dynamic>;
+          if (mounted) _navigateToDashboard(token, savedUser);
+          return;
+        }
+      } catch (_) {}
       _goToLogin();
     }
+  }
+
+  void _navigateToDashboard(String token, Map<String, dynamic> user) {
+    final String role = (user['role'] as String?) ?? '';
+    Widget home;
+    if (role == 'admin') {
+      home = AdminDashboardScreen(token: token, user: user);
+    } else if (role == 'company') {
+      home = CompanyDashboardScreen(token: token, user: user);
+    } else {
+      home = JobSeekerDashboardScreen(token: token, user: user);
+    }
+
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => home),
+    );
   }
 
   void _goToLogin() {
