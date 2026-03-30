@@ -255,18 +255,82 @@
                     </div>
                     <h4 class="text-lg font-bold text-gray-800 dark:text-white">السيرة الذاتية</h4>
                 </div>
-                <div class="flex flex-col md:flex-row gap-6 items-start">
+                <div class="flex flex-col md:flex-row gap-6 items-start"
+                     x-data="{
+                        fileName: '',
+                        fileSize: '',
+                        fileIcon: '',
+                        error: '',
+                        ready: false,
+                        allowedTypes: ['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+                        allowedExts: ['pdf','doc','docx'],
+                        maxSize: 5 * 1024 * 1024,
+                        handleFile(e) {
+                            this.error = ''; this.ready = false; this.fileName = ''; this.fileSize = ''; this.fileIcon = '';
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            const ext = file.name.split('.').pop().toLowerCase();
+                            if (!this.allowedExts.includes(ext) && !this.allowedTypes.includes(file.type)) {
+                                this.error = 'صيغة الملف غير مدعومة. الصيغ المسموحة: PDF, DOC, DOCX';
+                                e.target.value = '';
+                                return;
+                            }
+                            if (file.size > this.maxSize) {
+                                this.error = 'حجم الملف يتجاوز الحد الأقصى (5MB). حجم الملف: ' + (file.size / 1024 / 1024).toFixed(1) + 'MB';
+                                e.target.value = '';
+                                return;
+                            }
+                            this.fileName = file.name;
+                            this.fileSize = (file.size / 1024).toFixed(0) + ' KB';
+                            this.fileIcon = ext === 'pdf' ? 'pdf' : 'word';
+                            this.ready = true;
+                        },
+                        clear() {
+                            this.fileName = ''; this.fileSize = ''; this.error = ''; this.ready = false; this.fileIcon = '';
+                            document.getElementById('cv').value = '';
+                        }
+                     }">
                     <div class="flex-1">
                         <x-input-label for="cv" value="رفع السيرة الذاتية (PDF/Word)" class="text-gray-700 dark:text-gray-300 font-medium" />
                         <div class="mt-2 flex items-center justify-center w-full">
-                            <label for="cv" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-700/50 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 transition-colors">
-                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <label for="cv"
+                                   class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors"
+                                   :class="error ? 'border-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:border-red-600' : (ready ? 'border-green-400 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:border-green-600' : 'border-gray-300 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-700')">
+                                {{-- Default state --}}
+                                <div x-show="!ready && !error" class="flex flex-col items-center justify-center pt-5 pb-6">
                                     <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                                     <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">انقر للرفع</span> أو اسحب الملف هنا</p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">PDF, DOC, DOCX (حتى 5MB)</p>
                                 </div>
-                                <input id="cv" name="cv" type="file" class="hidden" accept=".pdf,.doc,.docx" />
+                                {{-- Ready / preview state --}}
+                                <div x-show="ready" x-cloak class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <template x-if="fileIcon === 'pdf'">
+                                            <svg class="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8.5 13h1c.55 0 1 .45 1 1s-.45 1-1 1h-1v1.5a.5.5 0 01-1 0V13a.5.5 0 01.5-.5h1zm3.5 0h1c.83 0 1.5.67 1.5 1.5v1c0 .83-.67 1.5-1.5 1.5h-1a.5.5 0 01-.5-.5V13a.5.5 0 01.5-.5h1zm4 0a.5.5 0 01.5.5.5.5 0 01-.5.5H15v.5h1a.5.5 0 010 1h-1v1a.5.5 0 01-1 0V13a.5.5 0 01.5-.5H16z"/></svg>
+                                        </template>
+                                        <template x-if="fileIcon === 'word'">
+                                            <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13l1.5 5.5L11 14l1.5 4.5L14 13h1.5l-2.5 8h-1l-1.5-4.5L10 21H9l-2.5-8H8z"/></svg>
+                                        </template>
+                                        <span class="text-green-600 dark:text-green-400 font-bold text-lg">✓</span>
+                                    </div>
+                                    <p class="text-sm font-semibold text-green-700 dark:text-green-400 truncate max-w-xs px-4" x-text="fileName"></p>
+                                    <p class="text-xs text-green-600 dark:text-green-500 mt-1">جاهز للرفع • <span x-text="fileSize"></span></p>
+                                </div>
+                                {{-- Error state --}}
+                                <div x-show="error" x-cloak class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <p class="text-sm text-red-600 dark:text-red-400 font-medium text-center px-4" x-text="error"></p>
+                                    <p class="text-xs text-red-500 mt-1">انقر لاختيار ملف آخر</p>
+                                </div>
+                                <input id="cv" name="cv" type="file" class="hidden" accept=".pdf,.doc,.docx" @change="handleFile($event)" />
                             </label>
+                        </div>
+                        {{-- Clear selection button --}}
+                        <div x-show="ready" x-cloak class="mt-2 flex justify-end">
+                            <button type="button" @click="clear()" class="text-xs text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 flex items-center gap-1 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                إزالة الملف المحدد
+                            </button>
                         </div>
                         @if(!empty($js->cv_file))
                             <div class="mt-3 flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
