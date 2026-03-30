@@ -65,7 +65,7 @@ class AuthController extends Controller
         try {
             $role = (string) $request->input('role');
 
-            // Create user
+            // Create user — jobseekers are active immediately, companies need admin approval
             $user = User::create([
                 'name' => $request->input('name'),
                 'email' => $request->input('email'),
@@ -73,6 +73,7 @@ class AuthController extends Controller
                 'role' => $role,
                 'status' => $role === 'company' ? 'inactive' : 'active',
                 'whatsapp_number' => $role === 'jobseeker' ? $request->input('whatsapp_number') : null,
+                'email_verified_at' => now(),
             ]);
 
             // Create role-specific profile
@@ -164,11 +165,11 @@ class AuthController extends Controller
 
             $user = auth()->user();
 
-            // Check if user is active
-            if ($user->status !== 'active') {
+            // Companies still need admin approval
+            if ($user->role === 'company' && $user->status !== 'active') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Account is not active. Please contact admin.'
+                    'message' => 'حساب الشركة بانتظار موافقة المشرف.'
                 ], 403);
             }
 

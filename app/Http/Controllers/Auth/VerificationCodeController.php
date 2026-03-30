@@ -36,7 +36,6 @@ class VerificationCodeController extends Controller
             'verification_channel' => $request->channel,
             'verification_expires_at' => now()->addMinutes(15),
             'whatsapp_number' => $request->channel==='whatsapp' ? $request->whatsapp_number : null,
-            'status' => 'inactive',
         ]);
 
         if ($request->channel==='email') {

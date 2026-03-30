@@ -1405,7 +1405,7 @@ class _JobsScreenState extends State<JobsScreen> {
             border: Border.all(color: AppTheme.borderLight),
           ),
           child: DropdownButtonFormField<T>(
-            value: value,
+            initialValue: value,
             items: items,
             onChanged: onChanged,
             decoration: const InputDecoration(
@@ -4881,7 +4881,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: _selectedProvince,
+                        initialValue: _selectedProvince,
                         decoration: const InputDecoration(
                           labelText: 'المحافظة',
                           border: OutlineInputBorder(),
@@ -4898,7 +4898,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: _selectedGender,
+                        initialValue: _selectedGender,
                         decoration: const InputDecoration(
                           labelText: 'الجنس',
                           border: OutlineInputBorder(),
@@ -4955,7 +4955,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: _selectedSpeciality,
+                        initialValue: _selectedSpeciality,
                         decoration: const InputDecoration(
                           labelText: 'التخصص',
                           border: OutlineInputBorder(),
@@ -4972,7 +4972,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: _selectedEducationLevel,
+                        initialValue: _selectedEducationLevel,
                         decoration: const InputDecoration(
                           labelText: 'مستوى التعليم',
                           border: OutlineInputBorder(),
@@ -4989,7 +4989,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: _selectedExperienceLevel,
+                        initialValue: _selectedExperienceLevel,
                         decoration: const InputDecoration(
                           labelText: 'مستوى الخبرة',
                           border: OutlineInputBorder(),
@@ -5694,7 +5694,7 @@ class _ApplicantsScreenState extends State<ApplicantsScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
-                value: _selectedStatus,
+                initialValue: _selectedStatus,
                 decoration: const InputDecoration(labelText: 'الحالة', border: OutlineInputBorder()),
                 items: [
                   const DropdownMenuItem<String>(value: null, child: Text('كل الحالات')),
@@ -5710,7 +5710,7 @@ class _ApplicantsScreenState extends State<ApplicantsScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedSpeciality,
+                initialValue: _selectedSpeciality,
                 decoration: const InputDecoration(labelText: 'التخصص', border: OutlineInputBorder()),
                 items: [
                   const DropdownMenuItem<String>(value: null, child: Text('كل التخصصات')),
@@ -5720,7 +5720,7 @@ class _ApplicantsScreenState extends State<ApplicantsScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedProvince,
+                initialValue: _selectedProvince,
                 decoration: const InputDecoration(labelText: 'المحافظة', border: OutlineInputBorder()),
                 items: [
                   const DropdownMenuItem<String>(value: null, child: Text('كل المحافظات')),
@@ -5730,7 +5730,7 @@ class _ApplicantsScreenState extends State<ApplicantsScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _sortBy,
+                initialValue: _sortBy,
                 decoration: const InputDecoration(labelText: 'ترتيب حسب', border: OutlineInputBorder()),
                 items: const [
                   DropdownMenuItem<String>(value: 'matching_percentage', child: Text('نسبة التطابق')),
@@ -5740,7 +5740,7 @@ class _ApplicantsScreenState extends State<ApplicantsScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _sortOrder,
+                initialValue: _sortOrder,
                 decoration: const InputDecoration(labelText: 'اتجاه الترتيب', border: OutlineInputBorder()),
                 items: const [
                   DropdownMenuItem<String>(value: 'desc', child: Text('تنازلي')),
@@ -5935,7 +5935,7 @@ class _ApplicantDetailScreenState extends State<ApplicantDetailScreen> {
                     const Text('تحديث الحالة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      value: _status,
+                      initialValue: _status,
                       decoration: const InputDecoration(labelText: 'الحالة', border: OutlineInputBorder()),
                       items: _statuses.map((s) => DropdownMenuItem<String>(value: s, child: Text(_statusText(s)))).toList(),
                       onChanged: (v) => setState(() { _status = v; }),

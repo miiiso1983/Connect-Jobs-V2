@@ -47,8 +47,8 @@ class RegisteredUserController extends Controller
         ]);
 
         $role = $request->input('role');
-        // Companies need admin approval, jobseekers need code verification
-        $status = $role === 'company' ? 'inactive' : 'inactive';
+        // Companies need admin approval; jobseekers are active immediately
+        $status = $role === 'company' ? 'inactive' : 'active';
 
         $user = User::create([
             'name' => $request->name,
@@ -57,6 +57,7 @@ class RegisteredUserController extends Controller
             'role' => $role,
             'status' => $status,
             'whatsapp_number' => $role === 'jobseeker' ? $request->input('whatsapp_number') : null,
+            'email_verified_at' => now(),
         ]);
         // Post-create: create related profile record
         if ($role === 'company') {
@@ -95,23 +96,14 @@ class RegisteredUserController extends Controller
             } catch (\Throwable $e) { \Log::error('NewJobSeeker mail failed: '.$e->getMessage()); }
         }
 
-        // Ensure email verification link is sent even if events aren't registered
-        $dispatcher = app('events');
-        if (is_object($dispatcher) && method_exists($dispatcher, 'hasListeners')
-            && ! $dispatcher->hasListeners(Registered::class)) {
-            $user->sendEmailVerificationNotification();
-        }
-
-        // Fire the Registered event (framework listener will send verification when events are enabled)
+        // Fire the Registered event (no email verification required)
         event(new Registered($user));
 
         Auth::login($user);
         // Match normal login behavior so the authenticated session persists reliably.
         $request->session()->regenerate();
 
-        if ($role === 'jobseeker') {
-            return redirect()->route('verify.code.show')->with('status','أرسلنا لك صفحة التفعيل، اختر القناة وأرسل الرمز.');
-        }
+        // All roles go straight to their dashboard — no verification step
         return redirect(route('dashboard', absolute: false));
     }
 }

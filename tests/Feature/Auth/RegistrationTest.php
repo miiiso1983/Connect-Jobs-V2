@@ -30,7 +30,7 @@ class RegistrationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('verify.code.show', absolute: false));
+        $response->assertRedirect(route('dashboard', absolute: false));
         $this->assertDatabaseHas('users', [
             'email' => 'test@example.com',
             'whatsapp_number' => '07701234567',
