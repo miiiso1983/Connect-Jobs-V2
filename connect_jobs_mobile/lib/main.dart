@@ -23,6 +23,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart' show PdfColors;
 import 'package:printing/printing.dart' show PdfGoogleFonts, networkImage;
 import 'package:file_saver/file_saver.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 import 'package:firebase_core/firebase_core.dart';
@@ -3863,12 +3864,117 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildProfileInfoRow(Icons.trending_up_rounded, 'مستوى الخبرة', jobSeeker['experience_level'] ?? 'غير محدد'),
           ],
         ),
+        const SizedBox(height: AppTheme.spacingM),
+
+        // CV File Section
+        _buildCvFileCard(jobSeeker),
         const SizedBox(height: AppTheme.spacingL),
 
         // Account Management Section
         _buildDeleteAccountButton(),
       ],
     );
+  }
+
+  Widget _buildCvFileCard(Map<String, dynamic> jobSeeker) {
+    final String? cvFile = jobSeeker['cv_file'] as String?;
+    final bool hasCv = cvFile != null && cvFile.isNotEmpty;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppTheme.spacingM),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        boxShadow: AppTheme.lightShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryNavy.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.description_rounded, size: 20, color: AppTheme.primaryNavy),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'السيرة الذاتية (CV)',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+              ),
+            ],
+          ),
+          const Divider(height: 20),
+          if (hasCv) ...[
+            Row(
+              children: [
+                Icon(Icons.check_circle_rounded, size: 18, color: Colors.green[600]),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'تم رفع السيرة الذاتية',
+                    style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _openCvFile(cvFile),
+                icon: const Icon(Icons.open_in_new_rounded),
+                label: const Text('عرض ملف السيرة الذاتية'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.primaryNavy,
+                  side: const BorderSide(color: AppTheme.primaryNavy),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ] else ...[
+            Row(
+              children: [
+                Icon(Icons.info_outline_rounded, size: 18, color: Colors.orange[600]),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'لم يتم رفع السيرة الذاتية بعد',
+                    style: TextStyle(color: Colors.orange[700], fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openCvFile(String cvPath) async {
+    // Construct full URL from relative storage path
+    const String siteBase = 'https://www.connect-job.com';
+    final String fullUrl = '$siteBase/storage/$cvPath';
+    final Uri uri = Uri.parse(fullUrl);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تعذر فتح ملف السيرة الذاتية')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('خطأ في فتح الملف: $e')),
+      );
+    }
   }
 
   Widget _buildCompanyProfile() {
@@ -4559,12 +4665,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       if (!mounted) return;
 
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf','doc','docx'],
-      );
+      FilePickerResult? result;
+      try {
+        // Try custom type first (works on most devices)
+        result = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['pdf', 'doc', 'docx'],
+          withData: false,
+          withReadStream: false,
+        );
+      } catch (_) {
+        // Fallback: open any file picker if custom type fails on some Android devices
+        result = await FilePicker.platform.pickFiles(type: FileType.any);
+      }
+
       if (result != null && result.files.single.path != null) {
-        setState(() { _selectedCVFile = File(result.files.single.path!); });
+        final path = result.files.single.path!;
+        final ext = path.split('.').last.toLowerCase();
+        // Validate file extension
+        if (!['pdf', 'doc', 'docx'].contains(ext)) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('صيغة الملف غير مدعومة. الصيغ المسموحة: PDF, DOC, DOCX')),
+          );
+          return;
+        }
+        // Validate file size (5MB max)
+        final file = File(path);
+        final sizeInBytes = await file.length();
+        if (sizeInBytes > 5 * 1024 * 1024) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('حجم الملف كبير جداً (${(sizeInBytes / 1024 / 1024).toStringAsFixed(1)}MB). الحد الأقصى 5MB')),
+          );
+          return;
+        }
+        setState(() { _selectedCVFile = file; });
       }
     } catch (e) {
       if (!mounted) return;
@@ -5184,6 +5320,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                         ],
                       ),
+                      // View existing CV button (if already uploaded)
+                      if (widget.profileData?['job_seeker']?['cv_file'] != null &&
+                          (widget.profileData!['job_seeker']['cv_file'] as String).isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () async {
+                                  final cvPath = widget.profileData!['job_seeker']['cv_file'] as String;
+                                  const String siteBase = 'https://www.connect-job.com';
+                                  final uri = Uri.parse('$siteBase/storage/$cvPath');
+                                  try {
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                    } else {
+                                      if (!mounted) return;
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('تعذر فتح ملف السيرة الذاتية')),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('خطأ في فتح الملف: $e')),
+                                    );
+                                  }
+                                },
+                                icon: const Icon(Icons.open_in_new_rounded, color: Colors.green),
+                                label: const Text('عرض ملف CV الحالي', style: TextStyle(color: Colors.green)),
+                                style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.green)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
 
                     ],
                   ),
