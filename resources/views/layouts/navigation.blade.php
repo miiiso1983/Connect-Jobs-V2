@@ -67,6 +67,11 @@
 	                                إدارة المناطق
 	                            </x-nav-link>
 	                        @endif
+	                        @if($u?->hasAdminPermission('jobseekers'))
+	                            <x-nav-link :href="route('admin.whatsapp.index')" :active="request()->routeIs('admin.whatsapp.*')">
+	                                📱 إشعارات واتساب
+	                            </x-nav-link>
+	                        @endif
 	                        @if($u?->hasAdminPermission('admin_users'))
 	                            <x-nav-link :href="route('admin.admin_users.index')" :active="request()->routeIs('admin.admin_users.*')">
 	                                إدارة المديرين

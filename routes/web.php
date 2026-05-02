@@ -235,6 +235,12 @@ Route::middleware(['setlocale','auth','role:admin'])->prefix('admin')->name('adm
     });
 
 
+    // WhatsApp notifications
+    Route::middleware(['admin.permission:jobseekers'])->group(function(){
+        Route::get('/whatsapp-notifications', [\App\Http\Controllers\Admin\WhatsAppNotificationController::class, 'index'])->name('whatsapp.index');
+        Route::post('/whatsapp-notifications/send', [\App\Http\Controllers\Admin\WhatsAppNotificationController::class, 'send'])->name('whatsapp.send');
+    });
+
     // Users enable/disable (generic)
     Route::put('/users/{user}/toggle', [\App\Http\Controllers\Admin\UserAdminController::class, 'toggleStatus'])->name('users.toggle');
 });
