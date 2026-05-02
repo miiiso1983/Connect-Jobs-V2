@@ -152,23 +152,59 @@
                 <template x-for="id in selected" :key="id">
                     <input type="hidden" name="user_ids[]" :value="id">
                 </template>
+                <input type="hidden" name="send_mode" :value="sendMode">
 
-                {{-- Quick Templates --}}
+                {{-- Send Mode Toggle --}}
                 <div class="mb-4">
-                    <label class="label"><span class="label-text font-semibold">رسائل جاهزة (اختياري)</span></label>
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" @click="setTemplate('incomplete')" class="btn btn-sm btn-outline border-red-400 text-red-600 hover:bg-red-50">📋 تذكير إكمال البيانات</button>
-                        <button type="button" @click="setTemplate('no-cv')" class="btn btn-sm btn-outline border-amber-400 text-amber-600 hover:bg-amber-50">📄 تذكير رفع CV</button>
+                    <label class="label"><span class="label-text font-semibold">طريقة الإرسال</span></label>
+                    <div class="flex gap-3">
+                        <label class="flex items-center gap-2 cursor-pointer p-3 rounded-lg border-2 transition-all" :class="sendMode === 'template' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-700'">
+                            <input type="radio" x-model="sendMode" value="template" class="radio radio-sm radio-success">
+                            <span class="font-medium">📋 قالب معتمد (يصل بدون شروط)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-3 rounded-lg border-2 transition-all" :class="sendMode === 'custom' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'">
+                            <input type="radio" x-model="sendMode" value="custom" class="radio radio-sm radio-info">
+                            <span class="font-medium">✏️ رسالة مخصصة (تتطلب محادثة سابقة)</span>
+                        </label>
                     </div>
                 </div>
 
-                <div class="form-control mb-4">
+                {{-- Template Selection --}}
+                <div x-show="sendMode === 'template'" class="mb-4">
+                    <label class="label"><span class="label-text font-semibold">اختر القالب</span></label>
+                    <div class="flex flex-wrap gap-3">
+                        <label class="flex items-center gap-2 cursor-pointer p-3 rounded-lg border-2 transition-all" :class="selectedTemplate === 'profile' ? 'border-red-400 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-gray-700'">
+                            <input type="radio" name="template" x-model="selectedTemplate" value="profile" class="radio radio-sm radio-error">
+                            <div>
+                                <div class="font-medium text-red-600">📋 تذكير إكمال البيانات</div>
+                                <div class="text-xs text-gray-500">للمستخدمين الذين لم يكملوا ملفهم</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-3 rounded-lg border-2 transition-all" :class="selectedTemplate === 'cv' ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20' : 'border-gray-200 dark:border-gray-700'"
+                            @if(!config('services.twilio.content_sid_cv')) title="قالب CV غير معتمد بعد" @endif>
+                            <input type="radio" name="template" x-model="selectedTemplate" value="cv" class="radio radio-sm radio-warning" @if(!config('services.twilio.content_sid_cv')) disabled @endif>
+                            <div>
+                                <div class="font-medium text-amber-600">📄 تذكير رفع CV</div>
+                                <div class="text-xs text-gray-500">
+                                    @if(config('services.twilio.content_sid_cv'))
+                                        للمستخدمين الذين لم يرفعوا سيرتهم الذاتية
+                                    @else
+                                        ⚠️ غير معتمد بعد — أعد إنشاءه في Twilio
+                                    @endif
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                {{-- Custom Message --}}
+                <div x-show="sendMode === 'custom'" class="mb-4">
                     <label class="label"><span class="label-text font-semibold">نص الرسالة</span></label>
-                    <textarea name="message" x-model="message" rows="6" class="textarea textarea-bordered w-full" required minlength="10" maxlength="2000" placeholder="اكتب رسالتك هنا..."></textarea>
+                    <textarea name="message" x-model="message" rows="6" class="textarea textarea-bordered w-full" :required="sendMode === 'custom'" minlength="10" maxlength="2000" placeholder="اكتب رسالتك هنا..."></textarea>
                     <label class="label"><span class="label-text-alt" x-text="message.length + '/2000'"></span></label>
                 </div>
 
-                <button type="submit" class="btn bg-green-600 hover:bg-green-700 text-white w-full md:w-auto" :disabled="submitting || !message.trim() || selected.length === 0" @if(!$twilioConfigured) disabled title="Twilio غير مفعّل" @endif>
+                <button type="submit" class="btn bg-green-600 hover:bg-green-700 text-white w-full md:w-auto" :disabled="submitting || selected.length === 0 || (sendMode === 'custom' && !message.trim()) || (sendMode === 'template' && !selectedTemplate)" @if(!$twilioConfigured) disabled title="Twilio غير مفعّل" @endif>
                     <span x-show="!submitting">📤 إرسال عبر WhatsApp</span>
                     <span x-show="submitting" class="loading loading-spinner loading-sm"></span>
                 </button>
@@ -182,6 +218,8 @@
         return {
             selected: [],
             allSelected: false,
+            sendMode: 'template',
+            selectedTemplate: 'profile',
             message: '',
             submitting: false,
             toggleAll() {
@@ -191,14 +229,6 @@
                 } else {
                     this.selected = [...pageIds];
                     this.allSelected = true;
-                }
-            },
-            setTemplate(type) {
-                const url = '{{ url("/jobseeker/profile") }}';
-                if (type === 'incomplete') {
-                    this.message = `مرحباً 👋\n\nلاحظنا أن ملفك الشخصي على Connect Jobs غير مكتمل بعد.\n\n✅ أكمل بياناتك الآن (المسمى الوظيفي، التخصص، المحافظة، الجنس) لتظهر في نتائج البحث وتزيد فرصك في الحصول على وظيفة مناسبة.\n\n🔗 حدّث ملفك من هنا:\n${url}\n\nفريق Connect Jobs`;
-                } else {
-                    this.message = `مرحباً 👋\n\nبياناتك الشخصية مكتملة على Connect Jobs 🎉\n\nلكن لم يتم رفع السيرة الذاتية (CV) بعد.\n\n📄 رفع الـ CV يزيد فرصك بنسبة كبيرة! الشركات تبحث عن مرشحين لديهم سيرة ذاتية جاهزة.\n\n🔗 ارفع سيرتك الذاتية الآن:\n${url}\n\nفريق Connect Jobs`;
                 }
             }
         };

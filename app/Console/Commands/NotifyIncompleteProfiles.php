@@ -69,18 +69,20 @@ class NotifyIncompleteProfiles extends Command
         }
 
         $client = new Client($sid, $token);
+        $profileTemplateSid = config('services.twilio.content_sid_profile');
+        $cvTemplateSid = config('services.twilio.content_sid_cv');
         $sent = 0;
         $failed = 0;
 
         // ── إرسال رسائل المجموعة 1 ──
         foreach ($incompleteUsers as $user) {
-            $result = $this->sendWhatsApp($client, $from, $user, $this->incompleteProfileMessage($user));
+            $result = $this->sendWhatsApp($client, $from, $user, $this->incompleteProfileMessage($user), $profileTemplateSid);
             $result ? $sent++ : $failed++;
         }
 
         // ── إرسال رسائل المجموعة 2 ──
         foreach ($noCvUsers as $user) {
-            $result = $this->sendWhatsApp($client, $from, $user, $this->noCvMessage($user));
+            $result = $this->sendWhatsApp($client, $from, $user, $this->noCvMessage($user), $cvTemplateSid);
             $result ? $sent++ : $failed++;
         }
 
@@ -90,7 +92,7 @@ class NotifyIncompleteProfiles extends Command
         return self::SUCCESS;
     }
 
-    private function sendWhatsApp(Client $client, string $from, User $user, string $body): bool
+    private function sendWhatsApp(Client $client, string $from, User $user, string $body, ?string $contentSid = null): bool
     {
         $to = $this->normalizeMsisdn($user->whatsapp_number);
         if (!$to) {
@@ -100,10 +102,18 @@ class NotifyIncompleteProfiles extends Command
         }
 
         try {
-            $client->messages->create("whatsapp:+{$to}", [
-                'from' => $from,
-                'body' => $body,
-            ]);
+            $payload = ['from' => $from];
+
+            if ($contentSid) {
+                $name = $user->jobSeeker->full_name ?? $user->name;
+                $profileUrl = url('/jobseeker/profile');
+                $payload['contentSid'] = $contentSid;
+                $payload['contentVariables'] = json_encode(['1' => $name, '2' => $profileUrl]);
+            } else {
+                $payload['body'] = $body;
+            }
+
+            $client->messages->create("whatsapp:+{$to}", $payload);
             $this->line("  ✔ {$user->email} → +{$to}");
             Log::info("WhatsApp notify sent", ['user_id' => $user->id, 'to' => $to]);
             return true;

@@ -49,6 +49,8 @@ return [
         'token' => env('TWILIO_TOKEN'),
         'whatsapp_from' => env('TWILIO_WHATSAPP_FROM'),
         'content_sid' => env('TWILIO_CONTENT_SID'), // optional approved template
+        'content_sid_profile' => env('TWILIO_CONTENT_SID_PROFILE'), // profile reminder template
+        'content_sid_cv' => env('TWILIO_CONTENT_SID_CV'), // cv reminder template
     ],
 
     'google' => [

@@ -72,11 +72,21 @@ class WhatsAppNotificationController extends Controller
 
     public function send(Request $request): RedirectResponse
     {
-        $request->validate([
+        $sendMode = $request->input('send_mode', 'template');
+
+        $rules = [
             'user_ids' => 'required|array|min:1',
             'user_ids.*' => 'integer|exists:users,id',
-            'message' => 'required|string|min:10|max:2000',
-        ]);
+            'send_mode' => 'required|in:template,custom',
+        ];
+
+        if ($sendMode === 'template') {
+            $rules['template'] = 'required|in:profile,cv';
+        } else {
+            $rules['message'] = 'required|string|min:10|max:2000';
+        }
+
+        $request->validate($rules);
 
         $sid = config('services.twilio.sid');
         $token = config('services.twilio.token');
@@ -86,13 +96,25 @@ class WhatsAppNotificationController extends Controller
             return back()->with('status', '❌ إعدادات Twilio غير مكتملة. تأكد من TWILIO_SID و TWILIO_TOKEN و TWILIO_WHATSAPP_FROM في .env');
         }
 
+        // Resolve content SID for template mode
+        $contentSid = null;
+        if ($sendMode === 'template') {
+            $template = $request->input('template');
+            $contentSid = config("services.twilio.content_sid_{$template}");
+            if (!$contentSid) {
+                return back()->with('status', "❌ قالب \"{$template}\" غير مُعدّ. أضف TWILIO_CONTENT_SID_" . strtoupper($template) . " في .env");
+            }
+        }
+
         $client = new Client($sid, $token);
         $users = User::whereIn('id', $request->input('user_ids'))
             ->where('role', 'jobseeker')
             ->whereNotNull('whatsapp_number')
             ->where('whatsapp_number', '!=', '')
+            ->with('jobSeeker')
             ->get();
 
+        $profileUrl = url('/jobseeker/profile');
         $sent = 0;
         $failed = 0;
         $errors = [];
@@ -106,12 +128,19 @@ class WhatsAppNotificationController extends Controller
             }
 
             try {
-                $client->messages->create("whatsapp:+{$to}", [
-                    'from' => $from,
-                    'body' => $request->input('message'),
-                ]);
+                $payload = ['from' => $from];
+
+                if ($contentSid) {
+                    $name = $user->jobSeeker->full_name ?? $user->name;
+                    $payload['contentSid'] = $contentSid;
+                    $payload['contentVariables'] = json_encode(['1' => $name, '2' => $profileUrl]);
+                } else {
+                    $payload['body'] = $request->input('message');
+                }
+
+                $client->messages->create("whatsapp:+{$to}", $payload);
                 $sent++;
-                Log::info('Admin WhatsApp sent', ['admin' => auth()->id(), 'to_user' => $user->id, 'to_number' => $to]);
+                Log::info('Admin WhatsApp sent', ['admin' => auth()->id(), 'to_user' => $user->id, 'to_number' => $to, 'mode' => $sendMode]);
             } catch (\Throwable $e) {
                 $failed++;
                 $errors[] = "{$user->email}: {$e->getMessage()}";
