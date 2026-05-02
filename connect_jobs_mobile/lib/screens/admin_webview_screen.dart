@@ -1,5 +1,12 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:file_picker/file_picker.dart';
+
+// Android-specific imports for file upload support
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class AdminWebViewScreen extends StatefulWidget {
   final String title;
@@ -30,16 +37,30 @@ class _AdminWebViewScreenState extends State<AdminWebViewScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = WebViewController()
+
+    // Create platform-specific controller params for Android file upload support
+    late final PlatformWebViewControllerCreationParams params;
+    if (Platform.isAndroid) {
+      params = AndroidWebViewControllerCreationParams();
+    } else {
+      params = const PlatformWebViewControllerCreationParams();
+    }
+
+    _controller = WebViewController.fromPlatformCreationParams(params)
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.white)
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (_) => setState(() => _isLoading = true),
           onNavigationRequest: (request) {
-            // Normalize host/protocol to keep cookies valid (avoid jumping between www/non-www or http/https)
             try {
               final uri = Uri.parse(request.url);
+              // Open storage/file URLs (CV, images, etc.) externally in browser
+              if (uri.host.endsWith('connect-job.com') && uri.path.contains('/storage/')) {
+                launchUrl(uri, mode: LaunchMode.externalApplication);
+                return NavigationDecision.prevent;
+              }
+              // Normalize host/protocol to keep cookies valid
               final canon = _toCanonical(uri);
               if (canon.toString() != request.url) {
                 _controller.loadRequest(canon);
@@ -80,6 +101,55 @@ class _AdminWebViewScreenState extends State<AdminWebViewScreen> {
         ),
       )
       ..loadRequest(_toCanonical(_startUri));
+
+    // Android: enable <input type="file"> support via onShowFileSelector
+    if (_controller.platform is AndroidWebViewController) {
+      (_controller.platform as AndroidWebViewController)
+          .setOnShowFileSelector(_androidFilePicker);
+    }
+  }
+
+  /// Handles <input type="file"> on Android by opening a native file picker
+  Future<List<String>> _androidFilePicker(FileSelectorParams params) async {
+    try {
+      final acceptTypes = params.acceptTypes;
+      List<String>? allowedExtensions;
+      FileType fileType = FileType.any;
+
+      // Check if accept types indicate specific file types (PDF/DOC for CV)
+      final allAccept = acceptTypes.join(',').toLowerCase();
+      if (allAccept.contains('pdf') || allAccept.contains('doc') || allAccept.contains('msword') || allAccept.contains('openxmlformats')) {
+        fileType = FileType.custom;
+        allowedExtensions = ['pdf', 'doc', 'docx'];
+      } else if (allAccept.contains('image')) {
+        fileType = FileType.image;
+      }
+
+      FilePickerResult? result;
+      try {
+        result = await FilePicker.platform.pickFiles(
+          type: fileType,
+          allowedExtensions: allowedExtensions,
+          allowMultiple: params.mode == FileSelectorMode.openMultiple,
+        );
+      } catch (_) {
+        // Fallback if custom type fails on some Android devices
+        result = await FilePicker.platform.pickFiles(
+          type: FileType.any,
+          allowMultiple: params.mode == FileSelectorMode.openMultiple,
+        );
+      }
+
+      if (result != null && result.files.isNotEmpty) {
+        return result.files
+            .where((f) => f.path != null)
+            .map((f) => 'file://${f.path!}')
+            .toList();
+      }
+    } catch (e) {
+      debugPrint('File picker error: $e');
+    }
+    return [];
   }
 
   @override
@@ -98,8 +168,10 @@ class _AdminWebViewScreenState extends State<AdminWebViewScreen> {
           IconButton(
             icon: const Icon(Icons.open_in_browser),
             onPressed: () async {
-              // Keep simple: just reload; deep OS open can be added later if needed
-              _controller.loadRequest(Uri.parse(widget.url));
+              final uri = Uri.parse(widget.url);
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
             },
           ),
         ],
