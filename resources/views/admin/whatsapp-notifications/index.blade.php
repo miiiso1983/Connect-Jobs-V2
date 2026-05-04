@@ -103,6 +103,7 @@
                             <th>المحافظة</th>
                             <th>الحالة</th>
                             <th>CV</th>
+                            <th>آخر رسالة واتساب</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -127,9 +128,21 @@
                                         <span class="badge badge-warning badge-sm">لا يوجد</span>
                                     @endif
                                 </td>
+                                <td>
+                                    @if(isset($latestLogs[$s->user_id]))
+                                        @php $log = $latestLogs[$s->user_id]; @endphp
+                                        <div class="flex flex-col gap-1">
+                                            <span class="badge badge-success badge-sm">✅ تم الإرسال</span>
+                                            <span class="text-xs text-gray-500">{{ $log->getTypeLabel() }}</span>
+                                            <span class="text-xs text-gray-400">{{ $log->created_at->diffForHumans() }}</span>
+                                        </div>
+                                    @else
+                                        <span class="badge badge-ghost badge-sm">لم يُرسل</span>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
-                            <tr><td colspan="7" class="text-center text-gray-400 py-8">لا توجد نتائج</td></tr>
+                            <tr><td colspan="8" class="text-center text-gray-400 py-8">لا توجد نتائج</td></tr>
                         @endforelse
                     </tbody>
                 </table>

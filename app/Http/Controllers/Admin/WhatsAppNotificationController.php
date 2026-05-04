@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\JobSeeker;
 use App\Models\User;
+use App\Models\WhatsAppLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -50,6 +51,15 @@ class WhatsAppNotificationController extends Controller
 
         $seekers = $query->orderByDesc('id')->paginate(50)->withQueryString();
 
+        // Load latest WhatsApp log for each user
+        $userIds = $seekers->pluck('user_id')->toArray();
+        $latestLogs = WhatsAppLog::whereIn('user_id', $userIds)
+            ->where('status', 'sent')
+            ->orderByDesc('created_at')
+            ->get()
+            ->groupBy('user_id')
+            ->map(fn($logs) => $logs->first());
+
         $provinces = \App\Models\MasterSetting::where('setting_type', 'province')->pluck('value');
 
         // Stats
@@ -67,7 +77,7 @@ class WhatsAppNotificationController extends Controller
 
         $twilioConfigured = config('services.twilio.sid') && config('services.twilio.token') && config('services.twilio.whatsapp_from');
 
-        return view('admin.whatsapp-notifications.index', compact('seekers', 'provinces', 'stats', 'filter', 'province', 'search', 'twilioConfigured'));
+        return view('admin.whatsapp-notifications.index', compact('seekers', 'provinces', 'stats', 'filter', 'province', 'search', 'twilioConfigured', 'latestLogs'));
     }
 
     public function send(Request $request): RedirectResponse
@@ -138,12 +148,34 @@ class WhatsAppNotificationController extends Controller
                     $payload['body'] = $request->input('message');
                 }
 
-                $client->messages->create("whatsapp:+{$to}", $payload);
+                $msg = $client->messages->create("whatsapp:+{$to}", $payload);
                 $sent++;
+
+                // Log successful send
+                WhatsAppLog::create([
+                    'user_id' => $user->id,
+                    'phone_number' => $to,
+                    'message_type' => $sendMode === 'template' ? ($request->input('template') === 'profile' ? 'profile_update' : 'cv_upload') : 'custom',
+                    'template_sid' => $contentSid,
+                    'twilio_sid' => $msg->sid,
+                    'status' => 'sent',
+                ]);
+
                 Log::info('Admin WhatsApp sent', ['admin' => auth()->id(), 'to_user' => $user->id, 'to_number' => $to, 'mode' => $sendMode]);
             } catch (\Throwable $e) {
                 $failed++;
                 $errors[] = "{$user->email}: {$e->getMessage()}";
+
+                // Log failed send
+                WhatsAppLog::create([
+                    'user_id' => $user->id,
+                    'phone_number' => $to,
+                    'message_type' => $sendMode === 'template' ? ($request->input('template') === 'profile' ? 'profile_update' : 'cv_upload') : 'custom',
+                    'template_sid' => $contentSid,
+                    'status' => 'failed',
+                    'error_message' => $e->getMessage(),
+                ]);
+
                 Log::error('Admin WhatsApp failed', ['admin' => auth()->id(), 'to_user' => $user->id, 'error' => $e->getMessage()]);
             }
         }

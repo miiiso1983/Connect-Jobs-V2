@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use App\Models\JobSeeker;
+use App\Models\WhatsAppLog;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Twilio\Rest\Client;
@@ -76,13 +77,13 @@ class NotifyIncompleteProfiles extends Command
 
         // ── إرسال رسائل المجموعة 1 ──
         foreach ($incompleteUsers as $user) {
-            $result = $this->sendWhatsApp($client, $from, $user, $this->incompleteProfileMessage($user), $profileTemplateSid);
+            $result = $this->sendWhatsApp($client, $from, $user, $this->incompleteProfileMessage($user), $profileTemplateSid, 'profile_update');
             $result ? $sent++ : $failed++;
         }
 
         // ── إرسال رسائل المجموعة 2 ──
         foreach ($noCvUsers as $user) {
-            $result = $this->sendWhatsApp($client, $from, $user, $this->noCvMessage($user), $cvTemplateSid);
+            $result = $this->sendWhatsApp($client, $from, $user, $this->noCvMessage($user), $cvTemplateSid, 'cv_upload');
             $result ? $sent++ : $failed++;
         }
 
@@ -92,7 +93,7 @@ class NotifyIncompleteProfiles extends Command
         return self::SUCCESS;
     }
 
-    private function sendWhatsApp(Client $client, string $from, User $user, string $body, ?string $contentSid = null): bool
+    private function sendWhatsApp(Client $client, string $from, User $user, string $body, ?string $contentSid = null, string $messageType = 'custom'): bool
     {
         $to = $this->normalizeMsisdn($user->whatsapp_number);
         if (!$to) {
@@ -113,15 +114,41 @@ class NotifyIncompleteProfiles extends Command
                 $payload['body'] = $body;
             }
 
-            $client->messages->create("whatsapp:+{$to}", $payload);
+            $msg = $client->messages->create("whatsapp:+{$to}", $payload);
+
+            WhatsAppLog::create([
+                'user_id' => $user->id,
+                'phone_number' => $to,
+                'message_type' => $messageType,
+                'template_sid' => $contentSid,
+                'twilio_sid' => $msg->sid,
+                'status' => 'sent',
+            ]);
+
             $this->line("  ✔ {$user->email} → +{$to}");
             Log::info("WhatsApp notify sent", ['user_id' => $user->id, 'to' => $to]);
             return true;
         } catch (\Twilio\Exceptions\RestException $e) {
+            WhatsAppLog::create([
+                'user_id' => $user->id,
+                'phone_number' => $to,
+                'message_type' => $messageType,
+                'template_sid' => $contentSid,
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+            ]);
             $this->error("  ✖ {$user->email}: {$e->getMessage()}");
             Log::error("WhatsApp notify failed (Twilio)", ['user_id' => $user->id, 'error' => $e->getMessage()]);
             return false;
         } catch (\Throwable $e) {
+            WhatsAppLog::create([
+                'user_id' => $user->id,
+                'phone_number' => $to,
+                'message_type' => $messageType,
+                'template_sid' => $contentSid,
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+            ]);
             $this->error("  ✖ {$user->email}: {$e->getMessage()}");
             Log::error("WhatsApp notify failed", ['user_id' => $user->id, 'error' => $e->getMessage()]);
             return false;
