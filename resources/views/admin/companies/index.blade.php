@@ -57,6 +57,8 @@
                         <tr>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">#</th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الشركة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المكتب العلمي / الشركة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المنصب</th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">البريد الإلكتروني</th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">المحافظة</th>
                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">الخطة</th>
@@ -69,7 +71,9 @@
                     @foreach ($companies as $c)
                         <tr class="border-t border-gray-100 dark:border-gray-700">
                             <td class="px-4 py-2">{{ $c->id }}</td>
-                            <td class="px-4 py-2">{{ $c->company_name }}</td>
+                            <td class="px-4 py-2 font-semibold">{{ $c->company_name }}</td>
+                            <td class="px-4 py-2">{{ $c->scientific_office_name ?? '—' }}</td>
+                            <td class="px-4 py-2">{{ $c->company_job_title ?? '—' }}</td>
                             <td class="px-4 py-2">
                                 @if($c->user && $c->user->email)
                                     <a href="mailto:{{ $c->user->email }}" class="text-primary hover:underline">{{ $c->user->email }}</a>
