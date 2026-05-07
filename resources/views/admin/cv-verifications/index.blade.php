@@ -11,7 +11,7 @@
             <div class="p-3 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-200">{{ session('status') }}</div>
         @endif
 
-        <form method="GET" class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow grid grid-cols-1 md:grid-cols-6 gap-3">
+        <form method="GET" class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow grid grid-cols-1 md:grid-cols-8 gap-3">
             <div class="md:col-span-3">
                 <x-input-label for="q" value="بحث (اسم، بريد، مسمى)" />
                 <input type="text" id="q" name="q" value="{{ $q ?? '' }}" class="input input-bordered w-full" />
@@ -24,6 +24,10 @@
                     @endforeach
                 </select>
             </div>
+            <div>
+                <x-input-label for="graduation_year" value="سنة التخرج" />
+                <input type="number" id="graduation_year" name="graduation_year" value="{{ $graduationYear ?? '' }}" placeholder="مثال: 2020" min="1950" max="2100" class="input input-bordered w-full" />
+            </div>
 	            <div class="md:col-span-2 flex gap-2 items-end">
 		                <button class="btn bg-[#4A00B8] hover:bg-[#3C0094] text-white border-none">تطبيق</button>
                 <a href="{{ route('admin.cv_verifications.index') }}" class="btn btn-ghost">تفريغ</a>
@@ -35,7 +39,9 @@
                 <thead>
                     <tr>
 	                        <th class="whitespace-nowrap">الباحث</th>
+	                        <th class="whitespace-nowrap">الاسم الثلاثي</th>
 	                        <th class="whitespace-nowrap">التعليم</th>
+	                        <th class="whitespace-nowrap">النقابة</th>
 	                        <th class="whitespace-nowrap">المسمى</th>
 	                        <th class="whitespace-nowrap">الحالة</th>
 	                        <th class="whitespace-nowrap">السيرة الذاتية</th>
@@ -56,6 +62,7 @@
 	                                    </div>
 	                                </div>
                             </td>
+                            <td class="text-sm font-medium">{{ $r->triple_name ?? '—' }}</td>
 	                            <td>
 	                                <div class="text-sm space-y-1">
 	                                    <div>
@@ -72,6 +79,13 @@
 	                                    </div>
 	                                </div>
 	                            </td>
+                            <td>
+                                @if($r->is_syndicate_member)
+                                    <span class="badge badge-success badge-sm">منتمٍ</span>
+                                @else
+                                    <span class="badge badge-ghost badge-sm">غير منتمٍ</span>
+                                @endif
+                            </td>
                             <td>{{ $r->jobSeeker->job_title ?? '—' }}</td>
                             <td>
 	                                @php
@@ -125,7 +139,7 @@
                             </td>
                         </tr>
                     @empty
-	                        <tr><td colspan="7" class="text-center text-gray-500">لا توجد طلبات.</td></tr>
+	                        <tr><td colspan="9" class="text-center text-gray-500">لا توجد طلبات.</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -17,6 +17,8 @@ class CvVerificationRequest extends Model
     protected $fillable = [
         'job_seeker_id',
         'cv_file',
+        'triple_name',
+        'is_syndicate_member',
         'status',
         'admin_user_id',
         'admin_notes',
@@ -25,6 +27,7 @@ class CvVerificationRequest extends Model
 
     protected $casts = [
         'decided_at' => 'datetime',
+        'is_syndicate_member' => 'boolean',
     ];
 
     public function jobSeeker(): BelongsTo

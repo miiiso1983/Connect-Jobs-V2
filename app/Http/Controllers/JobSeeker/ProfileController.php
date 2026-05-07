@@ -106,6 +106,15 @@ class ProfileController extends Controller
 					->with('status', 'يرجى إكمال معلومات الدراسة قبل إرسال طلب التوثيق: ' . implode('، ', $missing) . '.');
 			}
 
+		$request->validate([
+			'triple_name' => 'required|string|min:5|max:255',
+			'is_syndicate_member' => 'required|in:0,1',
+		], [
+			'triple_name.required' => 'الاسم الثلاثي مطلوب.',
+			'triple_name.min' => 'الاسم الثلاثي يجب أن يكون 5 أحرف على الأقل.',
+			'is_syndicate_member.required' => 'يرجى تحديد الانتماء لنقابة الصيادلة.',
+		]);
+
 		$hasPending = CvVerificationRequest::where('job_seeker_id', $js->id)
 			->where('status', CvVerificationRequest::STATUS_PENDING)
 			->exists();
@@ -116,6 +125,8 @@ class ProfileController extends Controller
 		CvVerificationRequest::create([
 			'job_seeker_id' => $js->id,
 			'cv_file' => $js->cv_file,
+			'triple_name' => $request->input('triple_name'),
+			'is_syndicate_member' => (bool) $request->input('is_syndicate_member'),
 			'status' => CvVerificationRequest::STATUS_PENDING,
 		]);
 

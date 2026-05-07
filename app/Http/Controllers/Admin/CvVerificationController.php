@@ -17,6 +17,7 @@ class CvVerificationController extends Controller
         if ($status === '') { $status = 'pending'; }
 
         $q = trim((string) $request->get('q', ''));
+        $graduationYear = trim((string) $request->get('graduation_year', ''));
 
         $requestsQ = CvVerificationRequest::query()->with(['jobSeeker.user', 'adminUser']);
 
@@ -38,9 +39,15 @@ class CvVerificationController extends Controller
             });
         }
 
+        if ($graduationYear !== '') {
+            $requestsQ->whereHas('jobSeeker', function ($js) use ($graduationYear) {
+                $js->where('graduation_year', $graduationYear);
+            });
+        }
+
         $requests = $requestsQ->orderByDesc('id')->paginate(20)->withQueryString();
 
-        return view('admin.cv-verifications.index', compact('requests', 'status', 'q'));
+        return view('admin.cv-verifications.index', compact('requests', 'status', 'q', 'graduationYear'));
     }
 
     public function approve(Request $request, CvVerificationRequest $cvVerificationRequest): RedirectResponse

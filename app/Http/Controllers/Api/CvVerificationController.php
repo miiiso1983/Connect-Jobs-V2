@@ -78,6 +78,11 @@ class CvVerificationController extends Controller
 			], 422);
 		}
 
+        $request->validate([
+            'triple_name' => 'required|string|min:5|max:255',
+            'is_syndicate_member' => 'required|in:0,1,true,false',
+        ]);
+
         $hasPending = CvVerificationRequest::where('job_seeker_id', $jobSeeker->id)
             ->where('status', CvVerificationRequest::STATUS_PENDING)
             ->exists();
@@ -89,6 +94,8 @@ class CvVerificationController extends Controller
         $req = CvVerificationRequest::create([
             'job_seeker_id' => $jobSeeker->id,
             'cv_file' => $jobSeeker->cv_file,
+            'triple_name' => $request->input('triple_name'),
+            'is_syndicate_member' => filter_var($request->input('is_syndicate_member'), FILTER_VALIDATE_BOOLEAN),
             'status' => CvVerificationRequest::STATUS_PENDING,
         ]);
 

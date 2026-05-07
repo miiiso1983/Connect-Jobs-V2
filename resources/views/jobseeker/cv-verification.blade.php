@@ -121,8 +121,31 @@
 
                         <div>
 							@if(!$isVerified && $hasCv && $hasEducation && $latestStatus !== \App\Models\CvVerificationRequest::STATUS_PENDING)
-                                <form method="POST" action="{{ route('jobseeker.cv_verification.request') }}">
+                                <form method="POST" action="{{ route('jobseeker.cv_verification.request') }}" class="space-y-4 bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg">
                                     @csrf
+                                    <div>
+                                        <label for="triple_name" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">الاسم الثلاثي <span class="text-red-500">*</span></label>
+                                        <input type="text" id="triple_name" name="triple_name" value="{{ old('triple_name') }}" required minlength="5" maxlength="255" placeholder="مثال: أحمد محمد علي" class="input input-bordered w-full @error('triple_name') input-error @enderror" />
+                                        @error('triple_name')
+                                            <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">هل أنت منتمٍ لنقابة صيادلة العراق؟ <span class="text-red-500">*</span></label>
+                                        <div class="flex gap-6">
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <input type="radio" name="is_syndicate_member" value="1" class="radio radio-sm radio-primary" {{ old('is_syndicate_member') == '1' ? 'checked' : '' }} required>
+                                                <span>نعم</span>
+                                            </label>
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <input type="radio" name="is_syndicate_member" value="0" class="radio radio-sm radio-primary" {{ old('is_syndicate_member') == '0' ? 'checked' : '' }}>
+                                                <span>لا</span>
+                                            </label>
+                                        </div>
+                                        @error('is_syndicate_member')
+                                            <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                                        @enderror
+                                    </div>
 	                                    <button type="submit" class="btn bg-[#5B21B6] hover:bg-[#4C1D95] text-white border-none">
                                         {{ $latestStatus === \App\Models\CvVerificationRequest::STATUS_REJECTED ? 'إعادة إرسال طلب التوثيق' : 'طلب توثيق السيرة الذاتية' }}
                                     </button>
