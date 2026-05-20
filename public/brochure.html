@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Jobs - بروشور تعريفي</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Tajawal', sans-serif; background: #fff; color: #1a1a2e; }
+        .page { width: 210mm; min-height: 297mm; margin: 0 auto; position: relative; overflow: hidden; }
+        @media print {
+            body { background: #fff; }
+            .page { page-break-after: always; margin: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+        @media screen { .page { box-shadow: 0 4px 40px rgba(0,0,0,0.12); margin: 20px auto; } }
+
+        /* Page 1 - Cover */
+        .cover { background: linear-gradient(135deg, #4A00B8 0%, #5A00E1 40%, #3C0094 100%); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px 50px; }
+        .cover-logo { font-size: 52px; font-weight: 900; letter-spacing: 2px; margin-bottom: 8px; }
+        .cover-logo span { color: #38BDF8; }
+        .cover-tagline { font-size: 22px; color: #38BDF8; font-weight: 500; margin-bottom: 50px; }
+        .cover-title { font-size: 36px; font-weight: 800; line-height: 1.5; margin-bottom: 20px; }
+        .cover-sub { font-size: 18px; opacity: 0.9; line-height: 1.8; max-width: 500px; margin-bottom: 50px; }
+        .cover-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; max-width: 600px; }
+        .stat-box { background: rgba(255,255,255,0.1); border-radius: 16px; padding: 20px 10px; backdrop-filter: blur(10px); }
+        .stat-num { font-size: 32px; font-weight: 900; color: #38BDF8; }
+        .stat-label { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+        .cover-url { margin-top: 50px; font-size: 20px; color: #38BDF8; font-weight: 700; letter-spacing: 1px; }
+        .accent-line { width: 80px; height: 4px; background: #38BDF8; border-radius: 4px; margin: 0 auto 30px; }
+
+        /* Page 2 - About & Why */
+        .content-page { padding: 50px; }
+        .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .section-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #4A00B8, #5A00E1); display: flex; align-items: center; justify-content: center; color: #38BDF8; font-size: 22px; flex-shrink: 0; }
+        .section-title { font-size: 26px; font-weight: 800; color: #3C0094; }
+        .section-text { font-size: 16px; line-height: 2; color: #444; margin-bottom: 30px; }
+        .highlight { color: #4A00B8; font-weight: 700; }
+
+        .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-bottom: 40px; }
+        .feature-card { background: #f8f6ff; border-radius: 16px; padding: 24px; border-right: 4px solid #4A00B8; }
+        .feature-card h4 { font-size: 17px; font-weight: 700; color: #3C0094; margin-bottom: 8px; }
+        .feature-card p { font-size: 14px; color: #555; line-height: 1.7; }
+        .feature-card .icon { font-size: 28px; margin-bottom: 10px; }
+
+        /* Page 3 - Services */
+        .service-section { margin-bottom: 35px; }
+        .service-title { font-size: 20px; font-weight: 800; color: #4A00B8; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e8e0ff; }
+        .service-list { list-style: none; }
+        .service-list li { padding: 10px 16px; font-size: 15px; line-height: 1.7; color: #333; display: flex; align-items: flex-start; gap: 10px; }
+        .service-list li::before { content: "✓"; color: #4A00B8; font-weight: 900; font-size: 18px; flex-shrink: 0; }
+        .service-list li:nth-child(even) { background: #faf9ff; border-radius: 8px; }
+
+        .cta-box { background: linear-gradient(135deg, #4A00B8, #5A00E1); color: #fff; border-radius: 20px; padding: 35px 40px; text-align: center; margin-top: 30px; }
+        .cta-box h3 { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+        .cta-box p { font-size: 16px; opacity: 0.9; line-height: 1.8; margin-bottom: 20px; }
+        .cta-contacts { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .cta-contact { background: rgba(255,255,255,0.15); border-radius: 12px; padding: 12px 24px; font-size: 15px; }
+        .cta-contact span { color: #38BDF8; font-weight: 700; }
+
+        .page-num { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #999; }
+        .watermark { position: absolute; bottom: 15px; right: 30px; font-size: 11px; color: #bbb; }
+    </style>
+</head>
+<body>
+
+<!-- ==================== PAGE 1: COVER ==================== -->
+<div class="page cover">
+    <div class="cover-logo">Connect <span>Jobs</span></div>
+    <div class="cover-tagline">منصة التوظيف الأولى في العراق</div>
+    <div class="accent-line"></div>
+    <div class="cover-title">نربط الكفاءات بأفضل الفرص<br>الوظيفية في سوق العمل</div>
+    <div class="cover-sub">
+        منصة متكاملة تجمع بين الشركات والمكاتب العلمية والباحثين عن عمل
+        في بيئة رقمية احترافية وسهلة الاستخدام
+    </div>
+    <div class="cover-stats">
+        <div class="stat-box">
+            <div class="stat-num">5000+</div>
+            <div class="stat-label">باحث عن عمل</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num">500+</div>
+            <div class="stat-label">شركة مسجلة</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num">1000+</div>
+            <div class="stat-label">وظيفة متاحة</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num">95%</div>
+            <div class="stat-label">معدل النجاح</div>
+        </div>
+    </div>
+    <div class="cover-url">www.connect-job.com</div>
+</div>
+
+<!-- ==================== PAGE 2: ABOUT & WHY ==================== -->
+<div class="page content-page">
+    <div class="section-header">
+        <div class="section-icon">📋</div>
+        <div class="section-title">من نحن؟</div>
+    </div>
+    <div class="section-text">
+        <span class="highlight">Connect Jobs</span> هي منصة توظيف عراقية رائدة تهدف إلى تسهيل عملية التوظيف
+        وربط <span class="highlight">الشركات والمكاتب العلمية</span> بأفضل الكفاءات المتاحة في سوق العمل العراقي.
+        نوفر أدوات ذكية للبحث والتصفية والمطابقة بين متطلبات الوظائف ومهارات المرشحين،
+        مع تطبيق موبايل متكامل على <span class="highlight">Android و iOS</span> ونظام إشعارات فوري.
+    </div>
+
+    <div class="section-header">
+        <div class="section-icon">⭐</div>
+        <div class="section-title">لماذا Connect Jobs؟</div>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="icon">🔍</div>
+            <h4>بحث ذكي ومتقدم</h4>
+            <p>محرك بحث متطور يتيح التصفية حسب التخصص والمحافظة والمؤهلات ومستوى الخبرة</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">🎯</div>
+            <h4>مطابقة دقيقة</h4>
+            <p>نظام مطابقة تلقائي يربط متطلبات الوظيفة بمهارات المرشحين ويعرض نسبة التوافق</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">📱</div>
+            <h4>تطبيق موبايل</h4>
+            <p>تطبيق متكامل على الهاتف يتيح إدارة الوظائف والتقديم من أي مكان</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">🔔</div>
+            <h4>إشعارات فورية</h4>
+            <p>تنبيهات فورية عند تقديم متقدم جديد أو تحميل CV عبر التطبيق والبريد</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">✅</div>
+            <h4>توثيق السير الذاتية</h4>
+            <p>نظام توثيق احترافي يضمن مصداقية بيانات المرشحين وسيرهم الذاتية</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">📊</div>
+            <h4>لوحة تحكم تفاعلية</h4>
+            <p>إحصائيات ورسوم بيانية تعرض أداء إعلاناتك وتوزيع المتقدمين</p>
+        </div>
+    </div>
+    <div class="watermark">Connect Jobs — بروشور تعريفي</div>
+    <div class="page-num">2</div>
+</div>
+
+<!-- ==================== PAGE 3: SERVICES & CTA ==================== -->
+<div class="page content-page">
+    <div class="section-header">
+        <div class="section-icon">🏢</div>
+        <div class="section-title">خدماتنا للشركات والمكاتب العلمية</div>
+    </div>
+
+    <div class="service-section">
+        <div class="service-title">📌 إدارة الوظائف</div>
+        <ul class="service-list">
+            <li>نشر إعلانات وظيفية غير محدودة مع وصف تفصيلي ومتطلبات واضحة</li>
+            <li>مراجعة وإدارة الوظائف (فتح / إغلاق / تعديل) من لوحة التحكم</li>
+            <li>إرسال إشعارات تلقائية للباحثين المناسبين عند نشر وظيفة جديدة</li>
+        </ul>
+    </div>
+
+    <div class="service-section">
+        <div class="service-title">👥 استعراض الباحثين عن عمل</div>
+        <ul class="service-list">
+            <li>قاعدة بيانات شاملة لآلاف الباحثين عن عمل مع فلترة متقدمة</li>
+            <li>تصفية حسب: التخصص، المحافظة، سنة التخرج، الجنس، الخبرة، وامتلاك سيارة</li>
+            <li>تحميل السير الذاتية مباشرة ومراجعة الملفات الشخصية المفصلة</li>
+            <li>عرض نسبة المطابقة بين كل مرشح ومتطلبات وظائفك</li>
+        </ul>
+    </div>
+
+    <div class="service-section">
+        <div class="service-title">📈 التحليلات والإحصائيات</div>
+        <ul class="service-list">
+            <li>لوحة تحكم بإحصائيات فورية: عدد الوظائف، المتقدمين، نسب المطابقة</li>
+            <li>رسوم بيانية لتوزيع المتقدمين حسب المحافظة والتخصص</li>
+            <li>إشعار فوري عند كل طلب توظيف جديد عبر التطبيق والبريد الإلكتروني</li>
+        </ul>
+    </div>
+
+    <div class="cta-box">
+        <h3>ابدأ الآن مجاناً</h3>
+        <p>سجّل شركتك في دقائق وابدأ بنشر وظائفك والوصول لأفضل الكفاءات</p>
+        <div class="cta-contacts">
+            <div class="cta-contact">🌐 <span>www.connect-job.com</span></div>
+            <div class="cta-contact">📧 <span>info@connect-job.com</span></div>
+            <div class="cta-contact">📱 <span>+964 777 885 4530</span></div>
+        </div>
+    </div>
+    <div class="watermark">Connect Jobs — بروشور تعريفي</div>
+    <div class="page-num">3</div>
+</div>
+
+<!-- Print Button -->
+<div class="no-print" style="text-align:center; padding: 30px;">
+    <button onclick="window.print()" style="background: linear-gradient(135deg, #4A00B8, #5A00E1); color: #fff; border: none; padding: 14px 40px; border-radius: 12px; font-size: 18px; font-family: 'Tajawal', sans-serif; font-weight: 700; cursor: pointer;">
+        🖨️ طباعة / حفظ كـ PDF
+    </button>
+</div>
+
+</body>
+</html>
